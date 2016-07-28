@@ -1,0 +1,29 @@
+language: python
+dist: trusty
+sudo: required
+before_install:
+  # Automatic publishing to GitHub Pages from Travis CI
+  - openssl aes-256-cbc -K $encrypted_5add8fe0808b_key -iv $encrypted_5add8fe0808b_iv -in publish-key.enc -out ~/.ssh/publish-key -d
+  - chmod u=rw,og= ~/.ssh/publish-key
+  - echo "Host github.com" >> ~/.ssh/config
+  - echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+  - echo "  IdentityFile ~/.ssh/publish-key" >> ~/.ssh/config
+  - git remote set-url origin git@github.com:frRoy/Heat.git
+  - git fetch origin -f gh-pages:gh-pages
+install:
+  # command to install dependencies
+  - pip install --upgrade wheel setuptools pip
+  - pip install -r requirements.txt
+script:
+  - mkdir -p build && cd build
+  - cmake ..
+  - make
+  - ctest
+  - pip install -e .
+  - heat -v
+  - py.test --cov=heat tests/
+  - python setup.py test
+after_success:
+  - pip install ghp-import
+  - make doc
+  - ghp-import -n -p -m "Update gh-pages." doc/_build/
