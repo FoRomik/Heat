@@ -3,6 +3,7 @@ cmake_minimum_required (VERSION 3.2)
 set(CMAKE_BUILD_TYPE Release)
 # Debugging Options
 set (CMAKE_VERBOSE_MAKEFILE 0) # Use 1 for debugging, 0 otherwise.
+set (CMAKE_CXX_STANDARD 11)
 
 project (heat)
 
