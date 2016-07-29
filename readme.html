@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>heat’s Documentation &mdash; heat 0.1.0 documentation</title>
+    <title>Heat &mdash; heat 0.1.0 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,8 +24,9 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="heat 0.1.0 documentation" href="#" />
-    <link rel="next" title="Heat" href="readme.html" />
+    <link rel="top" title="heat 0.1.0 documentation" href="index.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="heat’s Documentation" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -41,20 +42,30 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="heat-s-documentation">
-<h1>heat&#8217;s Documentation<a class="headerlink" href="#heat-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p><a class="reference external" href="https://github.com/frRoy/Heat">GitHub repository</a></p>
-<div class="section" id="contents">
-<h2>Contents:<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="readme.html">Heat</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="theory.html">The Heat Equation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
+  <div class="section" id="heat">
+<h1>Heat<a class="headerlink" href="#heat" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="https://travis-ci.org/frRoy/Heat"><img alt="https://travis-ci.org/frRoy/Heat.svg?branch=master" src="https://travis-ci.org/frRoy/Heat.svg?branch=master" /></a>
+<ul class="simple">
+<li><a class="reference external" href="https://travis-ci.org/frRoy/Heat/builds">Build and test history</a></li>
+<li>Licensed under BSD-2</li>
+</ul>
+<p>Solve the heat equation with constant coefficients, heat source, and usual boundary conditions using Green&#8217;s function on a line (1D), a rectangle (2D), or a block (3D). Documentation is available <a class="reference external" href="http://frRoy.github.io/Heat">here</a></p>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>cmake</li>
 </ul>
 </div>
+<div class="section" id="download-and-test">
+<h2>Download and test<a class="headerlink" href="#download-and-test" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>git clone <a class="reference external" href="https://github.com/frRoy/Heat.git">https://github.com/frRoy/Heat.git</a></li>
+<li>cd Heat</li>
+<li>mkdir build &amp;&amp; cd build</li>
+<li>cmake ..</li>
+<li>make</li>
+<li>ctest</li>
+</ol>
 </div>
 </div>
 
@@ -64,28 +75,30 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-            <p class="logo"><a href="#">
+            <p class="logo"><a href="index.html">
               <img class="logo" src="_static/heat.png" alt="Logo"/>
             </a></p>
-  <h3><a href="#">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">heat&#8217;s Documentation</a><ul>
-<li><a class="reference internal" href="#contents">Contents:</a></li>
+<li><a class="reference internal" href="#">Heat</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#download-and-test">Download and test</a></li>
 </ul>
 </li>
 </ul>
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
-  <li><a href="#">Documentation overview</a><ul>
-      <li>Next: <a href="readme.html" title="next chapter">Heat</a></li>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">heat&#8217;s Documentation</a></li>
+      <li>Next: <a href="installation.html" title="next chapter">Installation</a></li>
   </ul></li>
 </ul>
 </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/index.txt"
+      <li><a href="_sources/readme.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -114,7 +127,7 @@
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |
-      <a href="_sources/index.txt"
+      <a href="_sources/readme.txt"
           rel="nofollow">Page source</a>
     </div>
 

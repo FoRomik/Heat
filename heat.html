@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>heat package &mdash; heat 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="heat 0.1.0 documentation" href="index.html" />
+    <link rel="up" title="Modules" href="modules.html" />
+    <link rel="prev" title="Modules" href="modules.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="heat-package">
+<h1>heat package<a class="headerlink" href="#heat-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-heat.command_line">
+<span id="heat-command-line-module"></span><h2>heat.command_line module<a class="headerlink" href="#module-heat.command_line" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="heat.command_line.print_version">
+<code class="descclassname">heat.command_line.</code><code class="descname">print_version</code><span class="sig-paren">(</span><em>ctx</em>, <em>param</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/command_line.html#print_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.command_line.print_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function prints the version and exits the program in the callback.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ctx</strong> (<em>click.context</em>) &#8211; Click internal object that holds state
+relevant for the script execution.</li>
+<li><strong>param</strong> (<em>click.core.option</em>) &#8211; The option.</li>
+<li><strong>value</strong> (<em>bool</em>) &#8211; Close the programm without printing the version if
+False.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-heat.wrapper">
+<span id="heat-wrapper-module"></span><h2>heat.wrapper module<a class="headerlink" href="#module-heat.wrapper" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="heat.wrapper.ComputeSeries">
+<em class="property">class </em><code class="descclassname">heat.wrapper.</code><code class="descname">ComputeSeries</code><a class="headerlink" href="#heat.wrapper.ComputeSeries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Wrapper for the C++ class ComputeSeries.</p>
+<dl class="method">
+<dt id="heat.wrapper.ComputeSeries.fct">
+<code class="descname">fct</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#heat.wrapper.ComputeSeries.fct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the function to be summed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="heat.wrapper.ComputeSeries.getLastAbsoluteError">
+<code class="descname">getLastAbsoluteError</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#heat.wrapper.ComputeSeries.getLastAbsoluteError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the absolute error.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="heat.wrapper.ComputeSeries.getLastNumberOfIterations">
+<code class="descname">getLastNumberOfIterations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#heat.wrapper.ComputeSeries.getLastNumberOfIterations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of iterations.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="heat.wrapper.ComputeSeries.getSumBackward">
+<code class="descname">getSumBackward</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#heat.wrapper.ComputeSeries.getSumBackward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the backward sum.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="heat.wrapper.ComputeSeries.getSumForward">
+<code class="descname">getSumForward</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#heat.wrapper.ComputeSeries.getSumForward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the forward sum.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="heat.wrapper.ComputeSeries.getSumKahan">
+<code class="descname">getSumKahan</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#heat.wrapper.ComputeSeries.getSumKahan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get lthe Kahan sum.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="heat.wrapper.InvalidBCType">
+<em class="property">exception </em><code class="descclassname">heat.wrapper.</code><code class="descname">InvalidBCType</code><a class="headerlink" href="#heat.wrapper.InvalidBCType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+<p>Exception for the boundary type.</p>
+<dl class="attribute">
+<dt id="heat.wrapper.InvalidBCType.message">
+<code class="descname">message</code><em class="property"> = 'Invlid BC type'</em><a class="headerlink" href="#heat.wrapper.InvalidBCType.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="heat.wrapper.InvalidTermType">
+<em class="property">exception </em><code class="descclassname">heat.wrapper.</code><code class="descname">InvalidTermType</code><a class="headerlink" href="#heat.wrapper.InvalidTermType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+<p>Exception for the term type.</p>
+<dl class="attribute">
+<dt id="heat.wrapper.InvalidTermType.message">
+<code class="descname">message</code><em class="property"> = 'Invlid Term type'</em><a class="headerlink" href="#heat.wrapper.InvalidTermType.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="heat.wrapper.Uniform">
+<em class="property">class </em><code class="descclassname">heat.wrapper.</code><code class="descname">Uniform</code><a class="headerlink" href="#heat.wrapper.Uniform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#heat.wrapper.ComputeSeries" title="heat.wrapper.ComputeSeries"><code class="xref py py-class docutils literal"><span class="pre">heat.wrapper.ComputeSeries</span></code></a></p>
+<p>Wrapper fro the C++ class Uniform.</p>
+<dl class="method">
+<dt id="heat.wrapper.Uniform.setTime">
+<code class="descname">setTime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#heat.wrapper.Uniform.setTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the time for the series evaluation.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="heat.wrapper.getbcType">
+<code class="descclassname">heat.wrapper.</code><code class="descname">getbcType</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#heat.wrapper.getbcType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper for bcType enum.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="heat.wrapper.gettermType">
+<code class="descclassname">heat.wrapper.</code><code class="descname">gettermType</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#heat.wrapper.gettermType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper for termType enum.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-heat">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-heat" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/heat.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">heat package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-heat.command_line">heat.command_line module</a></li>
+<li><a class="reference internal" href="#module-heat.wrapper">heat.wrapper module</a></li>
+<li><a class="reference internal" href="#module-heat">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">Modules</a><ul>
+      <li>Previous: <a href="modules.html" title="previous chapter">Modules</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/heat.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Francois Roy.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/heat.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
