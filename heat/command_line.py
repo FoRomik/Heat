@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import sys
 import click
-from heat import __version__
+import tkinter as tk
+from . import __version__
+from .gui import MainApplication
 
 
 def print_version(ctx, param, value):
@@ -23,6 +25,8 @@ def print_version(ctx, param, value):
 
 
 @click.command()
+@click.option('-g', '--gui', is_flag=True,
+              help="Use the user interface.")
 @click.option('-f', '--filename', default="init.txt",
               help="Set the name of the init file.")
 @click.option(
@@ -30,9 +34,16 @@ def print_version(ctx, param, value):
     is_flag=True, help='Show version information and exit.',
     callback=print_version, expose_value=False, is_eager=True,
 )
-def main(filename):
+def main(filename, gui):
     """Entry point to the program.
 
         :param str filename: The init filename.
     """
     print("The init file name is:", filename)
+    if gui:
+        print("Start GUI")
+        root = tk.Tk()
+        app = MainApplication(root)
+        #app.pack(side="top", fill="both", expand=True)
+        app.center_window(500, 400)
+        root.mainloop()

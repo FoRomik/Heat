@@ -16,6 +16,8 @@ Requirements
 ------------
 
 - cmake
+- C++ compiler supporting the C++11 standard
+- Python 2.7 or 3.5
 
 Download and test
 -----------------
