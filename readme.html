@@ -45,6 +45,7 @@
   <div class="section" id="heat">
 <h1>Heat<a class="headerlink" href="#heat" title="Permalink to this headline">¶</a></h1>
 <a class="reference external image-reference" href="https://travis-ci.org/frRoy/Heat"><img alt="https://travis-ci.org/frRoy/Heat.svg?branch=master" src="https://travis-ci.org/frRoy/Heat.svg?branch=master" /></a>
+<a class="reference external image-reference" href="https://codecov.io/gh/frRoy/Heat"><img alt="https://codecov.io/gh/frRoy/Heat/coverage.svg?branch=master" src="https://codecov.io/gh/frRoy/Heat/coverage.svg?branch=master" /></a>
 <ul class="simple">
 <li><a class="reference external" href="https://travis-ci.org/frRoy/Heat/builds">Build and test history</a></li>
 <li>Licensed under BSD-2</li>
@@ -61,7 +62,10 @@
 <ol class="arabic simple">
 <li>git clone <a class="reference external" href="https://github.com/frRoy/Heat.git">https://github.com/frRoy/Heat.git</a></li>
 <li>cd Heat</li>
+<li>pip install &#8211;upgrade wheel setuptools pip</li>
+<li>pip install -r requirements.txt</li>
 <li>mkdir build &amp;&amp; cd build</li>
+<li>pip install -e .</li>
 <li>cmake ..</li>
 <li>make</li>
 <li>ctest</li>
