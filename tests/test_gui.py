@@ -1,15 +1,20 @@
 import unittest
-import unittest.mock as mock
-import tkinter as tk
-
+#import unittest.mock as mock
+try:
+    # for Python2
+    import Tkinter as tk
+    #import mock as mock   
+except ImportError:
+    # for Python3
+    import tkinter as tk  
 
 class TestGUI(unittest.TestCase):
     """Test the user interface.
 
     """
     def setUp(self):
-        self.parent = mock.MagicMock(name='mock parent')
-        self.title = mock.MagicMock(name='mock title')
+        #self.parent = mock.MagicMock(name='mock parent')
+        #self.title = mock.MagicMock(name='mock title')
         self.root = tk.Tk()
 
     def tearDown(self):

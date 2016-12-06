@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 import sys
 import click
-import tkinter as tk
+try:
+    # for Python2
+    import Tkinter as tk   
+except ImportError:
+    # for Python3
+    import tkinter as tk 
 from . import __version__
 from .gui import MainApplication
 
