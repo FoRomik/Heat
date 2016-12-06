@@ -21,4 +21,3 @@ class TestGUI(unittest.TestCase):
 
         """
         self.assertEqual(1, 1)
-
