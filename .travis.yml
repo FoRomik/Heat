@@ -22,7 +22,6 @@ script:
   - mkdir -p build && cd build
   - cmake ..
   - make
-  - tox
   - ctest
   - pip install -e .
   - heat -v
