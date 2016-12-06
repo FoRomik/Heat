@@ -12,6 +12,14 @@ heat.command_line module
     :undoc-members:
     :show-inheritance:
 
+heat.gui module
+---------------
+
+.. automodule:: heat.gui
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 heat.wrapper module
 -------------------
 
