@@ -4,6 +4,8 @@ Heat
 
 .. image:: https://travis-ci.org/frRoy/Heat.svg?branch=master
     :target: https://travis-ci.org/frRoy/Heat
+.. image:: https://codecov.io/gh/frRoy/Heat/coverage.svg?branch=master
+    :target: https://codecov.io/gh/frRoy/Heat
 
 - `Build and test history <https://travis-ci.org/frRoy/Heat/builds>`_
 - Licensed under BSD-2
@@ -20,7 +22,10 @@ Download and test
 
 1. git clone `https://github.com/frRoy/Heat.git <https://github.com/frRoy/Heat.git>`_
 2. cd Heat
-3. mkdir build && cd build
-4. cmake ..
-5. make
-6. ctest
+3. pip install --upgrade wheel setuptools pip
+4. pip install -r requirements.txt
+5. mkdir build && cd build
+6. pip install -e .
+7. cmake ..
+8. make
+9. ctest

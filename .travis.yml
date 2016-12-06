@@ -14,6 +14,10 @@ install:
   # command to install dependencies
   - pip install --upgrade wheel setuptools pip
   - pip install -r requirements.txt
+before_script:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+  - sleep 3 # give xvfb some time to start
 script:
   - mkdir -p build && cd build
   - cmake ..
@@ -22,6 +26,7 @@ script:
   - pip install -e .
   - heat -v
   - py.test --cov=heat tests/
+  - tox
   - python setup.py test
 after_success:
   - pip install ghp-import

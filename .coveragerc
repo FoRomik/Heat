@@ -1,0 +1,5 @@
+[run]
+include = heat/*
+omit = *tests*
+plugins =
+    pytest-cov
