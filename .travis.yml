@@ -13,11 +13,7 @@ before_install:
 install:
   # command to install dependencies
   - pip install --upgrade wheel setuptools pip
-  - pip install -r requirements.txt
-before_script:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-  - sleep 3 # give xvfb some time to start
+  - pip install -r requirements/development.txt
 script:
   - mkdir -p build && cd build
   - cmake ..

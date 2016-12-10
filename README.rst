@@ -15,9 +15,10 @@ Solve the heat equation with constant coefficients, heat source, and usual bound
 Requirements
 ------------
 
-- cmake
+- Unix system with Python 2.x/3.x
 - C++ compiler supporting the C++11 standard
-- Python 2.7 or 3.5
+- cmake
+
 
 Download and test
 -----------------
@@ -25,7 +26,7 @@ Download and test
 1. git clone `https://github.com/frRoy/Heat.git <https://github.com/frRoy/Heat.git>`_
 2. cd Heat
 3. pip install --upgrade wheel setuptools pip
-4. pip install -r requirements.txt
+4. pip install -r requirements/development.txt
 5. mkdir build && cd build
 6. pip install -e .
 7. cmake ..

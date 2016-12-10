@@ -1,5 +1,5 @@
 [run]
 include = heat/*
-omit = *tests*
-plugins =
-    pytest-cov
+omit = *tests*, *command_line.py
+#plugins =
+    #pytest-cov
