@@ -50,6 +50,11 @@
 <div class="section" id="module-heat.command_line">
 <span id="heat-command-line-module"></span><h2>heat.command_line module<a class="headerlink" href="#module-heat.command_line" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
+<dt id="heat.command_line.editConfig">
+<code class="descclassname">heat.command_line.</code><code class="descname">editConfig</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/command_line.html#editConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.command_line.editConfig" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="heat.command_line.print_version">
 <code class="descclassname">heat.command_line.</code><code class="descname">print_version</code><span class="sig-paren">(</span><em>ctx</em>, <em>param</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/command_line.html#print_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.command_line.print_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function prints the version and exits the program in the callback.</p>
@@ -71,6 +76,45 @@ False.</li>
 </dd></dl>
 
 </div>
+<div class="section" id="module-heat.domain">
+<span id="heat-domain-module"></span><h2>heat.domain module<a class="headerlink" href="#module-heat.domain" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="heat.domain.Mesh">
+<em class="property">class </em><code class="descclassname">heat.domain.</code><code class="descname">Mesh</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/domain.html#Mesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.domain.Mesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mesh: Provide spatial coordinates in different formats.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="heat.domain.NonConvergingError">
+<em class="property">exception </em><code class="descclassname">heat.domain.</code><code class="descname">NonConvergingError</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/domain.html#NonConvergingError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.domain.NonConvergingError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="heat.domain.Settings">
+<em class="property">class </em><code class="descclassname">heat.domain.</code><code class="descname">Settings</code><a class="reference internal" href="_modules/heat/domain.html#Settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.domain.Settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Settings:  An empty class to be used as a &#8220;C struct&#8221;.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="heat.domain.Solution">
+<em class="property">class </em><code class="descclassname">heat.domain.</code><code class="descname">Solution</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/domain.html#Solution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.domain.Solution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solution:</p>
+<dl class="method">
+<dt id="heat.domain.Solution.coef">
+<code class="descname">coef</code><span class="sig-paren">(</span><em>coord</em>, <em>length</em>, <em>a</em>, <em>t</em>, <em>absTol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/domain.html#Solution.coef"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.domain.Solution.coef" title="Permalink to this definition">¶</a></dt>
+<dd><p>coef(coord, length, a, t, absTol):</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="heat.domain.Solution.compute">
+<code class="descname">compute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/domain.html#Solution.compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.domain.Solution.compute" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute: compute the solution.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-heat.gui">
 <span id="heat-gui-module"></span><h2>heat.gui module<a class="headerlink" href="#module-heat.gui" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -80,6 +124,98 @@ False.</li>
 <dl class="method">
 <dt id="heat.gui.MainApplication.center_window">
 <code class="descname">center_window</code><span class="sig-paren">(</span><em>width=300</em>, <em>height=200</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/gui.html#MainApplication.center_window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.gui.MainApplication.center_window" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="heat.gui.MainApplication.on_key_event">
+<code class="descname">on_key_event</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/gui.html#MainApplication.on_key_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.gui.MainApplication.on_key_event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-heat.init">
+<span id="heat-init-module"></span><h2>heat.init module<a class="headerlink" href="#module-heat.init" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="heat.init.Init">
+<em class="property">class </em><code class="descclassname">heat.init.</code><code class="descname">Init</code><a class="reference internal" href="_modules/heat/init.html#Init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.init.Init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Init:</p>
+<dl class="method">
+<dt id="heat.init.Init.ConfigSectionMap">
+<code class="descname">ConfigSectionMap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/init.html#Init.ConfigSectionMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.init.Init.ConfigSectionMap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="heat.init.Init.WriteConfig">
+<code class="descname">WriteConfig</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/init.html#Init.WriteConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.init.Init.WriteConfig" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-heat.solution">
+<span id="heat-solution-module"></span><h2>heat.solution module<a class="headerlink" href="#module-heat.solution" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="heat.solution.Temperature">
+<em class="property">class </em><code class="descclassname">heat.solution.</code><code class="descname">Temperature</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/solution.html#Temperature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.solution.Temperature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temperature: Contains the solution.</p>
+<dl class="method">
+<dt id="heat.solution.Temperature.line">
+<code class="descname">line</code><span class="sig-paren">(</span><em>axis</em>, <em>valIndex</em>, <em>tIndex</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/solution.html#Temperature.line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.solution.Temperature.line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Line():</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="heat.solution.Temperature.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/solution.html#Temperature.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.solution.Temperature.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>save():</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-heat.vtktools">
+<span id="heat-vtktools-module"></span><h2>heat.vtktools module<a class="headerlink" href="#module-heat.vtktools" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="heat.vtktools.VTK_XML_Serial_Unstructured">
+<em class="property">class </em><code class="descclassname">heat.vtktools.</code><code class="descname">VTK_XML_Serial_Unstructured</code><a class="reference internal" href="_modules/heat/vtktools.html#VTK_XML_Serial_Unstructured"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.vtktools.VTK_XML_Serial_Unstructured" title="Permalink to this definition">¶</a></dt>
+<dd><p>USAGE:
+vtk_writer = VTK_XML_Serial_Unstructured()
+vtk_writer.snapshot(&#8220;filename.vtu&#8221;, x, y, z, optional arguments...)
+vtk_writer.writePVD(&#8220;filename.pvd&#8221;)</p>
+<dl class="method">
+<dt id="heat.vtktools.VTK_XML_Serial_Unstructured.array_to_string">
+<code class="descname">array_to_string</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/vtktools.html#VTK_XML_Serial_Unstructured.array_to_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.vtktools.VTK_XML_Serial_Unstructured.array_to_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="heat.vtktools.VTK_XML_Serial_Unstructured.coords_to_string">
+<code class="descname">coords_to_string</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/vtktools.html#VTK_XML_Serial_Unstructured.coords_to_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.vtktools.VTK_XML_Serial_Unstructured.coords_to_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="heat.vtktools.VTK_XML_Serial_Unstructured.snapshot">
+<code class="descname">snapshot</code><span class="sig-paren">(</span><em>fileName</em>, <em>x</em>, <em>y</em>, <em>z</em>, <em>x_jump=[]</em>, <em>y_jump=[]</em>, <em>z_jump=[]</em>, <em>x_force=[]</em>, <em>y_force=[]</em>, <em>z_force=[]</em>, <em>radii=[]</em>, <em>colors=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/vtktools.html#VTK_XML_Serial_Unstructured.snapshot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.vtktools.VTK_XML_Serial_Unstructured.snapshot" title="Permalink to this definition">¶</a></dt>
+<dd><p>ARGUMENTS:
+fileName        file name and/or path/filename
+x               array of x coordinates of particle centers
+y               array of y coordinates of particle centers
+z               array of z coordinates of particle centers
+x_jump          optional array of x components of particle jump vectors
+y_jump          optional array of y components of particle jump vectors
+z_jump          optional array of z components of particle jump vectors
+x_force         optional array of x components of force vectors
+y_force         optional array of y components of force vectors
+z_force         optional array of z components of force vectors
+radii           optional array of particle radii
+colors          optional array of scalars to use to set particle colors</p>
+<blockquote>
+<div>The exact colors will depend on the color map you set up in Paraview.</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="heat.vtktools.VTK_XML_Serial_Unstructured.writePVD">
+<code class="descname">writePVD</code><span class="sig-paren">(</span><em>fileName</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/vtktools.html#VTK_XML_Serial_Unstructured.writePVD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.vtktools.VTK_XML_Serial_Unstructured.writePVD" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -199,7 +335,11 @@ False.</li>
 <li><a class="reference internal" href="#">heat package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-heat.command_line">heat.command_line module</a></li>
+<li><a class="reference internal" href="#module-heat.domain">heat.domain module</a></li>
 <li><a class="reference internal" href="#module-heat.gui">heat.gui module</a></li>
+<li><a class="reference internal" href="#module-heat.init">heat.init module</a></li>
+<li><a class="reference internal" href="#module-heat.solution">heat.solution module</a></li>
+<li><a class="reference internal" href="#module-heat.vtktools">heat.vtktools module</a></li>
 <li><a class="reference internal" href="#module-heat.wrapper">heat.wrapper module</a></li>
 <li><a class="reference internal" href="#module-heat">Module contents</a></li>
 </ul>

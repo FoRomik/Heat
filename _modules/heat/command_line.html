@@ -43,16 +43,27 @@
             
   <h1>Source code for heat.command_line</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">click</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="c1"># for Python2</span>
-    <span class="kn">import</span> <span class="nn">Tkinter</span> <span class="kn">as</span> <span class="nn">tk</span>   
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="c1"># for Python3</span>
-    <span class="kn">import</span> <span class="nn">tkinter</span> <span class="kn">as</span> <span class="nn">tk</span> 
+<span class="kn">from</span> <span class="nn">unipath</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span>  <span class="nn">.</span> <span class="kn">import</span> <span class="n">domain</span>
+<span class="kn">from</span> <span class="nn">.domain</span> <span class="kn">import</span> <span class="n">Solution</span>
+<span class="kn">from</span> <span class="nn">.solution</span> <span class="kn">import</span> <span class="n">Temperature</span>
+<span class="kn">from</span> <span class="nn">.init</span> <span class="kn">import</span> <span class="n">Init</span><span class="p">,</span> <span class="n">BASE_DIR</span>
+<span class="kn">from</span> <span class="nn">.vtktools</span> <span class="kn">import</span> <span class="n">VTK_XML_Serial_Unstructured</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">__version__</span>
 <span class="kn">from</span> <span class="nn">.gui</span> <span class="kn">import</span> <span class="n">MainApplication</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">Tkinter</span> <span class="kn">as</span> <span class="nn">tk</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">tkinter</span> <span class="kn">as</span> <span class="nn">tk</span>
 
 
 <div class="viewcode-block" id="print_version"><a class="viewcode-back" href="../../heat.html#heat.command_line.print_version">[docs]</a><span class="k">def</span> <span class="nf">print_version</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
@@ -72,30 +83,78 @@
     <span class="p">))</span>
     <span class="n">ctx</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span></div>
 
+<div class="viewcode-block" id="editConfig"><a class="viewcode-back" href="../../heat.html#heat.command_line.editConfig">[docs]</a><span class="k">def</span> <span class="nf">editConfig</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s1">&#39;vi&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">])</span></div>
 
 <span class="nd">@click.command</span><span class="p">()</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--config&#39;</span><span class="p">,</span> <span class="n">is_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Edit configuration file.&quot;</span><span class="p">)</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="s1">&#39;--reset&#39;</span><span class="p">,</span> <span class="n">is_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Reset configuration file to default.&quot;</span><span class="p">)</span>
 <span class="nd">@click.option</span><span class="p">(</span><span class="s1">&#39;-g&#39;</span><span class="p">,</span> <span class="s1">&#39;--gui&#39;</span><span class="p">,</span> <span class="n">is_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
               <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Use the user interface.&quot;</span><span class="p">)</span>
-<span class="nd">@click.option</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;--filename&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;init.txt&quot;</span><span class="p">,</span>
-              <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Set the name of the init file.&quot;</span><span class="p">)</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span> <span class="s1">&#39;--save&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;filename.vtu&quot;</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Save data in the vtu format.&quot;</span><span class="p">)</span>
 <span class="nd">@click.option</span><span class="p">(</span>
     <span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;--version&#39;</span><span class="p">,</span>
     <span class="n">is_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Show version information and exit.&#39;</span><span class="p">,</span>
     <span class="n">callback</span><span class="o">=</span><span class="n">print_version</span><span class="p">,</span> <span class="n">expose_value</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">is_eager</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">gui</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">gui</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">reset</span><span class="p">,</span> <span class="n">save</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Entry point to the program.</span>
 
 <span class="sd">        :param str filename: The init filename.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;The init file name is:&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">gui</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Start GUI&quot;</span><span class="p">)</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="n">Init</span><span class="p">()</span>   
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">BASE_DIR</span><span class="o">.</span><span class="n">child</span><span class="p">(</span><span class="s1">&#39;config.ini&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="n">I</span><span class="o">.</span><span class="n">WriteConfig</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">reset</span><span class="p">:</span>
+        <span class="n">I</span><span class="o">.</span><span class="n">WriteConfig</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">config</span><span class="p">:</span>
+        <span class="n">editConfig</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">gui</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Starting GUI, pres ctrl+C to exit from the terminal.&quot;</span><span class="p">)</span>
         <span class="n">root</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
         <span class="n">app</span> <span class="o">=</span> <span class="n">MainApplication</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
         <span class="c1">#app.pack(side=&quot;top&quot;, fill=&quot;both&quot;, expand=True)</span>
         <span class="n">app</span><span class="o">.</span><span class="n">center_window</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
         <span class="n">root</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span> <span class="c1"># no arguments</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;The init file name is:&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">I</span><span class="o">.</span><span class="n">ConfigSectionMap</span><span class="p">())</span>
+        <span class="n">vtk_writer</span> <span class="o">=</span> <span class="n">VTK_XML_Serial_Unstructured</span><span class="p">()</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">11</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">11</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">11</span><span class="p">)</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;data/filename.vtu&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filename</span><span class="p">)):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span> <span class="c1"># Guard against race condition</span>
+                <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">errno</span> <span class="o">!=</span> <span class="n">errno</span><span class="o">.</span><span class="n">EEXIST</span><span class="p">:</span>
+                    <span class="k">raise</span>
+        <span class="n">vtk_writer</span><span class="o">.</span><span class="n">snapshot</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+        <span class="c1"># vi is the default text editorfor Unix systems</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">Settings</span><span class="p">()</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">l1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float128</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">l2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float128</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float128</span><span class="p">(</span><span class="mf">1.19e-4</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">T0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float128</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">tmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float128</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">tmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float128</span><span class="p">(</span><span class="mf">100.0</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">tSize</span> <span class="o">=</span> <span class="mi">11</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">meshSize</span> <span class="o">=</span> <span class="s1">&#39;fine&#39;</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">absTol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float128</span><span class="p">(</span><span class="mf">1e-20</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float128</span>
+
+        <span class="n">T</span> <span class="o">=</span> <span class="n">Temperature</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">data_b64</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">sol</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">data_b64</span><span class="p">)</span>
+        <span class="n">dd</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float128</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">sol</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">dd1</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">__ndarray__</span><span class="o">=</span><span class="n">data_b64</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">sol</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span><span class="n">shape</span><span class="o">=</span><span class="n">T</span><span class="o">.</span><span class="n">sol</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">dd1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">))</span>
+        <span class="c1">#print(dd-T.sol)</span>
 </pre></div>
 
           </div>

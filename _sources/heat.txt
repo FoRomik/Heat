@@ -12,10 +12,42 @@ heat.command_line module
     :undoc-members:
     :show-inheritance:
 
+heat.domain module
+------------------
+
+.. automodule:: heat.domain
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 heat.gui module
 ---------------
 
 .. automodule:: heat.gui
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+heat.init module
+----------------
+
+.. automodule:: heat.init
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+heat.solution module
+--------------------
+
+.. automodule:: heat.solution
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+heat.vtktools module
+--------------------
+
+.. automodule:: heat.vtktools
     :members:
     :undoc-members:
     :show-inheritance:
