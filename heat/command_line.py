@@ -2,24 +2,18 @@
 import os
 import sys
 import click
-from unipath import Path
-
-from  . import domain
-from .domain import Solution
-from .solution import Temperature
-from .init import Init, BASE_DIR
-from .vtktools import VTK_XML_Serial_Unstructured
-import numpy as np
-import base64
 import subprocess
-
-from . import __version__
-from .gui import MainApplication
-
 if sys.version_info[0] < 3:
     import Tkinter as tk
 else:
     import tkinter as tk
+# import base64
+import numpy as np
+from unipath import Path
+from .model import Model, BASE_DIR, DATA_DIR
+from .vtktools import VTK
+from . import __version__
+from .gui import MainApplication
 
 
 def print_version(ctx, param, value):
@@ -40,7 +34,12 @@ def print_version(ctx, param, value):
     ctx.exit()
 
 def editConfig(filename):
+    '''
+    Allow editing the configuration file in vi.
+    vi is the default text editorfor Unix systems
+    '''
     subprocess.call(['vi', filename])
+
 
 @click.command()
 @click.option('-c', '--config', is_flag=True,
@@ -49,49 +48,58 @@ def editConfig(filename):
               help="Reset configuration file to default.")
 @click.option('-g', '--gui', is_flag=True,
               help="Use the user interface.")
-@click.option('-s', '--save', default="filename.vtu",
-              help="Save data in the vtu format.")
+@click.option('-s', '--solutionfilename', default=DATA_DIR.child("lastSolution.vtu"),
+              help='Save the model as "filename" in the vtu format. '\
+                   'the solution, geometry and mesh can be visualized by heat '\
+                   'but other visualization programs such as Paraview may be prefered. '\
+                   'the default file is '+DATA_DIR.child("lastSolution.vtu")+'.')
+@click.option('-o', '--modelfilename',
+              help='Open the specified vtu file and load the model in heat.')
 @click.option(
     '-v', '--version',
     is_flag=True, help='Show version information and exit.',
     callback=print_version, expose_value=False, is_eager=True,
 )
-def main(gui, config, reset, save):
-    """Entry point to the program.
-
-        :param str filename: The init filename.
+def main(gui, config, reset, solutionfilename, modelfilename):
     """
-    I = Init()   
-    filename = BASE_DIR.child('config.ini')
-    if not os.path.exists(filename):
-        I.WriteConfig()
-    if reset:
-        I.WriteConfig()
-    elif config:
-        editConfig(filename)
+    HEAT: Solve the heat equation with constant coefficients, 
+    heat source, and usual boundary conditions using Green's 
+    function on a line (1D), a rectangle (2D), or a block (3D).
+    """
+    vtk = VTK()
+    configFileName = BASE_DIR.child('config.ini')
+    if not os.path.exists(configFileName) or reset:
+        # If the configuration file doesn't exist create one.
+        reset = True
+        model = Model(reset, solutionfilename) 
+    if config:
+        # Edit the configuration file in terminal with vi.
+        editConfig(configFileName)
+    elif modelfilename:
+        # Overwrite the config file
+        vtk.readVTU(modelfilename)
     elif gui:
+        # Edit the configuration file using the GUI.
         print("Starting GUI, pres ctrl+C to exit from the terminal.")
         root = tk.Tk()
         app = MainApplication(root)
-        #app.pack(side="top", fill="both", expand=True)
         app.center_window(500, 400)
-        root.mainloop()
-    else: # no arguments
-        print("The init file name is:", filename)
-        print(I.ConfigSectionMap())
-        vtk_writer = VTK_XML_Serial_Unstructured()
-        x = np.linspace(0,1,11)
-        y = np.linspace(0,1,11)
-        z = np.linspace(0,1,11)
-        filename = "data/filename.vtu"
-        if not os.path.exists(os.path.dirname(filename)):
+        root.mainloop() 
+    else:  # compute and save the solution for the specified parameters.
+        reset = False
+        model = Model(reset, solutionfilename)
+        # fake solution
+        solution = np.random.rand(model.mesh.numPoints)
+        if not os.path.exists(os.path.dirname(model.solFile)):
             try:
-                os.makedirs(os.path.dirname(filename))
+                os.makedirs(os.path.dirname(model.solFile))
             except OSError as exc: # Guard against race condition
                 if exc.errno != errno.EEXIST:
                     raise
-        vtk_writer.snapshot(filename, x, y, z)
-        # vi is the default text editorfor Unix systems
+        
+        vtk.snapshot(model, solution)
+
+        '''
         s = domain.Settings()
         s.l1 = np.float128(1.5)
         s.l2 = np.float128(1.0)
@@ -111,3 +119,4 @@ def main(gui, config, reset, save):
         dd1 = dict(__ndarray__=data_b64,dtype=str(T.sol.dtype),shape=T.sol.shape)
         print(dd1.get('dtype'))
         #print(dd-T.sol)
+        '''
