@@ -4,6 +4,14 @@ heat package
 Submodules
 ----------
 
+heat.boundary module
+--------------------
+
+.. automodule:: heat.boundary
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 heat.command_line module
 ------------------------
 
@@ -12,10 +20,10 @@ heat.command_line module
     :undoc-members:
     :show-inheritance:
 
-heat.domain module
-------------------
+heat.geometry module
+--------------------
 
-.. automodule:: heat.domain
+.. automodule:: heat.geometry
     :members:
     :undoc-members:
     :show-inheritance:
@@ -28,10 +36,34 @@ heat.gui module
     :undoc-members:
     :show-inheritance:
 
-heat.init module
+heat.initial module
+-------------------
+
+.. automodule:: heat.initial
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+heat.material module
+--------------------
+
+.. automodule:: heat.material
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+heat.mesh module
 ----------------
 
-.. automodule:: heat.init
+.. automodule:: heat.mesh
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+heat.model module
+-----------------
+
+.. automodule:: heat.model
     :members:
     :undoc-members:
     :show-inheritance:
@@ -40,6 +72,14 @@ heat.solution module
 --------------------
 
 .. automodule:: heat.solution
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+heat.source module
+------------------
+
+.. automodule:: heat.source
     :members:
     :undoc-members:
     :show-inheritance:

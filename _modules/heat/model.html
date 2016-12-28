@@ -1,0 +1,623 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>heat.model &mdash; heat 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="heat 0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for heat.model</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">configparser</span>
+<span class="kn">import</span> <span class="nn">ast</span>
+<span class="kn">import</span> <span class="nn">numbers</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">unipath</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">.geometry</span> <span class="kn">import</span> <span class="n">Geometry</span>
+<span class="kn">from</span> <span class="nn">.mesh</span> <span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span> <span class="nn">.vtktools</span> <span class="kn">import</span> <span class="n">VTK</span>
+<span class="kn">from</span> <span class="nn">.wrapper</span> <span class="kn">import</span> <span class="n">Uniform</span>
+
+<span class="n">BASE_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">ancestor</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">DATA_DIR</span> <span class="o">=</span> <span class="n">BASE_DIR</span><span class="o">.</span><span class="n">child</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+<span class="n">DEFAULT_SETTINGS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">9.1</span><span class="p">],</span>
+                    <span class="s1">&#39;mesh&#39;</span><span class="p">:</span> <span class="s1">&#39;coarse&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;material&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Copper&#39;</span><span class="p">,</span> <span class="mf">8960.0</span><span class="p">,</span> <span class="mf">401.0</span><span class="p">,</span> <span class="mf">385.0</span><span class="p">],</span>
+                    <span class="s1">&#39;initial&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+                    <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span>
+                               <span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+                    <span class="s1">&#39;boundary&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;dirichlet&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span>
+                                 <span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+                    <span class="p">}</span>
+
+
+<div class="viewcode-block" id="Model"><a class="viewcode-back" href="../../heat.html#heat.model.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39; </span>
+<span class="sd">    The model class</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="o">.</span><span class="n">child</span><span class="p">(</span><span class="s2">&quot;lastSolution.vtu&quot;</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkOutputFilePath</span><span class="p">(</span><span class="n">output</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">output</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">material</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solution</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># The model class is always initialized reading the configuration file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readConfig</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Model.checkOutputFilePath"><a class="viewcode-back" href="../../heat.html#heat.model.Model.checkOutputFilePath">[docs]</a>    <span class="k">def</span> <span class="nf">checkOutputFilePath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Check if the output path is valid and add the vtu extension if missing.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">filepath</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.vtu&#39;</span><span class="p">:</span>
+                <span class="c1"># If not .vtu extension add it at the end</span>
+                <span class="n">filepath</span> <span class="o">=</span><span class="n">filepath</span><span class="o">+</span><span class="s1">&#39;.vtu&#39;</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">filepath</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s1">&#39;The output path is not valid.&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.getSettings"><a class="viewcode-back" href="../../heat.html#heat.model.Model.getSettings">[docs]</a>    <span class="k">def</span> <span class="nf">getSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Generate the settings dictionary for file I/O</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span>
+        <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;mesh&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span>
+        <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;material&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">material</span>
+        <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;initial&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial</span>
+        <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span>
+        <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;boundary&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span>
+        <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;solution&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">solution</span>
+        <span class="k">return</span> <span class="n">settings</span></div>
+
+<div class="viewcode-block" id="Model.updateModel"><a class="viewcode-back" href="../../heat.html#heat.model.Model.updateModel">[docs]</a>    <span class="k">def</span> <span class="nf">updateModel</span><span class="p">(</span><span class="n">Self</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Updtate the model attributes.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;mesh&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">material</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;material&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;initial&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;boundary&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solution</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;solution&#39;</span><span class="p">]</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Model.saveSettings"><a class="viewcode-back" href="../../heat.html#heat.model.Model.saveSettings">[docs]</a>    <span class="k">def</span> <span class="nf">saveSettings</span><span class="p">():</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Write the current settings to the configuration file.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">Model</span><span class="o">.</span><span class="n">getSettings</span><span class="p">(</span><span class="n">Model</span><span class="p">)</span>
+        <span class="n">Model</span><span class="o">.</span><span class="n">writeConfig</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span></div>
+    
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Model.writeDefaultConfig"><a class="viewcode-back" href="../../heat.html#heat.model.Model.writeDefaultConfig">[docs]</a>    <span class="k">def</span> <span class="nf">writeDefaultConfig</span><span class="p">():</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Write default configuration file.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="n">DEFAULT_SETTINGS</span>
+        <span class="n">Model</span><span class="o">.</span><span class="n">writeConfig</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Model.writeConfig"><a class="viewcode-back" href="../../heat.html#heat.model.Model.writeConfig">[docs]</a>    <span class="k">def</span> <span class="nf">writeConfig</span><span class="p">(</span><span class="n">settings</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Write or overwrite config.ini using the provided settings.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="o">.</span><span class="n">child</span><span class="p">(</span><span class="s2">&quot;config.ini&quot;</span><span class="p">),</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cfgfile</span><span class="p">:</span>
+            <span class="n">Config</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">(</span><span class="n">allow_no_value</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="s1">&#39;File&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;File&#39;</span><span class="p">,</span> <span class="s1">&#39;# Path to the solution file. The default file is &#39;</span><span class="o">+</span>\
+                                <span class="n">DATA_DIR</span><span class="o">.</span><span class="n">child</span><span class="p">(</span><span class="s2">&quot;lastSolution.vtu&quot;</span><span class="p">))</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;File&#39;</span><span class="p">,</span> <span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="n">DATA_DIR</span><span class="o">.</span><span class="n">child</span><span class="p">(</span><span class="s2">&quot;lastSolution.vtu&quot;</span><span class="p">))</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="s1">&#39;Geometry&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Geometry&#39;</span><span class="p">,</span> <span class="s1">&#39;# Set the geometry centered at the origin. The dimension d = 1, 2 or 3&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Geometry&#39;</span><span class="p">,</span> <span class="s1">&#39;# l is a vector giving the length of the geometry in meters for each&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Geometry&#39;</span><span class="p">,</span> <span class="s1">&#39;# dimensions. The extra components of the vector are ignored&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Geometry&#39;</span><span class="p">,</span> <span class="s1">&#39;# if the dimension is smaller than 3.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Geometry&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Geometry&#39;</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="s1">&#39;[1.0, 0.2, 9.1]&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="s1">&#39;Mesh&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Mesh&#39;</span><span class="p">,</span> <span class="s1">&#39;# Set the mesh size: &quot;coarse&quot;, &quot;fine&quot; or &quot;normal&quot;.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Mesh&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="s2">&quot;coarse&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="s1">&#39;Material&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Material&#39;</span><span class="p">,</span> <span class="s1">&#39;# Set the material properties.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Material&#39;</span><span class="p">,</span> <span class="s1">&#39;# name, e.g. Copper&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Material&#39;</span><span class="p">,</span> <span class="s1">&#39;# density &quot;rho&quot; in kg/m^3.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Material&#39;</span><span class="p">,</span> <span class="s1">&#39;# thermal conductivity &quot;k&quot; in W/m/K.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Material&#39;</span><span class="p">,</span> <span class="s1">&#39;# heat capacity &quot;Cp&quot; in J/kg/K.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Material&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s2">&quot;Copper&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Material&#39;</span><span class="p">,</span> <span class="s1">&#39;rho&#39;</span><span class="p">,</span> <span class="s2">&quot;8960.0&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Material&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="s2">&quot;401.0&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Material&#39;</span><span class="p">,</span> <span class="s1">&#39;Cp&#39;</span><span class="p">,</span> <span class="s2">&quot;385.0&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="s1">&#39;Initial&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Initial&#39;</span><span class="p">,</span> <span class="s1">&#39;# Set the initial temperature distribution.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Initial&#39;</span><span class="p">,</span> <span class="s1">&#39;# uniform T(x,y,z) = a.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Initial&#39;</span><span class="p">,</span> <span class="s1">&#39;# linear T(x_i) = a*(x_i/l - b), a&gt; = 0, 0 &lt;= b &gt;=1 .&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Initial&#39;</span><span class="p">,</span> <span class="s1">&#39;# exponential T(x_i) = a*exp(-(x_i/l - b)/c), c &gt; 0.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Initial&#39;</span><span class="p">,</span> <span class="s1">&#39;# gaussian T(x_i) = a*exp(-(x_i/l - b)^2/(2*c^2)).&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Initial&#39;</span><span class="p">,</span> <span class="s1">&#39;# The values of b, and c are ignored if not used in the distribution.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Initial&#39;</span><span class="p">,</span> <span class="s1">&#39;dist&#39;</span><span class="p">,</span> <span class="s2">&quot;uniform&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Initial&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s2">&quot;1.0&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Initial&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s2">&quot;1.0&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Initial&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s2">&quot;1.0&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="s1">&#39;Source&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="s1">&#39;# Set a localized time dependent heat source in the geometry.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="s1">&#39;# location is a vector specifying the center of the source in.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="s1">&#39;# units of length &quot;l&quot;. Each compoonent must have an absolute value&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="s1">&#39;# smaller or equal than &quot;1/2&quot;, e.g. [-1/2, 0, 1/2].&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="s1">&#39;# fwhm is the full width at half maximum of the source in units of &quot;l&quot;.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="s1">&#39;# fct is the time dependent function describing the source in W/m^d.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="s1">&#39;# uniform Q(t) = a.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="s1">&#39;# linear Q(t) = a*t + b.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="s1">&#39;# exponential Q(t) = a*exp(-t/b), b &gt; 0.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="s1">&#39;# The values of b is ignored if not used in the function.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="s1">&#39;location&#39;</span><span class="p">,</span> <span class="s2">&quot;[0, 0, 0]&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="s1">&#39;fwhm&#39;</span><span class="p">,</span> <span class="s2">&quot;0.1&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="s1">&#39;fct&#39;</span><span class="p">,</span> <span class="s2">&quot;uniform&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s2">&quot;1000.0&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s2">&quot;1.0&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;# Set the boundary conditions for the model.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;# The boundary conditions comes in pairs. If d = 1&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;# their is only one pair, if d = 2 two pairs, and if d = 3&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;# three pairs. There are 5 type of boundary conditions:&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;# dirichlet, neumann, robin, mixedI, mixedII.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;# the variable g1 and g2 can vary in time and the following&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;# functios can be used to describe them:&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;# uniform g_i = a.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;# linear g_i = a*t + b.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;# exponential g_i = a*exp(-t/b), b &gt; 0.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;# The values of b is ignored if not used in the function.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;# The parameters k1, and k2 are used for the robin boundary condition.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;# The values of k1, and k2 are ignored if not used.&#39;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s2">&quot;dirichlet&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;g1&#39;</span><span class="p">,</span> <span class="s2">&quot;uniform&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;a1&#39;</span><span class="p">,</span> <span class="s2">&quot;1.0&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;b1&#39;</span><span class="p">,</span> <span class="s2">&quot;1.0&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;g2&#39;</span><span class="p">,</span> <span class="s2">&quot;uniform&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;a2&#39;</span><span class="p">,</span> <span class="s2">&quot;1.0&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;b2&#39;</span><span class="p">,</span> <span class="s2">&quot;1.0&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;k1&#39;</span><span class="p">,</span> <span class="s2">&quot;1.0&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="s1">&#39;k2&#39;</span><span class="p">,</span> <span class="s2">&quot;1.0&quot;</span><span class="p">)</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cfgfile</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.compute"><a class="viewcode-back" href="../../heat.html#heat.model.Model.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        compute: compute the solution.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">d</span>
+        <span class="c1"># tArray = self.getTimeList()</span>
+        <span class="c1"># alpha = self.material.getAlpha()</span>
+        <span class="c1"># Coords = self.mesh.getCoords()</span>
+        <span class="c1"># dim = [&#39;x&#39;, &#39;y&#39;, &#39;z&#39;]</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">pass</span>
+            <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            initTerm = initial.compute(bc[0], Coords[dim[0]], tArray, alpha)</span>
+<span class="sd">            srcTerm = </span>
+<span class="sd">            bndTerm =</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># d == 2 or d == 3</span>
+            <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            initTerm =np.ones(x.size)</span>
+<span class="sd">            for i in range(0, d):</span>
+<span class="sd">                initTerm = initTerm*initial.compute(bc[0], Coords[dim[0]], tArray, alpha)</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="k">pass</span>
+        <span class="c1"># sol = intTerm + srcTerm + bndTerm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">getNumNodes</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Model.getTimeList"><a class="viewcode-back" href="../../heat.html#heat.model.Model.getTimeList">[docs]</a>    <span class="k">def</span> <span class="nf">getTimeList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">101</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return the simulation time list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">pass</span>
+        <span class="n">lmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">getMaxLength</span><span class="p">()</span>
+        <span class="n">kappa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">material</span><span class="o">.</span><span class="n">kappa</span>
+        <span class="n">tmax</span> <span class="o">=</span> <span class="n">lmax</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">kappa</span><span class="p">)</span><span class="o">/</span><span class="n">coeff</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">tmax</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.checkValidValues"><a class="viewcode-back" href="../../heat.html#heat.model.Model.checkValidValues">[docs]</a>    <span class="k">def</span> <span class="nf">checkValidValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Check that the property is a valid value.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Real</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; is not a valid number.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">prop</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; must be positive and larger than zero.&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Model.validateSource"><a class="viewcode-back" href="../../heat.html#heat.model.Model.validateSource">[docs]</a>    <span class="k">def</span> <span class="nf">validateSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Config</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">options</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">dic</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">option</span><span class="o">==</span><span class="s1">&#39;location&#39;</span> <span class="ow">or</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;fwhm&#39;</span> <span class="ow">or</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;fct&#39;</span> <span class="ow">or</span>
+                    <span class="n">option</span><span class="o">==</span><span class="s1">&#39;a&#39;</span> <span class="ow">or</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;b&#39;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [Source]: &quot;{0}&quot;&quot; is not a valid option.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">option</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;location&#39;</span><span class="p">:</span>
+                    <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">])</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+                                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [Source]: Invalid length vector. &#39;</span>\
+                                                 <span class="s1">&#39;the option &quot;location&quot; must be a list of three components.&#39;</span><span class="p">)</span>
+
+                    <span class="k">for</span> <span class="n">coord</span> <span class="ow">in</span> <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coord</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Real</span><span class="p">):</span>
+                                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;{0} is not a valid number.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">coord</span><span class="p">))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">coord</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+                                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;{0} must be between -0.5 and 0.5.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">coord</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;fwhm&#39;</span><span class="p">:</span>
+                    <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">checkValidValues</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="s1">&#39;fwhm&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;fct&#39;</span><span class="p">:</span>
+                    <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;uniform&#39;</span> <span class="ow">or</span>
+                            <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;linear&#39;</span> <span class="ow">or</span>
+                            <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;exponential&#39;</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [Source]: &quot;{0}&quot;&quot; is not a valid function.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="s1">&#39;fct&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;a&#39;</span><span class="p">:</span>
+                    <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">],</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Real</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;{0} is not a valid number.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>  <span class="c1"># option==&#39;b&#39;</span>
+                    <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">checkValidValues</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;exception on {0}!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">option</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">dic</span></div>
+
+<div class="viewcode-block" id="Model.validateBoundary"><a class="viewcode-back" href="../../heat.html#heat.model.Model.validateBoundary">[docs]</a>    <span class="k">def</span> <span class="nf">validateBoundary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Config</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">options</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">dic</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">option</span><span class="o">==</span><span class="s1">&#39;type&#39;</span> <span class="ow">or</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;g1&#39;</span> <span class="ow">or</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;a1&#39;</span> <span class="ow">or</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;b1&#39;</span> <span class="ow">or</span>
+                    <span class="n">option</span><span class="o">==</span><span class="s1">&#39;g2&#39;</span> <span class="ow">or</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;a2&#39;</span> <span class="ow">or</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;b2&#39;</span> <span class="ow">or</span>
+                    <span class="n">option</span><span class="o">==</span><span class="s1">&#39;k1&#39;</span> <span class="ow">or</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;k2&#39;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [Boundary]: &quot;{0}&quot;&quot; is not a valid option.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">option</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;type&#39;</span><span class="p">:</span>
+                    <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;dirichlet&#39;</span> <span class="ow">or</span>
+                            <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;neumann&#39;</span> <span class="ow">or</span>
+                            <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;robin&#39;</span> <span class="ow">or</span>
+                            <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;mixedI&#39;</span> <span class="ow">or</span>
+                            <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;mixedII&#39;</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [Boundary]: &quot;{0}&quot;&quot; is not a valid type.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;g1&#39;</span><span class="p">:</span>
+                    <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;uniform&#39;</span> <span class="ow">or</span>
+                            <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;linear&#39;</span> <span class="ow">or</span>
+                            <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;exponential&#39;</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [Boundary]: &quot;{0}&quot;&quot; is not a valid function.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">[</span><span class="s1">&#39;g1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;a1&#39;</span><span class="p">:</span>
+                    <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">],</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Real</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;{0} is not a valid number.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">[</span><span class="s1">&#39;a1&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;b1&#39;</span><span class="p">:</span>
+                    <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">checkValidValues</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">[</span><span class="s1">&#39;b1&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;g2&#39;</span><span class="p">:</span>
+                    <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;uniform&#39;</span> <span class="ow">or</span>
+                            <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;linear&#39;</span> <span class="ow">or</span>
+                            <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;exponential&#39;</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [Source]: &quot;{0}&quot;&quot; is not a valid function.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">[</span><span class="s1">&#39;g2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;a2&#39;</span><span class="p">:</span>
+                    <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">],</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Real</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;{0} is not a valid number.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">[</span><span class="s1">&#39;a2&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;b2&#39;</span><span class="p">:</span>
+                    <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">checkValidValues</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">[</span><span class="s1">&#39;b2&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;k1&#39;</span><span class="p">:</span>
+                    <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">],</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Real</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;{0} is not a valid number.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">[</span><span class="s1">&#39;k1&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>  <span class="c1"># option==&#39;k2&#39;</span>
+                    <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">checkValidValues</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">[</span><span class="s1">&#39;k2&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;exception on {0}!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">option</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">dic</span></div>
+
+<div class="viewcode-block" id="Model.readConfig"><a class="viewcode-back" href="../../heat.html#heat.model.Model.readConfig">[docs]</a>    <span class="k">def</span> <span class="nf">readConfig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Read config.ini and return the settings dictionary.</span>
+<span class="sd">        ADD extra boundary g3</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">Config</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">(</span><span class="n">allow_no_value</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="n">Config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="o">.</span><span class="n">child</span><span class="p">(</span><span class="s2">&quot;config.ini&quot;</span><span class="p">))</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">sections</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">sections</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">:</span>
+            <span class="n">dic</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="n">section</span><span class="o">==</span><span class="s1">&#39;File&#39;</span><span class="p">:</span>
+                <span class="n">options</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;path&#39;</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [File]: &quot;{0}&quot;&quot; is not a valid option.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">option</span><span class="p">))</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">],</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                                <span class="k">pass</span>
+                            <span class="n">exist</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+                            <span class="n">exist</span> <span class="o">=</span> <span class="bp">False</span>
+                        <span class="k">if</span> <span class="n">exist</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [File]: &quot;{0}&quot;&quot; is not a valid path.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]))</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;exception on {0}!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">option</span><span class="p">))</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [File]: is missing the &quot;path&quot; option.&#39;</span><span class="p">)</span>
+                <span class="n">dic</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># reset the temporary dictionary</span>
+            <span class="k">elif</span> <span class="n">section</span><span class="o">==</span><span class="s1">&#39;Geometry&#39;</span><span class="p">:</span>
+                <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">]</span>
+                <span class="n">options</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">option</span><span class="o">==</span><span class="s1">&#39;d&#39;</span> <span class="ow">or</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;l&#39;</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [Geometry]: &quot;{0}&quot;&quot; is not a valid option.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">option</span><span class="p">))</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;l&#39;</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">])</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+                                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [Geometry]: Invalid length vector. &#39;</span>\
+                                                 <span class="s1">&#39;the option &quot;l&quot; must be a list of three components.&#39;</span><span class="p">)</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;exception on </span><span class="si">%s</span><span class="s2">!&quot;</span> <span class="o">%</span> <span class="n">option</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">]</span>
+                    <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;l&#39;</span><span class="p">]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [Geometry]: One or more options is missing.&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="n">Geometry</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">],</span>
+                                         <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;l&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                                         <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;l&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                                         <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;l&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">]</span>
+                <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;l&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;l&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;l&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">dic</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">elif</span> <span class="n">section</span><span class="o">==</span><span class="s1">&#39;Mesh&#39;</span><span class="p">:</span>
+                <span class="n">options</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">option</span><span class="o">==</span><span class="s1">&#39;size&#39;</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [Mesh]: &quot;{0}&quot;&quot; is not a valid option.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">option</span><span class="p">))</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+                        <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;mesh&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]</span>  <span class="c1"># will raise an exception if it doesn&#39;t exist</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;exception on {0}!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">option</span><span class="p">))</span>
+                <span class="n">dic</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">elif</span> <span class="n">section</span><span class="o">==</span><span class="s1">&#39;Material&#39;</span><span class="p">:</span>
+                <span class="n">options</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">material</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">option</span><span class="o">==</span><span class="s1">&#39;name&#39;</span> <span class="ow">or</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;rho&#39;</span> <span class="ow">or</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;k&#39;</span> <span class="ow">or</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;cp&#39;</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [Material]: &quot;{0}&quot;&quot; is not a valid option.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">option</span><span class="p">))</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;name&#39;</span><span class="p">:</span>
+                            <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">))</span>
+                            <span class="k">if</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;rho&#39;</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">checkValidValues</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">])</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;rho&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                            <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;k&#39;</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">checkValidValues</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">])</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">checkValidValues</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">])</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;cp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;exception on {0}!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">option</span><span class="p">))</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;material&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;rho&#39;</span><span class="p">],</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">],</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;cp&#39;</span><span class="p">]]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [Material]: One or more options is missing.&#39;</span><span class="p">)</span>
+                <span class="n">dic</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">elif</span> <span class="n">section</span><span class="o">==</span><span class="s1">&#39;Initial&#39;</span><span class="p">:</span>
+                <span class="n">options</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">option</span><span class="o">==</span><span class="s1">&#39;dist&#39;</span> <span class="ow">or</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;a&#39;</span> <span class="ow">or</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;b&#39;</span> <span class="ow">or</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;c&#39;</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [Initial]: &quot;{0}&quot;&quot; is not a valid option.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">option</span><span class="p">))</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;dist&#39;</span><span class="p">:</span>
+                            <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;uniform&#39;</span> <span class="ow">or</span>
+                                    <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;linear&#39;</span> <span class="ow">or</span>
+                                    <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;exponential&#39;</span> <span class="ow">or</span>
+                                    <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;gaussian&#39;</span><span class="p">):</span>
+                                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [Initial]: &quot;{0}&quot;&quot; is not a valid distribution.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]))</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">initial</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                        <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;a&#39;</span><span class="p">:</span>
+                            <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">))</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">checkValidValues</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">])</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">initial</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                        <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;b&#39;</span><span class="p">:</span>
+                            <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">))</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">],</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Real</span><span class="p">):</span>
+                                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;{0} is not a valid number.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]))</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+                                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;{0} must be between -1.0 and 1.0.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]))</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">initial</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>  <span class="c1"># option == c</span>
+                            <span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">))</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">checkValidValues</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">])</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">initial</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">dic</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;exception on {0}!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">option</span><span class="p">))</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;initial&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">initial</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">],</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">initial</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">initial</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">],</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">initial</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [Initial]: One or more options is missing.&#39;</span><span class="p">)</span>
+                <span class="n">dic</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">elif</span> <span class="n">section</span><span class="o">==</span><span class="s1">&#39;Source&#39;</span><span class="p">:</span>
+                <span class="n">options</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">dic</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validateSource</span><span class="p">(</span><span class="n">Config</span><span class="p">,</span> <span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="s1">&#39;fwhm&#39;</span><span class="p">],</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="s1">&#39;fct&#39;</span><span class="p">],</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [Source]: One or more options is missing.&#39;</span><span class="p">)</span>
+                <span class="n">dic</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">elif</span> <span class="n">section</span><span class="o">==</span><span class="s1">&#39;Boundary&#39;</span><span class="p">:</span>
+                <span class="n">options</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">dic</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validateBoundary</span><span class="p">(</span><span class="n">Config</span><span class="p">,</span> <span class="s1">&#39;Boundary&#39;</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;boundary&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">],</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">[</span><span class="s1">&#39;g1&#39;</span><span class="p">],</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">[</span><span class="s1">&#39;a1&#39;</span><span class="p">],</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">[</span><span class="s1">&#39;b1&#39;</span><span class="p">],</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">[</span><span class="s1">&#39;g2&#39;</span><span class="p">],</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">[</span><span class="s1">&#39;a2&#39;</span><span class="p">],</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">[</span><span class="s1">&#39;b2&#39;</span><span class="p">],</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">[</span><span class="s1">&#39;k1&#39;</span><span class="p">],</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">[</span><span class="s1">&#39;k2&#39;</span><span class="p">]]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Configuration file [Boundary]: One or more options is missing.&#39;</span><span class="p">)</span>
+                <span class="n">dic</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The configuration file is not valid.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="s1">&#39;geometry&#39;</span> <span class="ow">in</span> <span class="n">parameters</span> <span class="ow">and</span>
+                <span class="s1">&#39;mesh&#39;</span> <span class="ow">in</span> <span class="n">parameters</span> <span class="ow">and</span>
+                <span class="s1">&#39;material&#39;</span> <span class="ow">in</span> <span class="n">parameters</span> <span class="ow">and</span>
+                <span class="s1">&#39;initial&#39;</span> <span class="ow">in</span> <span class="n">parameters</span> <span class="ow">and</span>
+                <span class="s1">&#39;source&#39;</span> <span class="ow">in</span> <span class="n">parameters</span> <span class="ow">and</span>
+                <span class="s1">&#39;boundary&#39;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The configuration file is not valid.&#39;</span><span class="p">)</span>
+                
+        <span class="k">return</span> <span class="n">parameters</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/heat.png" alt="Logo"/>
+            </a></p><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Francois Roy.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
