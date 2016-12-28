@@ -8,8 +8,11 @@
 
 #include "Uniform.h"
 
-Uniform::Uniform(node nd, bcType bc, termType term, double a)
-    : a(a)
+Uniform::Uniform(node nd, bcType bc, termType term,
+                 double a0, double a1, double a2)
+    : a0(a0)
+    , a1(a1)
+    , a2(a2)
     , nd(nd)
     , bc(bc)
     , term(term)
@@ -22,6 +25,10 @@ Uniform::~Uniform()
 
 void Uniform::setTime(double t){
     nd.t = t;
+}
+
+void Uniform::setPosition(double x){
+    nd.x = x;
 }
 
 double Uniform::fct(int n) {
@@ -50,13 +57,16 @@ double Uniform::fct(int n) {
 void Uniform::getDirichletExpression(double *p_expression, double n){
     double arg1 = (2*n+1)*PI*nd.x/nd.l;
     double arg2 = -pow((2*n+1)*PI/nd.l,2)*nd.alpha*nd.t;
+    double arg3 = (n+1)*PI*nd.x/nd.l;
+    double arg4 = -pow((n+1)*PI/nd.l,2)*nd.alpha*nd.t;
     switch (term) {
         case INITIAL:
-            *p_expression = pow(a,1/(double)nd.dim)*(4/PI)*1/(2*n+1)
+            *p_expression = pow(a0,1/(double)nd.dim)*(4/PI)*1/(2*n+1)
                             *sin(arg1)*exp(arg2);
             break;
         case BOUNDARY:
-            *p_expression = 1/n;
+            *p_expression = pow(a0,1/(double)nd.dim)*(2/PI)*1/(n+1)
+                            *(a1-pow(-1,n+1)*a2)*sin(arg3)*(1-exp(arg4));
             break;
         case SOURCE:
             *p_expression = 1/pow(n,2);

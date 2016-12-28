@@ -33,5 +33,6 @@ cdef extern from "ComputeSeries.h":
 
 cdef extern from "Uniform.h":
     cdef cppclass Uniform(ComputeSeries):
-        Uniform(node nd, bcType bc, termType term, double a) except +
+        Uniform(node nd, bcType bc, termType term, double a0, double a1, double a2) except +
         void setTime(double t) except +
+        void setPosition(double x) except +

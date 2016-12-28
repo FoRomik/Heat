@@ -15,7 +15,7 @@ Solve the heat equation with constant coefficients, heat source, and usual bound
 Requirements
 ------------
 
-- Unix system with Python 2.x/3.x
+- Unix system with Python 2.7/3.5
 - C++ compiler supporting the C++11 standard
 - cmake
 

@@ -25,7 +25,7 @@ class InvalidBCType(Exception):
 class InvalidTermType(Exception):
     """Exception for the term type.
     """
-    message = "Invlid Term type"
+    message = "Invalid Term type"
 
     def __init__(self, value):
         self.value = value
@@ -127,11 +127,15 @@ cdef class Uniform(ComputeSeries):
     cdef w.bcType bc
     cdef w.termType term
     cdef w.node nd
-    cdef double a
+    cdef double a0
+    cdef double a1
+    cdef double a2
 
-    def __cinit__(self, i, j, d, a):
+    def __cinit__(self, i, j, d, a0, a1, a2):
         try:
-            self.a = a
+            self.a0 = a0
+            self.a1 = a1
+            self.a2 = a2
             self.bc = getbcType(i)
             self.term = gettermType(j)
             self.nd.dim = d['dim']
@@ -143,7 +147,7 @@ cdef class Uniform(ComputeSeries):
             sys.exit(e.message)
         except InvalidTermType as e:
             sys.exit(e.message)
-        self.derivedptr = new w.Uniform(self.nd, self.bc, self.term, self.a)
+        self.derivedptr = new w.Uniform(self.nd, self.bc, self.term, self.a0, self.a1, self.a2)
         self.baseptr = self.derivedptr
 
     def __dealloc__(self):
@@ -154,3 +158,9 @@ cdef class Uniform(ComputeSeries):
 
         """
         self.derivedptr.setTime(t)
+
+    def setPosition(self, double x):
+        """Set the position for the series evaluation.
+
+        """
+        self.derivedptr.setPosition(x)
