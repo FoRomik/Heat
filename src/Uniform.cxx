@@ -53,7 +53,7 @@ void Uniform::getDirichletExpression(double *p_expression, double n){
     switch (term) {
         case INITIAL:
             *p_expression = pow(a,1/(double)nd.dim)*(4/PI)*1/(2*n+1)
-            *sin(arg1)*exp(arg2);
+                            *sin(arg1)*exp(arg2);
             break;
         case BOUNDARY:
             *p_expression = 1/n;

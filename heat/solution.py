@@ -3,7 +3,7 @@ import numpy as np
 from . import domain
 import os
 
-
+"""
 class Temperature:
     '''Temperature: Contains the solution.'''
     def __init__(self,s):
@@ -37,5 +37,5 @@ class Temperature:
     def save(self):
         '''save(): '''
         sol = self.sol
-        np.savetxt(os.getcwd()+'/data/test.txt', sol[0,:,:])
-  
+        np.savetxt(os.getcwd()+'/data/test.txt', sol[0,:,:]) 
+"""

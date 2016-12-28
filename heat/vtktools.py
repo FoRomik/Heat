@@ -13,43 +13,40 @@ except ImportError:
 
 
 class VTK:
-    """
-    USAGE:
-    vtk = VTK()
-    vtk.snapshot("filename.vtu", x, y, z, optional arguments...)
-    vtk.writePVD("filename.pvd")
-    """
+    '''
+    '''
     def __init__(self):
         self.fileNames = []
 
     def prettify(self, elem):
-        """Return a pretty-printed XML string for the Element.
-        """
+        '''
+        Return a pretty-printed XML string for the Element.
+        '''
         rough_string = ET.tostring(elem, 'utf-8')
         reparsed = xml.dom.minidom.parseString(rough_string)
         return reparsed.toprettyxml(indent="  ")
 
-    def snapshot(self, model, solution):
-        """
+    def writeVTU(self, model):
+        '''
         ARGUMENTS:
         model           the model class
         solution        array of temperatures
-        """
-        fileName = model.solFile
-        T = solution
-        parameters = model.parameters
+        '''
+        fileName = model.output
+        T = model.solution
+        parameters = model.getSettings()
         geomdic = model.mesh.getCoords()
         x = geomdic['x']
         y = geomdic['y']
         z = geomdic['z']
-        numCells = model.mesh.numCells
+        numCells = model.mesh.getNumCells()
         offsets = model.mesh.getOffsets()
         types = model.mesh.getTypes()
         c = model.mesh.getConnectivity()
-        geom = 'Geometry={0},{1},{2},{3}\n'.format(parameters['geom'][0],
-                                                   parameters['geom'][1],
-                                                   parameters['geom'][2],
-                                                   parameters['geom'][3])
+        geom = 'Geometry={0},{1},{2},{3}\n'.format(parameters['geometry'].d,
+                                                   parameters['geometry'].lx,
+                                                   parameters['geometry'].ly,
+                                                   parameters['geometry'].lz)
         mesh = 'Mesh={0}\n'.format(parameters['mesh'])
         mat = 'Material={0},{1},{2},{3}\n'.format(parameters['material'][0],
                                               parameters['material'][1],
@@ -143,10 +140,8 @@ class VTK:
         Tystr = Tystr[:-2]
         darray.text = Tystr
         xmlstr = xml.dom.minidom.parseString(ET.tostring(VTK, 'utf-8')).toprettyxml(indent="  ")
-        print(fileName)
         with open(fileName, 'w') as f:
             f.write(xmlstr)
-
 
     def writePVD(self, fileName):
         '''
@@ -189,6 +184,7 @@ class VTK:
         else:
             try:
                 with open(fileName, 'r') as f:
+                    print(f)
                     for line in f:
                         if keys[0] in line:
                             geom=line.split("=",1)[1]

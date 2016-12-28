@@ -8,29 +8,25 @@ class Mesh:
     """
     def __init__(self, size, geometry):
         self.size = size
-        self.checkSize()
-        Geometry.checkGeometry(geometry)
-        self.geometry = geometry
-        self.cellNumPerDim = self.getCellNumPerDim()
-        self.numCells = self.getNumCells()
-        self.getCoords()
-        
-
+        if self.checkSize():
+            self.geometry = geometry
 
     def checkSize(self):
         '''
         Check if the mesh size is one of the three available options.
         '''
-        if self.size not in ['normal','coarse','fine']:
+        if self.size not in ['normal', 'coarse', 'fine']:
             raise ValueError('The mesh size should be one of the three '
-            	             'following options: "normal", "coarse", or "fine". '+
-            	             'The option size = "{0}"" is not valid.'.format(self.size))
+                             'following options: "normal", "coarse", or '
+                             '"fine". The option size = "{0}"" is not valid.'
+                             .format(self.size))
+        return True
 
     def getNmax(self):
         '''
-        Return the number of cell for the maximum length of the geometry.
+        Return the number of cell for the maximum side length of the geometry.
         '''
-        d = self.geometry['d']
+        d = self.geometry.d
         if d == 1:
             if self.size == 'normal':
                 Nmax = 100
@@ -38,7 +34,7 @@ class Mesh:
                 Nmax = 10
             else:  # fine
                 Nmax = 1000
-        if d == 2:
+        elif d == 2:
             if self.size == 'normal':
                 Nmax = 50
             elif self.size == 'coarse':
@@ -56,7 +52,7 @@ class Mesh:
 
     def getN(self, l, Delta):
         '''
-        Return the nearest integer.
+        Return the nearest integer or one if the nearest integer is zero.
         '''
         if int(np.rint(l/Delta)) == 0:
             N = 1
@@ -66,18 +62,19 @@ class Mesh:
 
     def getCellNumPerDim(self):
         '''
-        Return the number of cell per dimension.
+        Return the number of cell per side.
         '''
         Nmax = self.getNmax()
-        d = self.geometry['d']
-        lx = self.geometry['lx']
+        d = self.geometry.d
+        lx = self.geometry.lx
+        ly = self.geometry.ly
+        lz = self.geometry.lz
         Ny = None
         Nz = None
         if d == 1:
             Nx = Nmax
         if d == 2:
-            ly = self.geometry['ly']
-            if np.argmax(np.array([lx, ly]))==0:
+            if np.argmax(np.array([lx, ly])) == 0:
                 Delta = lx/Nmax
                 Nx = Nmax
                 Ny = self.getN(ly, Delta)
@@ -86,17 +83,12 @@ class Mesh:
                 Ny = Nmax
                 Nx = self.getN(lx, Delta)
         if d == 3:
-            ly = self.geometry['ly']
-            lz = self.geometry['lz']
-            if np.argmax(np.array([lx, ly, lz]))==0:
+            if np.argmax(np.array([lx, ly, lz])) == 0:
                 Delta = lx/Nmax
                 Nx = Nmax
                 Ny = self.getN(ly, Delta)
                 Nz = self.getN(lz, Delta)
-                print(Nx)
-                print(Ny)
-                print(Nz)
-            elif np.argmax(np.array([lx, ly, lz]))==1:
+            elif np.argmax(np.array([lx, ly, lz])) == 1:
                 Delta = ly/Nmax
                 Ny = Nmax
                 Nx = self.getN(lx, Delta)
@@ -112,37 +104,53 @@ class Mesh:
         '''
         Return the total number of cell.
         '''
-        d = self.geometry['d']
-        Nx = self.cellNumPerDim['Nx']
-        if d ==1:
+        d = self.geometry.d
+        dic = self.getCellNumPerDim()
+        Nx = dic['Nx']
+        Ny = dic['Ny']
+        Nz = dic['Nz']
+        if d == 1:
             N = Nx
         elif d == 2:
-            Ny = self.cellNumPerDim['Ny']
             N = Nx*Ny
         else:  # d == 3
-            Ny = self.cellNumPerDim['Ny']
-            Nz = self.cellNumPerDim['Nz']
             N = Nx*Ny*Nz
         return N
 
+    def getNumNodes(self):
+        '''
+        Return the number of nodes
+        '''
+        d = self.geometry.d
+        dic = self.getCellNumPerDim()
+        Nx = dic['Nx']
+        Ny = dic['Ny']
+        Nz = dic['Nz']
+        if d == 1:
+            return Nx+1
+        elif d == 2:
+            return (Nx+1)*(Ny+1)
+        else:  # d == 3
+            return (Nx+1)*(Ny+1)*(Nz+1)  # Check it is an integer
 
     def getCoords(self):
         '''
         Return the spatial coordinates.
         '''
-        d = self.geometry['d']
-        if d ==1:
-            lx = self.geometry['lx']
-            Nx = self.cellNumPerDim['Nx']
+        d = self.geometry.d
+        dic = self.getCellNumPerDim()
+        Nx = dic['Nx']
+        Ny = dic['Ny']
+        Nz = dic['Nz']
+        lx = self.geometry.lx
+        ly = self.geometry.ly
+        lz = self.geometry.lz
+        if d == 1:
             x = np.linspace(-lx/2, lx/2, Nx+1)
             y = np.zeros(Nx+1)
             z = np.zeros(Nx+1)
         elif d == 2:
-            lx = self.geometry['lx']
-            Nx = self.cellNumPerDim['Nx']
-            ly = self.geometry['ly']
-            Ny = self.cellNumPerDim['Ny']
-            n =(Nx+1)*(Ny+1)
+            n = (Nx+1)*(Ny+1)
             xlist = np.linspace(-lx/2, lx/2, Nx+1)
             ylist = np.linspace(-ly/2, ly/2, Ny+1)
             xg, yg = np.meshgrid(xlist, ylist)
@@ -150,13 +158,7 @@ class Mesh:
             y = np.reshape(yg, n)
             z = np.zeros(n)
         else:  # d == 3
-            lx = self.geometry['lx']
-            Nx = self.cellNumPerDim['Nx']
-            ly = self.geometry['ly']
-            Ny = self.cellNumPerDim['Ny']
-            lz = self.geometry['lz']
-            Nz = self.cellNumPerDim['Nz']
-            n =(Nx+1)*(Ny+1)*(Nz+1)
+            n = (Nx+1)*(Ny+1)*(Nz+1)
             xlist = np.linspace(-lx/2, lx/2, Nx+1)
             ylist = np.linspace(-ly/2, ly/2, Ny+1)
             zlist = np.linspace(-lz/2, lz/2, Nz+1)
@@ -164,18 +166,18 @@ class Mesh:
             x = np.reshape(xg, n)
             y = np.reshape(yg, n)
             z = np.reshape(zg, n)
-        self.numPoints = x.size
         return {'x': x, 'y': y, 'z': z}
 
     def getConnectivity(self):
         '''
-        Return the connectivity for the VTU file.
+        Return the connectivity used in the VTU format.
         '''
-        d = self.geometry['d']
-        Nx= self.cellNumPerDim['Nx']
+        d = self.geometry.d
+        dic = self.getCellNumPerDim()
+        Nx = dic['Nx']
+        Ny = dic['Ny']
+        Nz = dic['Nz']
         if d == 3:
-            Ny= self.cellNumPerDim['Ny']
-            Nz= self.cellNumPerDim['Nz']
             N = Nx*Ny*Nz
             c = np.zeros([8, N])
             for i in range(0, Nx):
@@ -191,7 +193,6 @@ class Mesh:
             c[7] = c[6] + 1
             c = (np.transpose(c)).astype(int)
         elif d == 2:
-            Ny= self.cellNumPerDim['Ny']
             N = Nx*Ny  # number of cells
             c = np.zeros([4, N])
             for i in range(0, Ny):
@@ -206,42 +207,41 @@ class Mesh:
             c[0] = np.arange(Nx)
             c[1] = c[0] + 1
             c = (np.transpose(c)).astype(int)
-        return c 
+        return c
 
     def getOffsets(self):
         '''
-        Return the offset for the VTU file
+        Return the offsets used in the VTU format.
         '''
-        d = self.geometry['d']
-        Nx= self.cellNumPerDim['Nx']
+        d = self.geometry.d
+        dic = self.getCellNumPerDim()
+        Nx = dic['Nx']
+        Ny = dic['Ny']
+        Nz = dic['Nz']
         if d == 1:
             offsets = np.arange(2, Nx*2+2, 2)
-        elif d ==2:
-            Ny= self.cellNumPerDim['Ny']
+        elif d == 2:
             offsets = np.arange(4, Nx*Ny*4+4, 4)
         else:  # d == 3
-            Ny= self.cellNumPerDim['Ny']
-            Nz= self.cellNumPerDim['Nz']
             offsets = np.arange(8, Nx*Ny*Nz*8+8, 8)
         return offsets.astype(int)
 
     def getTypes(self):
         '''
-        Return the cell type for the VTU file
-        if d == 1 type = 4, if d == 2 type = 8, else type = 11
+        Return the cell type used in the VTU format.
         '''
-        d = self.geometry['d']
-        Nx= self.cellNumPerDim['Nx']
+        d = self.geometry.d
+        dic = self.getCellNumPerDim()
+        Nx = dic['Nx']
+        Ny = dic['Ny']
+        Nz = dic['Nz']
         if d == 1:
             cellType = 4  # VTK_POLY_LINE
             types = cellType*np.ones(Nx)
-        elif d ==2:
+        elif d == 2:
             cellType = 8  # VTK_PIXEL
-            Ny= self.cellNumPerDim['Ny']
             types = cellType*np.ones(Nx*Ny)
         else:  # d == 3
             cellType = 11  # VTK_VOXEL
-            Ny= self.cellNumPerDim['Ny']
-            Nz= self.cellNumPerDim['Nz']
             types = cellType*np.ones(Nx*Ny*Nz)
         return types.astype(int)
