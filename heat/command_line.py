@@ -66,10 +66,13 @@ def main(gui, config, reset, output_filepath):
     function on a line (1D), a rectangle (2D), or a block (3D).
     """
     configFileName = BASE_DIR.child('config.ini')
+    defaultResultFileName = DATA_DIR.child("lastSolution.vtu")
     vtk = VTK()
     if not os.path.exists(configFileName):
         # If the configuration file doesn't exist create one.
         Model.writeDefaultConfig()
+    if not os.path.exists(defaultResultFileName):
+        os.makedirs(DATA_DIR)
 
     if reset:
         # Reset the configuration file and exit.
@@ -79,13 +82,14 @@ def main(gui, config, reset, output_filepath):
         editConfig(configFileName)
     elif gui:
         # Edit the configuration file using the GUI.
-        print("Starting GUI, pres ctrl+C to exit from the terminal.")
-        model = Model(output_filepath)  # read config first
-        root = tk.Tk()
-        app = MainApplication(root)
-        app.center_window(500, 400)
-        root.mainloop()
-        vtk.writeVTU(model, solution)
+        print("This functionality hasn't been implemented yet.")
+        #print("Starting GUI, pres ctrl+C to exit from the terminal.")
+        #model = Model(output_filepath)  # read config first
+        #root = tk.Tk()
+        #app = MainApplication(root)
+        #app.center_window(500, 400)
+        #root.mainloop()
+        #vtk.writeVTU(model, solution)
         #model.writeConfig()
     else:  # compute and save the solution for the specified parameters.
         model = Model(output_filepath)  # read config first
@@ -100,28 +104,6 @@ def main(gui, config, reset, output_filepath):
             except OSError as exc: # Guard against race condition
                 if exc.errno != errno.EEXIST:
                     raise
-        vtk.writeVTU(model)
-        print(vtk.readVTU(model.output)[0])
+        #vtk.writeVTU(model)
+        #print(vtk.readVTU(model.output)[0])
         #model.writeConfig()
-
-        '''
-        s = domain.Settings()
-        s.l1 = np.float128(1.5)
-        s.l2 = np.float128(1.0)
-        s.alpha = np.float128(1.19e-4)
-        s.T0 = np.float128(1.0)
-        s.tmin = np.float128(0.0)
-        s.tmax = np.float128(100.0)
-        s.tSize = 11
-        s.meshSize = 'fine'
-        s.absTol = np.float128(1e-20)
-        s.dtype = np.float128
-
-        T = Temperature(s)
-        data_b64 = base64.b64encode(T.sol.data)
-        data = base64.b64decode(data_b64)
-        dd= np.frombuffer(data, np.float128).reshape(T.sol.shape)
-        dd1 = dict(__ndarray__=data_b64,dtype=str(T.sol.dtype),shape=T.sol.shape)
-        print(dd1.get('dtype'))
-        #print(dd-T.sol)
-        '''

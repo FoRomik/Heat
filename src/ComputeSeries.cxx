@@ -67,9 +67,9 @@ double ComputeSeries::sumForward(double tol)
     int i = 0;
     while( eps > tol )
     {
-        out = out  + (this->*p_fct)(i);
-        eps = abs(temp-out);
-        temp = out;
+        temp = (this->*p_fct)(i);
+        out = out  + temp;
+        eps = abs(temp);
         i++;
         if (i > nMax) {
             // maximum number of iterarion reached

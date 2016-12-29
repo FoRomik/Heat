@@ -140,12 +140,41 @@ private:
      *  \left(1-\exp\left(-\alpha \frac{\pi^2n^2}{l^2}t\right)\right)
      *  \label{eq:bnd8}\end{equation}.\f]
      *
-     *  Starting the summation at \f$n = 0\f$ gives:
-     *  \f[\begin{equation}T_{b}(x, t) = \frac{2}{\pi}\sum_{n=0}^\infty 
-     *  \frac{1}{(n+1)}\left(a_1-(-1)^{n+1} a_2\right) 
-     *   \sin\left(\frac{(n+1)\pi x}{l}\right)
-     *  \left(1-\exp\left(-\alpha \frac{\pi^2(n+1)^2}{l^2}t\right)\right)
+     *  The latter equation can be expanded such as:
+     *  \f[\begin{equation}T_{b}(x, t) = \frac{2a_1}{\pi}\sum_{n=1}^\infty 
+     *  \frac{1}{n}\sin\left(\frac{n\pi x}{l}\right)-
+     *  \frac{2a_2}{\pi}\sum_{n=1}^\infty 
+     *  \frac{(-1)^n}{n}\sin\left(\frac{n\pi x}{l}\right)-
+     *  \frac{2}{\pi}\sum_{n=1}^\infty 
+     *  \frac{1}{n}\left(a_1-(-1)^n a_2\right)\sin\left(\frac{n\pi x}{l}\right)
+     *  \exp\left(-\alpha \frac{\pi^2n^2}{l^2}t\right)
      *  \label{eq:bnd9}\end{equation}.\f]
+     *
+     *  with
+     *  \f[\begin{equation}\sum_{n=1}^\infty 
+     *  \frac{1}{n}\sin\left(\frac{n\pi x}{l}\right)=\frac{\pi}{2}\left(1-\frac{x}{l}\right),
+     *  \quad \frac{x}{l}\in ]0, 1]
+     *  \label{eq:bnd10}\end{equation}.\f]
+     *
+     *  and
+     *  \f[\begin{equation}\sum_{n=1}^\infty 
+     *  \frac{(-1)^{n-1}}{n}\sin\left(\frac{n\pi x}{l}\right)=\frac{\pi}{2}\frac{x}{l},
+     *  \quad \frac{x}{l}\in [0, 1]
+     *  \label{eq:bnd11}\end{equation}.\f]     
+     *
+     *  we have:
+     *  \f[\begin{equation}T_{b}(x, t) = a_1+\left(a_2-a_1\right)\frac{x}{l}+
+     *  \frac{2}{\pi}\sum_{n=1}^\infty 
+     *  \frac{1}{n}\left((-1)^n a_2-a_1\right)\sin\left(\frac{n\pi x}{l}\right)
+     *  \exp\left(-\alpha \frac{\pi^2n^2}{l^2}t\right)
+     *  \label{eq:bnd12}\end{equation}.\f]
+     *
+     *  Starting the summation at \f$n = 0\f$ gives:
+     *  \f[\begin{equation}T_{b}(x, t) = a_1+\left(a_2-a_1\right)\frac{x}{l}+
+     *  \frac{2}{\pi}\sum_{n=0}^\infty 
+     *  \frac{1}{n+1}\left((-1)^{n+1} a_2-a_1\right)\sin\left(\frac{(n+1)\pi x}{l}\right)
+     *  \exp\left(-\alpha \frac{\pi^2(n+1)^2}{l^2}t\right)
+     *  \label{eq:bnd13}\end{equation}.\f]
      *
      */
     void getDirichletExpression(double* p_expression, double n);

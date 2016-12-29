@@ -6,7 +6,7 @@ class Mesh:
     """
 
     """
-    def __init__(self, size, geometry):
+    def __init__(self, size='coarse', geometry=Geometry()):
         self.size = size
         if self.checkSize():
             self.geometry = geometry

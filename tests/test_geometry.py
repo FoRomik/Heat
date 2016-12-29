@@ -48,7 +48,7 @@ class Test3DGeometry(unittest.TestCase):
                                     'l=u is not a valid length.'):
             geom.checkLength('u', 'x')
 
-    def test_validateGeometry_dension(self):
+    def test_validateGeometry_dimension(self):
         '''
         generate error if d > 3
         '''

@@ -1,9 +1,12 @@
 import numpy as np
+from heat.geometry import Geometry
+
 
 class Initial:
     '''
     '''
-    def __init__(self, fct, a, b=0.0, c=0.0):
+    def __init__(self, geometry=Geometry(), fct='uniform', a=1.0, b=0.0, c=0.0):
+        self.geometry = geometry
         self.fct = fct
         self.a = a
         self.b = b

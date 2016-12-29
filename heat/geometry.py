@@ -1,11 +1,12 @@
 import numbers
+import numpy as np
 
 
 class Geometry:
     """
     Get the model geometry.
     """
-    def __init__(self, d, lx, ly=None, lz=None):
+    def __init__(self, d=1, lx=1.0, ly=None, lz=None):
         self.d = int(d)
         self.lx = lx
         self.ly = ly
@@ -66,3 +67,13 @@ class Geometry:
             return np.max(np.array([self.lx, self.ly]))
         else:
             return np.max(np.array([self.lx, self.ly, self.lz]))
+
+    def getSettings(self):
+        '''Return the geometry settings.
+        '''
+        if self.d == 1:
+            return [1, self.lx, 0.0, 0.0]
+        elif self.d == 2:
+            return [1, self.lx, self.ly, 0.0]
+        else:  # 3D
+            return [1, self.lx, self.ly, self.lz]

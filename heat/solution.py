@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-from . import domain
+#from . import domain
 import os
+
+
+class Solution:
+    """
+    """
+    pass
 
 """
 class Temperature:
