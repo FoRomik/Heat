@@ -110,10 +110,13 @@
 <span class="sd">    function on a line (1D), a rectangle (2D), or a block (3D).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">configFileName</span> <span class="o">=</span> <span class="n">BASE_DIR</span><span class="o">.</span><span class="n">child</span><span class="p">(</span><span class="s1">&#39;config.ini&#39;</span><span class="p">)</span>
+    <span class="n">defaultResultFileName</span> <span class="o">=</span> <span class="n">DATA_DIR</span><span class="o">.</span><span class="n">child</span><span class="p">(</span><span class="s2">&quot;lastSolution.vtu&quot;</span><span class="p">)</span>
     <span class="n">vtk</span> <span class="o">=</span> <span class="n">VTK</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">configFileName</span><span class="p">):</span>
         <span class="c1"># If the configuration file doesn&#39;t exist create one.</span>
         <span class="n">Model</span><span class="o">.</span><span class="n">writeDefaultConfig</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">defaultResultFileName</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">reset</span><span class="p">:</span>
         <span class="c1"># Reset the configuration file and exit.</span>
@@ -123,13 +126,14 @@
         <span class="n">editConfig</span><span class="p">(</span><span class="n">configFileName</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">gui</span><span class="p">:</span>
         <span class="c1"># Edit the configuration file using the GUI.</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Starting GUI, pres ctrl+C to exit from the terminal.&quot;</span><span class="p">)</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">output_filepath</span><span class="p">)</span>  <span class="c1"># read config first</span>
-        <span class="n">root</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
-        <span class="n">app</span> <span class="o">=</span> <span class="n">MainApplication</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
-        <span class="n">app</span><span class="o">.</span><span class="n">center_window</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
-        <span class="n">root</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
-        <span class="n">vtk</span><span class="o">.</span><span class="n">writeVTU</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">solution</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;This functionality hasn&#39;t been implemented yet.&quot;</span><span class="p">)</span>
+        <span class="c1">#print(&quot;Starting GUI, pres ctrl+C to exit from the terminal.&quot;)</span>
+        <span class="c1">#model = Model(output_filepath)  # read config first</span>
+        <span class="c1">#root = tk.Tk()</span>
+        <span class="c1">#app = MainApplication(root)</span>
+        <span class="c1">#app.center_window(500, 400)</span>
+        <span class="c1">#root.mainloop()</span>
+        <span class="c1">#vtk.writeVTU(model, solution)</span>
         <span class="c1">#model.writeConfig()</span>
     <span class="k">else</span><span class="p">:</span>  <span class="c1"># compute and save the solution for the specified parameters.</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">output_filepath</span><span class="p">)</span>  <span class="c1"># read config first</span>
@@ -144,31 +148,9 @@
             <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span> <span class="c1"># Guard against race condition</span>
                 <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">errno</span> <span class="o">!=</span> <span class="n">errno</span><span class="o">.</span><span class="n">EEXIST</span><span class="p">:</span>
                     <span class="k">raise</span>
-        <span class="n">vtk</span><span class="o">.</span><span class="n">writeVTU</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">vtk</span><span class="o">.</span><span class="n">readVTU</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">output</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="c1">#vtk.writeVTU(model)</span>
+        <span class="c1">#print(vtk.readVTU(model.output)[0])</span>
         <span class="c1">#model.writeConfig()</span>
-
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        s = domain.Settings()</span>
-<span class="sd">        s.l1 = np.float128(1.5)</span>
-<span class="sd">        s.l2 = np.float128(1.0)</span>
-<span class="sd">        s.alpha = np.float128(1.19e-4)</span>
-<span class="sd">        s.T0 = np.float128(1.0)</span>
-<span class="sd">        s.tmin = np.float128(0.0)</span>
-<span class="sd">        s.tmax = np.float128(100.0)</span>
-<span class="sd">        s.tSize = 11</span>
-<span class="sd">        s.meshSize = &#39;fine&#39;</span>
-<span class="sd">        s.absTol = np.float128(1e-20)</span>
-<span class="sd">        s.dtype = np.float128</span>
-
-<span class="sd">        T = Temperature(s)</span>
-<span class="sd">        data_b64 = base64.b64encode(T.sol.data)</span>
-<span class="sd">        data = base64.b64decode(data_b64)</span>
-<span class="sd">        dd= np.frombuffer(data, np.float128).reshape(T.sol.shape)</span>
-<span class="sd">        dd1 = dict(__ndarray__=data_b64,dtype=str(T.sol.dtype),shape=T.sol.shape)</span>
-<span class="sd">        print(dd1.get(&#39;dtype&#39;))</span>
-<span class="sd">        #print(dd-T.sol)</span>
-<span class="sd">        &#39;&#39;&#39;</span>
 </pre></div>
 
           </div>
