@@ -44,22 +44,23 @@
   <h1>Source code for heat.solution</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="c1">#from . import domain</span>
+<span class="kn">from</span> <span class="nn">heat.mesh</span> <span class="kn">import</span> <span class="n">Mesh</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
 
 <div class="viewcode-block" id="Solution"><a class="viewcode-back" href="../../heat.html#heat.solution.Solution">[docs]</a><span class="k">class</span> <span class="nc">Solution</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">pass</span></div>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh</span><span class="o">=</span><span class="n">Mesh</span><span class="p">(),</span> <span class="n">sol</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span> <span class="o">=</span> <span class="n">mesh</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sol</span> <span class="o">=</span> <span class="n">sol</span>
+
+<div class="viewcode-block" id="Solution.getSolution"><a class="viewcode-back" href="../../heat.html#heat.solution.Solution.getSolution">[docs]</a>    <span class="k">def</span> <span class="nf">getSolution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sol</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div></div>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">class Temperature:</span>
-<span class="sd">    &#39;&#39;&#39;Temperature: Contains the solution.&#39;&#39;&#39;</span>
-<span class="sd">    def __init__(self,s):</span>
-<span class="sd">        self.s = s</span>
-<span class="sd">        self.sol = domain.Solution(self.s).compute()</span>
-
 <span class="sd">    def line(self, axis, valIndex, tIndex):</span>
 <span class="sd">        &#39;&#39;&#39;Line(): &#39;&#39;&#39;</span>
 <span class="sd">        s = self.s</span>
@@ -83,11 +84,6 @@
 <span class="sd">        else:</span>
 <span class="sd">            raise ValueError(&#39;axis must be &quot;x&quot; or &quot;y&quot;&#39;)</span>
 <span class="sd">        return{&#39;xcoord&#39;:xcoord,&#39;ycoord&#39;:ycoord}</span>
-
-<span class="sd">    def save(self):</span>
-<span class="sd">        &#39;&#39;&#39;save(): &#39;&#39;&#39;</span>
-<span class="sd">        sol = self.sol</span>
-<span class="sd">        np.savetxt(os.getcwd()+&#39;/data/test.txt&#39;, sol[0,:,:]) </span>
 <span class="sd">&quot;&quot;&quot;</span>
 </pre></div>
 

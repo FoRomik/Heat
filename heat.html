@@ -141,7 +141,7 @@ False.</td>
 <span id="heat-geometry-module"></span><h2>heat.geometry module<a class="headerlink" href="#module-heat.geometry" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="heat.geometry.Geometry">
-<em class="property">class </em><code class="descclassname">heat.geometry.</code><code class="descname">Geometry</code><span class="sig-paren">(</span><em>d=3</em>, <em>lx=1.0</em>, <em>ly=1.0</em>, <em>lz=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/geometry.html#Geometry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.geometry.Geometry" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">heat.geometry.</code><code class="descname">Geometry</code><span class="sig-paren">(</span><em>d=3</em>, <em>lx=1.0</em>, <em>ly=2.0</em>, <em>lz=3.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/geometry.html#Geometry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.geometry.Geometry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the model geometry.</p>
 <dl class="method">
 <dt id="heat.geometry.Geometry.checkLength">
@@ -205,7 +205,7 @@ False.</td>
 <span id="heat-initial-module"></span><h2>heat.initial module<a class="headerlink" href="#module-heat.initial" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="heat.initial.Initial">
-<em class="property">class </em><code class="descclassname">heat.initial.</code><code class="descname">Initial</code><span class="sig-paren">(</span><em>geometry=&lt;heat.geometry.Geometry instance&gt;</em>, <em>fct='uniform'</em>, <em>a=300.0</em>, <em>b=0.0</em>, <em>c=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/initial.html#Initial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.initial.Initial" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">heat.initial.</code><code class="descname">Initial</code><span class="sig-paren">(</span><em>mesh=&lt;heat.mesh.Mesh instance&gt;</em>, <em>fct='uniform'</em>, <em>a=300.0</em>, <em>b=0.0</em>, <em>c=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/initial.html#Initial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.initial.Initial" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="heat.initial.Initial.compute">
 <code class="descname">compute</code><span class="sig-paren">(</span><em>bcType</em>, <em>Coords</em>, <em>tArray</em>, <em>alpha</em>, <em>tol=1e-20</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/initial.html#Initial.compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.initial.Initial.compute" title="Permalink to this definition">¶</a></dt>
@@ -228,6 +228,16 @@ x = x+l/2.</p>
 <dl class="method">
 <dt id="heat.initial.Initial.getSolutionComponent">
 <code class="descname">getSolutionComponent</code><span class="sig-paren">(</span><em>u</em>, <em>xArray</em>, <em>tArray</em>, <em>tol</em>, <em>component</em>, <em>term</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/initial.html#Initial.getSolutionComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.initial.Initial.getSolutionComponent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="heat.initial.Initial.getSolutionComponent2D">
+<code class="descname">getSolutionComponent2D</code><span class="sig-paren">(</span><em>u</em>, <em>xArray</em>, <em>tArray</em>, <em>tol</em>, <em>component</em>, <em>term</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/initial.html#Initial.getSolutionComponent2D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.initial.Initial.getSolutionComponent2D" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="heat.initial.Initial.getSolutionComponent3D">
+<code class="descname">getSolutionComponent3D</code><span class="sig-paren">(</span><em>u</em>, <em>xArray</em>, <em>tArray</em>, <em>tol</em>, <em>component</em>, <em>term</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/initial.html#Initial.getSolutionComponent3D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.initial.Initial.getSolutionComponent3D" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -465,8 +475,13 @@ x = x+l/2.</p>
 <span id="heat-solution-module"></span><h2>heat.solution module<a class="headerlink" href="#module-heat.solution" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="heat.solution.Solution">
-<em class="property">class </em><code class="descclassname">heat.solution.</code><code class="descname">Solution</code><a class="reference internal" href="_modules/heat/solution.html#Solution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.solution.Solution" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">heat.solution.</code><code class="descname">Solution</code><span class="sig-paren">(</span><em>mesh=&lt;heat.mesh.Mesh instance&gt;</em>, <em>sol={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/solution.html#Solution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.solution.Solution" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="heat.solution.Solution.getSolution">
+<code class="descname">getSolution</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/solution.html#Solution.getSolution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.solution.Solution.getSolution" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+</dd></dl>
 
 </div>
 <div class="section" id="module-heat.source">
@@ -611,7 +626,8 @@ boundary[26]: k2 in the z-direction</p>
 <dl class="method">
 <dt id="heat.wrapper.ComputeSeries.getSumForward">
 <code class="descname">getSumForward</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#heat.wrapper.ComputeSeries.getSumForward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the forward sum.</p>
+<dd><p>Get the forward sum. If nMax equals None, use the default argument
+nMax = 50000.</p>
 </dd></dl>
 
 <dl class="method">
