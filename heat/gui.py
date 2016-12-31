@@ -18,7 +18,7 @@ class MainApplication(tk.Frame):
         #tk.Frame.__init__(self, parent, *args, **kwargs)
         super().__init__(parent, *args, **kwargs)
         self.parent = parent
-        # <create the rest of your GUI here>
+        # The rest of the GUI here
         parent.title("A simple GUI")
         f = Figure(figsize=(2.5, 2), dpi=100)
         a = f.add_subplot(111)

@@ -22,7 +22,7 @@ ComputeSeries::~ComputeSeries()
 {
 }
 
-double ComputeSeries::getSumForward(double tol, int flag, double t)
+double ComputeSeries::getSumForward(double tol, int nMax)
 {
     double result = 0.0;
     //mpz_class x("7612058254738945");
@@ -35,7 +35,7 @@ double ComputeSeries::getSumForward(double tol, int flag, double t)
             << x * y << "\n";
     */
     try {
-        result = sumForward(tol, flag, t);
+        result = sumForward(tol, nMax);
     } catch (exc_MaxItReached& e) {
         cout << e.what() << endl;
         //exit(0);
@@ -65,12 +65,11 @@ double ComputeSeries::getLastNumberOfIterations()
 }
 
 // Use the function pointer to calculate the sum
-double ComputeSeries::sumForward(double tol, int flag, double t)
+double ComputeSeries::sumForward(double tol, int nMax)
 {
     //Assert tol >=1
     assert(tol<1.0); // this will terminate the execution if true
 
-    double nMax = 5.0e4;
     double out = 0.0;
     double temp = 0.0;
     double eps = 1.0; // eps > tol
@@ -79,15 +78,13 @@ double ComputeSeries::sumForward(double tol, int flag, double t)
     {
         temp = (this->*p_fct)(i);
         out = out  + temp;
-        if (flag!=0)
-            temp = 0.1*tol;
         eps = abs(temp);
         i++;
         if (i > nMax) {
             // maximum number of iterarion reached
             absErr = eps;
             nIt = i;
-            throw exc_MaxItReached(out, absErr, nIt, t);
+            throw exc_MaxItReached(out, absErr, nIt);
         }
     }
     absErr = eps;
@@ -117,7 +114,7 @@ double ComputeSeries::sumKahan(double tol)
 {
     //throw exception if tol >=1 or use assert
     if (tol>=1.0) {
-        throw exc_MaxItReached(2.0, 1.0, 2, 12.0);
+        throw exc_MaxItReached(2.0, 1.0, 2);
     }
     //assert(tol<1.0);
     

@@ -32,7 +32,7 @@ double Dummy::fct(int n) {
 
 TEST(ComputeSeriesTest, testSumForward_1) {
     Dummy d;
-    double out = d.getSumForward(1e-8, 0, 0.0);
+    double out = d.getSumForward(1e-8);
     // Geometric series exact solution is out = 1/(1-r), where r = 1/2
     EXPECT_NEAR(out, 2.0, 1e-8);
     //EXPECT_FLOAT_EQ(out, 0.5);

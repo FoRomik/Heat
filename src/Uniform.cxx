@@ -60,14 +60,18 @@ void Uniform::getDirichletExpression(double *p_expression, double n){
     double arg2 = (n+1.0)*PI/nd.l;
     switch (term) {
         case INITIAL:
-            if (nd.t==0) {
-                *p_expression = pow(a0,1.0/(double)nd.dim);
-            }
-            if (nd.x<=0.0001||nd.x>=1.0001*nd.l) {
-                // if at the boundaries, the result is 0.0
+            if (nd.x<=0.0001||nd.x>=0.9999*nd.l) {
+                // if at the boundaries, the exact solution is 0.0
                 *p_expression = 0.0;
+            } else if (nd.t == 0.0) {
+                  if (n==0) {
+                      // if t = 0, the exact solution is the initial temperature
+                      *p_expression = pow(a0,1.0/(double)nd.dim);
+                  } else {
+                      *p_expression = 0.0;
+                  }
             } else {
-                *p_expression = pow(a0,1.0/(double)nd.dim)*(4.0/PI)*1.0/(2.0*n+1.0)
+                 *p_expression = pow(a0,1.0/(double)nd.dim)*(4.0/PI)*1.0/(2.0*n+1.0)
                                 *sin(arg1*nd.x)*exp(-nd.alpha*pow(arg1,2.0)*nd.t);
             }
             break;

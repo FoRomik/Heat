@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-#from . import domain
+from heat.mesh import Mesh
 import os
 
 
 class Solution:
     """
     """
-    pass
+    def __init__(self, mesh=Mesh(), sol={}):
+        self.mesh = mesh
+        self.sol = sol
+
+    def getSolution(self, index):
+        """
+        """
+        return self.sol[index]
 
 """
-class Temperature:
-    '''Temperature: Contains the solution.'''
-    def __init__(self,s):
-        self.s = s
-        self.sol = domain.Solution(self.s).compute()
-
     def line(self, axis, valIndex, tIndex):
         '''Line(): '''
         s = self.s
@@ -39,9 +40,4 @@ class Temperature:
         else:
             raise ValueError('axis must be "x" or "y"')
         return{'xcoord':xcoord,'ycoord':ycoord}
-
-    def save(self):
-        '''save(): '''
-        sol = self.sol
-        np.savetxt(os.getcwd()+'/data/test.txt', sol[0,:,:]) 
 """

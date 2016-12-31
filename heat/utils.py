@@ -70,7 +70,7 @@ DEFAULT_SETTINGS_1D = {'geometry': [1, 1.0, None, None],
                                     0.0, 0.0, 0.0] 
                        }
 
-DEFAULT_SETTINGS_2D = {'geometry': [2, 1.0, 2.0, None],
+DEFAULT_SETTINGS_2D = {'geometry': [2, 1.0, 3.0, None],
                        'mesh': 'coarse',
                        'material': ['Copper', 8960.0, 401.0, 385.0],
                        'initial': ['uniform', 300.0, 0.0, 0.0],
@@ -87,7 +87,7 @@ DEFAULT_SETTINGS_2D = {'geometry': [2, 1.0, 2.0, None],
                                     0.0, 0.0, 0.0] 
                        }
 
-DEFAULT_SETTINGS_3D = {'geometry': [3, 1.0, 1.0, 1.0],
+DEFAULT_SETTINGS_3D = {'geometry': [3, 1.0, 2.0, 3.0],
                        'mesh': 'normal',
                        'material': ['Copper', 8960.0, 401.0, 385.0],
                        'initial': ['uniform', 300.0, 0.0, 0.0],

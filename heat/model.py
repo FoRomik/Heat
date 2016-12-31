@@ -26,6 +26,7 @@ class Model:
         self.initial = Initial()
         self.source = Source()
         self.boundary = Boundary()
+        self.solution = Solution()
         # The model class is always initialized reading the configuration file
         self.readConfig()
 
@@ -170,12 +171,11 @@ class Model:
         print('Computing:')
         initTerm = self.initial.compute(bc, Coords, tArray, alpha)
         '''
-        initTerm = initial.compute(bc[0], Coords[dim[0]], tArray, alpha)
         srcTerm = source.compute(bc[0], Coords[dim[0]], tArray, alpha)
         bndTerm = boundary.compute(bc[0], Coords[dim[0]], tArray, alpha)
         '''
         sol = initTerm  # + srcTerm + bndTerm
-        self.solution = sol[0]  # np.random.rand(self.mesh.getNumNodes())
+        self.solution.sol = sol  # np.random.rand(self.mesh.getNumNodes())
 
     def getTimeList(self, coeff=100, length=101):
         '''Return the simulation time list
@@ -322,7 +322,7 @@ class Model:
                 raise ValueError("Congiguration file [{0}]: exception on {1}."
                                  .format(section, option))
         try:
-            self.initial = Initial(self.geometry,
+            self.initial = Initial(self.mesh,
                                    dic['dist'],
                                    dic['a'],
                                    dic['b'],
