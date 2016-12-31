@@ -44,13 +44,15 @@
   <h1>Source code for heat.geometry</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numbers</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">DEFAULT_SETTINGS</span>
 
+<span class="n">ds</span> <span class="o">=</span> <span class="n">DEFAULT_SETTINGS</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Geometry"><a class="viewcode-back" href="../../heat.html#heat.geometry.Geometry">[docs]</a><span class="k">class</span> <span class="nc">Geometry</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the model geometry.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lx</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ly</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">lz</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lx</span><span class="o">=</span><span class="n">ds</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ly</span><span class="o">=</span><span class="n">ds</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">lz</span><span class="o">=</span><span class="n">ds</span><span class="p">[</span><span class="mi">3</span><span class="p">]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lx</span> <span class="o">=</span> <span class="n">lx</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ly</span> <span class="o">=</span> <span class="n">ly</span>
@@ -120,7 +122,14 @@
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ly</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># 3D</span>
-            <span class="k">return</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ly</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lz</span><span class="p">]</span></div></div>
+            <span class="k">return</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ly</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lz</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Geometry.printSettings"><a class="viewcode-back" href="../../heat.html#heat.geometry.Geometry.printSettings">[docs]</a>    <span class="k">def</span> <span class="nf">printSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the settings as a string for file I/O</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getSettings</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;Geometry={0},{1},{2},{3}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span></div></div>
 </pre></div>
 
           </div>

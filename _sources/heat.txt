@@ -84,6 +84,14 @@ heat.source module
     :undoc-members:
     :show-inheritance:
 
+heat.utils module
+-----------------
+
+.. automodule:: heat.utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 heat.vtktools module
 --------------------
 

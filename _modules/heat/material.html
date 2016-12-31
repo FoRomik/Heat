@@ -43,11 +43,14 @@
             
   <h1>Source code for heat.material</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numbers</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">DEFAULT_SETTINGS</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">DEFAULT_SETTINGS</span><span class="p">[</span><span class="s1">&#39;material&#39;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Material"><a class="viewcode-back" href="../../heat.html#heat.material.Material">[docs]</a><span class="k">class</span> <span class="nc">Material</span><span class="p">:</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Copper&#39;</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="mf">8960.0</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mf">401.0</span><span class="p">,</span> <span class="n">cp</span><span class="o">=</span><span class="mf">385.0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rho</span><span class="o">=</span><span class="n">ds</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="n">ds</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">cp</span><span class="o">=</span><span class="n">ds</span><span class="p">[</span><span class="mi">3</span><span class="p">]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
@@ -77,7 +80,19 @@
 <div class="viewcode-block" id="Material.getAlpha"><a class="viewcode-back" href="../../heat.html#heat.material.Material.getAlpha">[docs]</a>    <span class="k">def</span> <span class="nf">getAlpha</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Get the thermal diffusivity</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">cp</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">cp</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Material.getSettings"><a class="viewcode-back" href="../../heat.html#heat.material.Material.getSettings">[docs]</a>    <span class="k">def</span> <span class="nf">getSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Return the material settings.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cp</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Material.printSettings"><a class="viewcode-back" href="../../heat.html#heat.material.Material.printSettings">[docs]</a>    <span class="k">def</span> <span class="nf">printSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the settings as a string for file I/O</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getSettings</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;Material={0},{1},{2},{3}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span>
+                <span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span></div></div>
 </pre></div>
 
           </div>

@@ -44,13 +44,15 @@
   <h1>Source code for heat.mesh</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">.geometry</span> <span class="kn">import</span> <span class="n">Geometry</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">DEFAULT_SETTINGS</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">DEFAULT_SETTINGS</span><span class="p">[</span><span class="s1">&#39;mesh&#39;</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="Mesh"><a class="viewcode-back" href="../../heat.html#heat.mesh.Mesh">[docs]</a><span class="k">class</span> <span class="nc">Mesh</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;coarse&#39;</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">Geometry</span><span class="p">()):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">Geometry</span><span class="p">()):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkSize</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="n">geometry</span>
@@ -288,7 +290,17 @@
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># d == 3</span>
             <span class="n">cellType</span> <span class="o">=</span> <span class="mi">11</span>  <span class="c1"># VTK_VOXEL</span>
             <span class="n">types</span> <span class="o">=</span> <span class="n">cellType</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">Nx</span><span class="o">*</span><span class="n">Ny</span><span class="o">*</span><span class="n">Nz</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">types</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">types</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Mesh.getSettings"><a class="viewcode-back" href="../../heat.html#heat.mesh.Mesh.getSettings">[docs]</a>    <span class="k">def</span> <span class="nf">getSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Return the mesh settings.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span></div>
+
+<div class="viewcode-block" id="Mesh.printSettings"><a class="viewcode-back" href="../../heat.html#heat.mesh.Mesh.printSettings">[docs]</a>    <span class="k">def</span> <span class="nf">printSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the settings as a string for file I/O</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;Mesh={0}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">))</span></div></div>
 </pre></div>
 
           </div>
