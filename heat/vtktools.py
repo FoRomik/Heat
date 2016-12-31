@@ -19,61 +19,32 @@ class VTK:
         self.fileNames = []
 
     def prettify(self, elem):
-        '''
-        Return a pretty-printed XML string for the Element.
+        '''Return a pretty-printed XML string for the Element.
         '''
         rough_string = ET.tostring(elem, 'utf-8')
         reparsed = xml.dom.minidom.parseString(rough_string)
         return reparsed.toprettyxml(indent="  ")
 
     def writeVTU(self, model):
-        '''
-        ARGUMENTS:
-        model           the model class
-        solution        array of temperatures
+        '''Write the solution file
         '''
         fileName = model.output
         T = model.solution
-        parameters = model.getSettings()
-        geomdic = model.mesh.getCoords()
-        x = geomdic['x']
-        y = geomdic['y']
-        z = geomdic['z']
+        coords = model.mesh.getCoords()
+        x = coords['x']
+        y = coords['y']
+        z = coords['z']
         numCells = model.mesh.getNumCells()
         offsets = model.mesh.getOffsets()
         types = model.mesh.getTypes()
         c = model.mesh.getConnectivity()
-        geom = 'Geometry={0},{1},{2},{3}\n'.format(parameters['geometry'].d,
-                                                   parameters['geometry'].lx,
-                                                   parameters['geometry'].ly,
-                                                   parameters['geometry'].lz)
-        mesh = 'Mesh={0}\n'.format(parameters['mesh'])
-        mat = 'Material={0},{1},{2},{3}\n'.format(parameters['material'][0],
-                                              parameters['material'][1],
-                                              parameters['material'][2],
-                                              parameters['material'][3])
-        init = 'Initial={0},{1},{2},{3}\n'.format(parameters['initial'][0],
-                                                  parameters['initial'][1],
-                                                  parameters['initial'][2],
-                                                  parameters['initial'][3])
-        src = 'Source={},{},{},{},{},{},{}\n'.format(parameters['source'][0],
-                                                     parameters['source'][1],
-                                                     parameters['source'][2],
-                                                     parameters['source'][3],
-                                                     parameters['source'][4],
-                                                     parameters['source'][5],
-                                                     parameters['source'][6])
-        bnd = 'Boundary={},{},{},{},{},{},{},{},{}\n'.format(parameters['boundary'][0],
-                                                             parameters['boundary'][1],
-                                                             parameters['boundary'][2],
-                                                             parameters['boundary'][3],
-                                                             parameters['boundary'][4],
-                                                             parameters['boundary'][5],
-                                                             parameters['boundary'][6],
-                                                             parameters['boundary'][7],
-                                                             parameters['boundary'][8])
-        
-        comment = ET.Comment('\n    Parameters:\n    '+geom+'    '+\
+        geom = model.geometry.printSettings()
+        mesh = model.mesh.printSettings()
+        mat = model.material.printSettings()
+        init = model.initial.printSettings()
+        src = model.source.printSettings()
+        bnd = model.boundary.printSettings()
+        comment = ET.Comment('\n    Settings:\n    '+geom+'    '+\
                               mesh+'    '+mat+'    '+init+'    '+\
                               src+'    '+bnd+'  ')
         VTK = ET.Element('VTKFile', {'type': 'UnstructuredGrid',
@@ -86,7 +57,7 @@ class VTK:
         piece = ET.SubElement(ug, 'Piece', {'NumberOfPoints': str(T.size),
                                             'NumberOfCells': str(numCells)}) # define from geomdic
         pdata = ET.SubElement(piece, 'PointData', {'Scalars': 'scalars'})
-        darray = ET.SubElement(pdata, 'DataArray', {'type': 'Float32',
+        darray = ET.SubElement(pdata, 'DataArray', {'type': 'Float64',
                                                     'Name': 'Temperature',
                                                     'Format': 'ascii'})
         Tstr = ['\n          ']
@@ -96,7 +67,7 @@ class VTK:
         Tstr = Tstr[:-2]
         darray.text = Tstr
         points = ET.SubElement(piece, 'Points')
-        darray = ET.SubElement(points, 'DataArray', {'type': 'Float32',
+        darray = ET.SubElement(points, 'DataArray', {'type': 'Float64',
                                                      'NumberOfComponents': '3',
                                                      'Format': 'ascii'})
         Pstr = ['\n          ']
@@ -108,7 +79,7 @@ class VTK:
         # Type 1D=4, 2D=8, 3D=11 for line, square, cube
         # Type 2D=5 triangle, 3D = 10 tetra
         cells = ET.SubElement(piece, 'Cells')
-        darray = ET.SubElement(cells, 'DataArray', {'type': 'Int32',
+        darray = ET.SubElement(cells, 'DataArray', {'type': 'Int64',
                                        'Name': 'connectivity',
                                        'Format': 'ascii'})
         Cstr = ['\n          ']
@@ -119,7 +90,7 @@ class VTK:
         Cstr = ''.join(Cstr)
         Cstr = Cstr[:-2]
         darray.text = Cstr
-        darray = ET.SubElement(cells, 'DataArray', {'type': 'Int32',
+        darray = ET.SubElement(cells, 'DataArray', {'type': 'Int64',
                                        'Name': 'offsets',
                                        'Format': 'ascii'})
         Ostr = ['\n          ']
@@ -129,7 +100,7 @@ class VTK:
         Ostr = ''.join(Ostr)
         Ostr = Ostr[:-2]
         darray.text = Ostr
-        darray = ET.SubElement(cells, 'DataArray', {'type': 'Int32',
+        darray = ET.SubElement(cells, 'DataArray', {'type': 'Int64',
                                        'Name': 'types',
                                        'Format': 'ascii'})
         Tystr = ['\n          ']
@@ -174,8 +145,7 @@ class VTK:
         '''
 
     def readVTU(self, fileName):
-        '''
-        Read the VTU file and update the configuration file
+        '''Read the VTU file and update the model attributes
         '''
         parameters = {}
         keys = ['Geometry', 'Mesh', 'Material', 'Initial', 'Source', 'Boundary']

@@ -1,6 +1,7 @@
+import unittest
 import six
 from heat.geometry import Geometry
-import unittest
+from heat.utils import DEFAULT_SETTINGS
 
 
 class Test3DGeometry(unittest.TestCase):
@@ -72,7 +73,8 @@ class Test2DGeometry(unittest.TestCase):
         self.assertEqual(d, geom.d)
         self.assertEqual(lx, geom.lx)
         self.assertEqual(ly, geom.ly)
-        self.assertEqual(None, geom.lz)
+        self.assertEqual(DEFAULT_SETTINGS['geometry'][2],
+                         geom.lz)
 
     def test_checkLength_length(self):
         '''
@@ -112,8 +114,10 @@ class Test1DGeometry(unittest.TestCase):
         geom = Geometry(d, lx)
         self.assertEqual(d, geom.d)
         self.assertEqual(lx, geom.lx)
-        self.assertEqual(None, geom.ly)
-        self.assertEqual(None, geom.lz)
+        self.assertEqual(DEFAULT_SETTINGS['geometry'][1],
+                         geom.ly)
+        self.assertEqual(DEFAULT_SETTINGS['geometry'][2],
+                         geom.lz)
 
     def test_checkLength_length(self):
         '''

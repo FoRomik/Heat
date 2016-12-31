@@ -4,6 +4,7 @@ import numbers
 import numpy as np
 from unipath import Path
 
+from .utils import BASE_DIR, DATA_DIR, DEFAULT_SETTINGS
 from .geometry import Geometry
 from .mesh import Mesh
 from .material import Material
@@ -11,67 +12,6 @@ from .initial import Initial
 from .source import Source
 from .boundary import Boundary
 from .solution import Solution
-
-
-BASE_DIR = Path(__file__).ancestor(2)
-DATA_DIR = BASE_DIR.child("data")
-
-"""DEFAULT_SETTINGS
-   file: Default filename where the solution is saved
-   geometry[0]: dimension
-   geometry[1]: length in the x direction
-
-   source[0]: x-ccordinate of the center of the source
-   source[1]:
-   source[2]:
-   source[3]: Full-width at half-maxium in units of maximum length
-   source[4]: Time-dependent function type
-   source[5]: parameter for the time-dependent function
-   source[6]: parameter for the time dependent function
-   boundary[0]: boundary type in the x-direction
-   boundary[1]: boundary type in the y-direction
-
-   boundary[3]: function type on the first boundary in the x-direction 
-   boundary[4]: function type on the first boundary in the y-direction 
-   boundary[5]: function type on the first boundary in the z-direction 
-   boundary[6]: a1 in the x-direction 
-   boundary[7]: a1 in the y-direction 
-   boundary[8]: a1 in the z-direction
-   boundary[9]: b1 in the x-direction 
-   boundary[10]: b1 in the y-direction 
-   boundary[11]: b1 in the z-direction
-   boundary[12]: function type on the second boundary in the x-direction 
-   boundary[13]: function type on the second boundary in the y-direction 
-   boundary[14]: function type on the second boundary in the z-direction 
-   boundary[15]: a2 in the x-direction 
-   boundary[16]: a2 in the y-direction 
-   boundary[17]: a2 in the z-direction
-   boundary[18]: b2 in the x-direction 
-   boundary[19]: b2 in the y-direction 
-   boundary[20]: b2 in the z-direction
-   boundary[21]: k1 in the x-direction 
-   boundary[22]: k1 in the y-direction 
-   boundary[23]: k1 in the z-direction
-   boundary[24]: k2 in the x-direction 
-   boundary[25]: k2 in the y-direction 
-   boundary[26]: k2 in the z-direction  
-"""
-DEFAULT_SETTINGS = {'geometry': [2.0, 1.0, 1.0, 0.0],
-                    'mesh': 'coarse',
-                    'material': ['Copper', 8960.0, 401.0, 385.0],
-                    'initial': ['uniform', 1.0, 0.0, 0.0],
-                    'source': [0.0, 0.0, 0.0, 0.1,
-                               'uniform', 1000.0, 0.0],
-                    'boundary': ['dirichlet', 'dirichlet', 'dirichlet',
-                                 'uniform', 'uniform', 'uniform', 
-                                 1.0, 1.0, 1.0, 
-                                 1.0, 1.0, 1.0, 
-                                 'uniform', 'uniform', 'uniform', 
-                                 1.0, 1.0, 1.0, 
-                                 1.0, 1.0, 1.0,
-                                 -1.0, -1.0, -1.0, 
-                                 1.0, 1.0, 1.0] 
-                    }
 
 
 class Model:
@@ -84,6 +24,8 @@ class Model:
         self.mesh = Mesh()
         self.material = Material()
         self.initial = Initial()
+        self.source = Source()
+        self.boundary = Boundary()
         # The model class is always initialized reading the configuration file
         self.readConfig()
 
@@ -105,13 +47,12 @@ class Model:
         '''Generate the settings dictionary for file I/O
         '''
         settings = {}
-        settings['file'] = self.output
         settings['geometry'] = self.geometry.getSettings()
-        settings['mesh'] = self.mesh
-        settings['material'] = self.material
-        settings['initial'] = self.initial
-        settings['source'] = self.source
-        settings['boundary'] = self.boundary
+        settings['mesh'] = self.mesh.getSettings()
+        settings['material'] = self.material.getSettings()
+        settings['initial'] = self.initial.getSettings()
+        settings['source'] = self.source.getSettings()
+        settings['boundary'] = self.boundary.getSettings()
         return settings
 
     def updateModel(self):
@@ -119,11 +60,10 @@ class Model:
         '''
         pass
 
-    @staticmethod
-    def saveSettings():
+    def saveSettings(self):
         '''Write the current settings to the configuration file.
         '''
-        Model.getSettings(Model)
+        settings = self.getSettings()
         Model.writeConfig(settings, self.output)
     
     @staticmethod
@@ -213,47 +153,37 @@ class Model:
             Config.set('Boundary', 'g1', "[{0}, {1}, {2}]".format(bnd[3], bnd[4], bnd[5]))
             Config.set('Boundary', 'a1', "[{0}, {1}, {2}]".format(bnd[6], bnd[7], bnd[8]))
             Config.set('Boundary', 'b1', "[{0}, {1}, {2}]".format(bnd[9], bnd[10], bnd[11]))
-            Config.set('Boundary', 'g2', "[{0}, {1}, {2}]".format(bnd[12], bnd[13], bnd[14]))
-            Config.set('Boundary', 'a2', "[{0}, {1}, {2}]".format(bnd[15], bnd[16], bnd[17]))
-            Config.set('Boundary', 'b2', "[{0}, {1}, {2}]".format(bnd[18], bnd[19], bnd[20]))
-            Config.set('Boundary', 'k1', "[{0}, {1}, {2}]".format(bnd[21], bnd[22], bnd[23]))
+            Config.set('Boundary', 'k1', "[{0}, {1}, {2}]".format(bnd[12], bnd[13], bnd[14]))
+            Config.set('Boundary', 'g2', "[{0}, {1}, {2}]".format(bnd[15], bnd[16], bnd[17]))
+            Config.set('Boundary', 'a2', "[{0}, {1}, {2}]".format(bnd[18], bnd[19], bnd[20]))
+            Config.set('Boundary', 'b2', "[{0}, {1}, {2}]".format(bnd[21], bnd[22], bnd[23]))
             Config.set('Boundary', 'k2', "[{0}, {1}, {2}]".format(bnd[24], bnd[25], bnd[26]))
             Config.write(cfgfile)
 
     def compute(self):
+        '''Compute: compute the solution.
         '''
-        compute: compute the solution.
-        '''
-        d = self.geometry.d
         tArray = self.getTimeList()
         alpha = self.material.getAlpha()
         Coords = self.mesh.getCoords()
-        dim = ['x', 'y', 'z']
-        if d == 1:
-            pass
-            '''
-            initTerm = initial.compute(bc[0], Coords[dim[0]], tArray, alpha)
-            srcTerm = source.compute(bc[0], Coords[dim[0]], tArray, alpha)
-            bndTerm = boundary.compute(bc[0], Coords[dim[0]], tArray, alpha)
-            '''
-        else:  # d == 2 or d == 3
-            '''
-            initTerm =np.ones(x.size)
-            for i in range(0, d):
-                initTerm = initTerm*initial.compute(bc[0], Coords[dim[0]], tArray, alpha)
-            '''
-            pass
-        # sol = intTerm + srcTerm + bndTerm
-        return np.random.rand(self.mesh.getNumNodes())
-
-    def getTimeList(self, coeff=10.0, length=101):
+        bc = self.boundary.bcType
+        print('Computing:')
+        initTerm = self.initial.compute(bc, Coords, tArray, alpha)
         '''
-        Return the simulation time list
+        initTerm = initial.compute(bc[0], Coords[dim[0]], tArray, alpha)
+        srcTerm = source.compute(bc[0], Coords[dim[0]], tArray, alpha)
+        bndTerm = boundary.compute(bc[0], Coords[dim[0]], tArray, alpha)
+        '''
+        sol = initTerm  # + srcTerm + bndTerm
+        self.solution = sol[0]  # np.random.rand(self.mesh.getNumNodes())
+
+    def getTimeList(self, coeff=100, length=101):
+        '''Return the simulation time list
         '''
         pass
         lmax = self.geometry.getMaxLength()
         k = self.material.k
-        tmax = lmax**2/(4*k)/coeff
+        tmax = coeff*lmax**2/(4*k)
         return np.linspace(0, tmax, length)
 
     def readConfig(self):
@@ -288,19 +218,22 @@ class Model:
                 options = Config.options(section)
                 self.validateBoundary(Config, section, options)
                 opt[5] = True
+            elif section=='File':
+                pass
             else:
-                raise ValueError('The configuration file is not valid.')
-        if False in opt: 
-            raise ValueError('The configuration file is not valid.')
+                raise ValueError('Configuration file: [{0}] is not valid section.'.format(section))
+        if False in opt:
+            ind=np.where(np.invert(opt))
+            s = ['Geometry', 'Mesh', 'Material', 'Initial', 'Source', 'Boundary']
+            # Display the first missing section
+            raise ValueError('The configuration file is not valid the section [{0}] is missing.'
+                             .format(s[ind[0][0]]))
 
-    def checkValidValues(self, prop):
-        '''Check that the property is a valid value.
-        '''
-        if not isinstance(prop, numbers.Real):
-            raise ValueError(str(prop)+' is not a valid number.')
-        else:
-            if prop <= 0.0:
-                raise ValueError(str(prop)+' must be positive and larger than zero.')
+    def checkLengthOption(self, section, option, optionList, length):
+        if not len(optionList)==length:
+            raise ValueError('Configuration file [{0}]: Invalid length vector. '\
+                             'the option "{1}" must be a list of {2} components.'
+                             .format(section, option, length))
 
     def validateGeometry(self, Config, section, options):
         """Initilize the geometry attribute
@@ -308,24 +241,24 @@ class Model:
         dic = {}
         for option in options:
             if not (option=='d' or option=='l'):
-                raise ValueError('Configuration file [Geometry]: "{0}"" is not a valid option.'.format(option))
+                raise ValueError('Configuration file [{0}]: "{1}"" is not a valid option.'
+                                 .format(section, option))
             try:
                 dic[option] = ast.literal_eval(Config.get(section, option))
                 if option=='l':
-                    if not len(dic[option])==3:
-                        raise ValueError('Configuration file [Geometry]: Invalid length vector. '\
-                                         'the option "l" must be a list of three components.')
+                    self.checkLengthOption(section, option, dic[option], 3)
             except:
-                raise ValueError("Exception on {0}!".format(option))
-            try:
-                dic['d']
-                dic['l']
-            except:
-                raise ValueError('Configuration file [Geometry]: One or more options is missing.')
-        self.geometry = Geometry(dic['d'],
-                                 dic['l'][0],
-                                 dic['l'][1],
-                                 dic['l'][2])
+                raise ValueError("Congiguration file [{0}]: exception on {1}."
+                                 .format(section, option))
+        try:
+            self.geometry = Geometry(dic['d'],
+                                     dic['l'][0],
+                                     dic['l'][1],
+                                     dic['l'][2])
+        except:
+            raise ValueError('Configuration file [{0}]: One or more options is missing.'
+                             .format(section))
+
 
     def validateMesh(self, Config, section, options):
         """Initilize the mesh attribute
@@ -333,13 +266,18 @@ class Model:
         dic = {}
         for option in options:
             if not (option=='size'):
-                raise ValueError('Configuration file [Mesh]: "{0}"" is not a valid option.'.format(option))
+                raise ValueError('Configuration file [{0}]: "{1}"" is not a valid option.'
+                                 .format(section, option))
             try:
                 dic[option] = Config.get(section, option)
-                dic['size']  # will raise an exception if it doesn't exist
             except:
-                raise ValueError("exception on {0}!".format(option))
-        self.mesh = Mesh(dic['size'], self.geometry)
+                raise ValueError("Congiguration file [{0}]: exception on {1}."
+                                 .format(section, option))
+        try:
+            self.mesh = Mesh(dic['size'], self.geometry)
+        except:
+            raise ValueError('Configuration file [{0}]: One or more options is missing.'
+                             .format(section))
 
     def validateMaterial(self, Config, section, options):
         """Initilize the material attribute
@@ -347,32 +285,25 @@ class Model:
         dic = {}
         for option in options:
             if not (option=='name' or option=='rho' or option=='k' or option=='cp'):
-                raise ValueError('Configuration file [Material]: "{0}"" is not a valid option.'.format(option))
+                raise ValueError('Configuration file [{0}]: "{1}"" is not a valid option.'
+                                 .format(section, option))
             try:
                 if option=='name':
                     dic[option] = Config.get(section, option)
                 else:
                     dic[option] = ast.literal_eval(Config.get(section, option))
-                    if option=='rho':
-                        self.checkValidValues(dic[option])
-                    elif option=='k':
-                        self.checkValidValues(dic[option])
-                    else:
-                        self.checkValidValues(dic[option])
             except:
-                raise ValueError("Exception on {0}!".format(option))
-            try:
-                dic['name']
-                dic['rho']
-                dic['k']
-                dic['cp']
-            except:
-                raise ValueError('Configuration file [Material]: One or more options is missing.')
-        self.material = Material(dic['name'],
-                                 dic['rho'],
-                                 dic['k'],
-                                 dic['cp'])
+                raise ValueError("Congiguration file [{0}]: exception on {1}."
+                                 .format(section, option))
+        try:
+            self.material = Material(dic['name'],
+                                     dic['rho'],
+                                     dic['k'],
+                                     dic['cp'])
 
+        except:
+            raise ValueError('Configuration file [{0}]: One or more options is missing.'
+                             .format(section))
 
     def validateInitial(self, Config, section, options):
         """Initilize the initial attribute
@@ -380,32 +311,25 @@ class Model:
         dic = {}
         for option in options:
             if not (option=='dist' or option=='a' or option=='b' or option=='c'):
-                raise ValueError('Configuration file [Initial]: "{0}"" is not a valid option.'.format(option))
+                raise ValueError('Configuration file [{0}]: "{1}"" is not a valid option.'
+                                 .format(section, option))
             try:
                 if option=='dist':
                     dic[option] = Config.get(section, option)
-                    if not (dic[option]=='uniform' or
-                            dic[option]=='linear' or
-                            dic[option]=='exponential' or
-                            dic[option]=='gaussian'):
-                                raise ValueError('Configuration file [Initial]: "{0}"" is not a valid distribution.'.format(dic[option]))
                 else:
                     dic[option] = ast.literal_eval(Config.get(section, option))
             except:
-                raise ValueError("exception on {0}!".format(option))
-            try:
-                dic['dist']
-                dic['a']
-                dic['b']
-                dic['c']
-            except:
-                raise ValueError('Configuration file [Initial]: One or more options is missing.')
+                raise ValueError("Congiguration file [{0}]: exception on {1}."
+                                 .format(section, option))
+        try:
             self.initial = Initial(self.geometry,
                                    dic['dist'],
                                    dic['a'],
                                    dic['b'],
                                    dic['c'])
-
+        except:
+            raise ValueError('Configuration file [{0}]: One or more options is missing.'
+                             .format(section))
 
     def validateSource(self, Config, section, options):
         '''Initilize the source attribute
@@ -414,47 +338,29 @@ class Model:
         for option in options:
             if not (option=='location' or option=='fwhm' or option=='fct' or
                     option=='a' or option=='b'):
-                raise ValueError('Configuration file [Source]: "{0}"" is not a valid option.'.format(option))
+                raise ValueError('Configuration file [{0}]: "{1}"" is not a valid option.'
+                                 .format(section, option))
             try:
                 if option=='location':
                     dic[option] = ast.literal_eval(Config.get(section, option))
-                    if not len(dic[option])==3:
-                        raise ValueError('Configuration file [Source]: Invalid length vector. '\
-                                         'the option "location" must be a list of three components.')
-                    for coord in dic[option]:
-                        if not isinstance(coord, numbers.Real):
-                                raise ValueError('{0} is not a valid number.'.format(coord))
-                        else:
-                            if abs(coord) > 0.5:
-                                raise ValueError('{0} must be between -0.5 and 0.5.'.format(coord))
-                elif option=='fwhm':
-                    dic[option] = ast.literal_eval(Config.get(section, option))
-                    self.checkValidValues(dic[option])
+                    self.checkLengthOption(section, option, dic[option], 3)
                 elif option=='fct':
                     dic[option] = Config.get(section, option)
-                    if not (dic[option]=='uniform' or
-                            dic[option]=='linear' or
-                            dic[option]=='exponential'):
-                        raise ValueError('Configuration file [Source]: "{0}"" is not a valid function.'.format(dic[option]))
-                else:
+                else:  # fwhm, a, b
                     dic[option] = ast.literal_eval(Config.get(section, option))
             except:
-                raise ValueError("exception on {0}!".format(option))
-            try:
-                dic['location']
-                dic['fwh']
-                dic['fct']
-                dic['a']
-                dic['b']
-            except:
-                raise ValueError('Configuration file [Source]: One or more options is missing.')
+                raise ValueError("Congiguration file [{0}]: exception on {1}."
+                                 .format(section, option))
+        try:
             self.source = Source(self.geometry,
                                  dic['location'],
                                  dic['fwhm'],
                                  dic['fct'],
                                  dic['a'],
                                  dic['b'])
-        
+        except:
+            raise ValueError('Configuration file [{0}]: One or more options is missing.'
+                             .format(section))
 
     def validateBoundary(self, Config, section, options):
         '''Initilize the boundary attribute
@@ -464,50 +370,34 @@ class Model:
             if not (option=='type' or option=='g1' or option=='a1' or option=='b1' or
                     option=='g2' or option=='a2' or option=='b2' or
                     option=='k1' or option=='k2'):
-                raise ValueError('Configuration file [Boundary]: "{0}"" is not a valid option.'.format(option))
+                raise ValueError('Configuration file [{0}]: "{1}"" is not a valid option.'
+                                 .format(section, option))
             try:
-                if option=='type':
+                if (option=='type' or option=='g1' or option=='g2'):
                     dic[option] = Config.get(section, option)
-                    if not (dic[option]=='dirichlet' or
-                            dic[option]=='neumann' or
-                            dic[option]=='robin' or
-                            dic[option]=='mixedI' or
-                            dic[option]=='mixedII'):
-                        raise ValueError('Configuration file [Boundary]: "{0}"" is not a valid type.'.format(dic[option]))
-                elif option=='g1':
-                    dic[option] = Config.get(section, option)
-                    if not (dic[option]=='uniform' or
-                            dic[option]=='linear' or
-                            dic[option]=='exponential'):
-                        raise ValueError('Configuration file [Boundary]: "{0}"" is not a valid function.'.format(dic[option]))
-                elif option=='a1':
+                    dic[option]=dic[option].strip("[]").split(',')
+                    for i in range(0, len(dic[option])):
+                        # remove remaining whitespaces from beginning and end of the string
+                        dic[option][i]=dic[option][i].strip()
+                else:
                     dic[option] = ast.literal_eval(Config.get(section, option))
-                    if not isinstance(dic[option], numbers.Real):
-                        raise ValueError('{0} is not a valid number.'.format(dic[option]))
-                elif option=='b1':
-                    dic[option] = ast.literal_eval(Config.get(section, option))
-                    self.checkValidValues(dic[option])
-                elif option=='g2':
-                    dic[option] = Config.get(section, option)
-                    if not (dic[option]=='uniform' or
-                            dic[option]=='linear' or
-                            dic[option]=='exponential'):
-                        raise ValueError('Configuration file [Source]: "{0}"" is not a valid function.'.format(dic[option]))
-                elif option=='a2':
-                    dic[option] = ast.literal_eval(Config.get(section, option))
-                    if not isinstance(dic[option], numbers.Real):
-                        raise ValueError('{0} is not a valid number.'.format(dic[option]))
-                elif option=='b2':
-                    dic[option] = ast.literal_eval(Config.get(section, option))
-                    self.checkValidValues(dic[option])
-                elif option=='k1':
-                    dic[option] = ast.literal_eval(Config.get(section, option))
-                    if not isinstance(dic[option], numbers.Real):
-                        raise ValueError('{0} is not a valid number.'.format(dic[option]))
-                else:  # option=='k2'
-                    dic[option] = ast.literal_eval(Config.get(section, option))
-                    self.checkValidValues(dic[option])
+                self.checkLengthOption(section, option, dic[option], 3)
             except:
-                raise ValueError("exception on {0}!".format(option))
+                raise ValueError("Congiguration file [{0}]: exception on {1}."
+                                 .format(section, option))
+        try:
+            self.boundary = Boundary(self.geometry,
+                                     dic['type'],
+                                     dic['g1'],
+                                     dic['a1'],
+                                     dic['b1'],
+                                     dic['k1'],
+                                     dic['g2'],
+                                     dic['a2'],
+                                     dic['b2'],
+                                     dic['k2'])
+        except:
+            raise ValueError('Configuration file [{0}]: One or more options is missing.'
+                             .format(section))
 
 

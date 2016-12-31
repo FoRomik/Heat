@@ -6,6 +6,7 @@
 //  Copyright © 2016 Francois Roy. All rights reserved.
 //
 
+#include <iostream> // for debugging
 #include "Uniform.h"
 
 Uniform::Uniform(node nd, bcType bc, termType term,
@@ -59,8 +60,16 @@ void Uniform::getDirichletExpression(double *p_expression, double n){
     double arg2 = (n+1.0)*PI/nd.l;
     switch (term) {
         case INITIAL:
-            *p_expression = pow(a0,1.0/(double)nd.dim)*(4.0/PI)*1.0/(2.0*n+1.0)
-                            *sin(arg1*nd.x)*exp(-nd.alpha*pow(arg1,2.0)*nd.t);
+            if (nd.t==0) {
+                *p_expression = pow(a0,1.0/(double)nd.dim);
+            }
+            if (nd.x<=0.0001||nd.x>=1.0001*nd.l) {
+                // if at the boundaries, the result is 0.0
+                *p_expression = 0.0;
+            } else {
+                *p_expression = pow(a0,1.0/(double)nd.dim)*(4.0/PI)*1.0/(2.0*n+1.0)
+                                *sin(arg1*nd.x)*exp(-nd.alpha*pow(arg1,2.0)*nd.t);
+            }
             break;
         case BOUNDARY:
             if (n==0) {

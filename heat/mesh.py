@@ -1,12 +1,14 @@
 import numpy as np
 from .geometry import Geometry
+from .utils import DEFAULT_SETTINGS
+
+ds = DEFAULT_SETTINGS['mesh']
 
 
 class Mesh:
     """
-
     """
-    def __init__(self, size='coarse', geometry=Geometry()):
+    def __init__(self, size=ds, geometry=Geometry()):
         self.size = size
         if self.checkSize():
             self.geometry = geometry
@@ -245,3 +247,13 @@ class Mesh:
             cellType = 11  # VTK_VOXEL
             types = cellType*np.ones(Nx*Ny*Nz)
         return types.astype(int)
+
+    def getSettings(self):
+        '''Return the mesh settings.
+        '''
+        return self.size
+
+    def printSettings(self):
+        """Return the settings as a string for file I/O
+        """
+        return ('Mesh={0}\n'.format(self.size))

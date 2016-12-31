@@ -10,7 +10,8 @@ import click
 # import base64
 import numpy as np
 from unipath import Path
-from .model import Model, BASE_DIR, DATA_DIR
+from .utils import BASE_DIR, DATA_DIR
+from .model import Model
 from .vtktools import VTK
 from . import __version__
 from .gui import MainApplication
@@ -92,7 +93,7 @@ def main(gui, config, reset, output_filepath):
         #vtk.writeVTU(model, solution)
         #model.writeConfig()
     else:  # compute and save the solution for the specified parameters.
-        model = Model(output_filepath)  # read config first
+        model = Model(output_filepath)
         
         # Compute the solution
         model.compute()
@@ -101,9 +102,9 @@ def main(gui, config, reset, output_filepath):
         if not os.path.exists(os.path.dirname(model.output)):
             try:
                 os.makedirs(os.path.dirname(model.output))
-            except OSError as exc: # Guard against race condition
-                if exc.errno != errno.EEXIST:
-                    raise
-        #vtk.writeVTU(model)
+            except:
+                pass
+
+        vtk.writeVTU(model)
         #print(vtk.readVTU(model.output)[0])
-        #model.writeConfig()
+        #model.saveSettings()

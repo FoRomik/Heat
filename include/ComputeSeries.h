@@ -39,7 +39,7 @@ public:
      *  @return The result of the sum returned by sumForward when the absolute
      *  error is below tol.
      */
-    double getSumForward(double tol);
+    double getSumForward(double tol, int flag, double t);
     
     /**
      *  @brief  Get the value returned by sumBackward.
@@ -105,7 +105,7 @@ private:
      *  @warning Adding floating point numbers of different magnitude can lead
      *  to rounding errors.
      */
-    double sumForward(double tol);
+    double sumForward(double tol, int flag, double t);
     
     /**
      *  @brief Sums terms through a callback function @c p_fct(n), as for 

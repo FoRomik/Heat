@@ -24,7 +24,7 @@ cdef extern from "Utils.h":
 cdef extern from "ComputeSeries.h":
     cdef cppclass ComputeSeries:
         ComputeSeries() except +
-        double getSumForward(double tol) except +
+        double getSumForward(double tol, int flag, double t) except +
         double getSumBackward(double nmax) except +
         double getSumKahan(double tol) except +
         double getLastAbsoluteError() except +

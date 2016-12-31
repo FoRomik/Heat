@@ -1,9 +1,12 @@
 import numbers
+from .utils import DEFAULT_SETTINGS
+
+ds = DEFAULT_SETTINGS['material']
 
 class Material:
     '''
     '''
-    def __init__(self, name='Copper', rho=8960.0, k=401.0, cp=385.0):
+    def __init__(self, name=ds[0], rho=ds[1], k=ds[2], cp=ds[3]):
         self.name = name
         self.rho = rho
         self.k = k
@@ -34,3 +37,15 @@ class Material:
         '''Get the thermal diffusivity
         '''
         return self.k/(self.rho*self.cp)
+
+    def getSettings(self):
+        '''Return the material settings.
+        '''
+        return [self.name, self.rho, self.k, self.cp]
+
+    def printSettings(self):
+        """Return the settings as a string for file I/O
+        """
+        s = self.getSettings()
+        return ('Material={0},{1},{2},{3}\n'.
+                format(s[0], s[1], s[2], s[3]))

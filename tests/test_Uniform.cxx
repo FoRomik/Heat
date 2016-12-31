@@ -42,7 +42,7 @@
     for (int i = 0; i < 11; i++)
     {
         u.setPosition(i*node.l/10.0);
-        result = u.getSumForward(1e-20);
+        result = u.getSumForward(1e-20, 0, node.t);
         EXPECT_NEAR(expected[i], result, 1e-6);
     }
 }
@@ -77,7 +77,7 @@
     for (int i = 0; i < 11; i++)
     {
         u.setPosition(i*node.l/10.0);
-        result = u.getSumForward(1e-20);
+        result = u.getSumForward(1e-20, 0, node.t);
         EXPECT_NEAR(expected[i], result, 1e-6);
     }
 }

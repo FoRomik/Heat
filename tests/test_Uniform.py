@@ -24,7 +24,7 @@ class TestUniform:
         res = np.zeros(11)
         for i in range(0, 11):
             u.setPosition(i*dic['l']/10.0)
-            res[i] = u.getSumForward(1e-20)
+            res[i] = u.getSumForward(1e-20, 0, dic['t'])
         np.testing.assert_allclose(res, expected, rtol=1e-07, atol=1e-10)
 
     def test_DirichletBoundary(self):
@@ -45,5 +45,5 @@ class TestUniform:
         res = np.zeros(11)
         for i in range(0, 11):
             u.setPosition(i*dic['l']/10.0)
-            res[i] = u.getSumForward(1e-20)
+            res[i] = u.getSumForward(1e-20, 0, dic['t'])
         np.testing.assert_allclose(res, expected)

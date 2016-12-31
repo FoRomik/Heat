@@ -15,12 +15,12 @@
 class exc_MaxItReached: public std::exception
 {
 public:
-    exc_MaxItReached(double output, double absErr, int nIt);
+    exc_MaxItReached(double output, double absErr, int nIt, double t);
     double getOutput();
     const char * what() const throw();
 private:
     int nIt;
-    double output, absErr;
+    double output, absErr, t;
 };
 
 #endif /* Exceptions_h */

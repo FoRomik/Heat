@@ -1,12 +1,14 @@
 import numbers
 import numpy as np
+from .utils import DEFAULT_SETTINGS
 
+ds = DEFAULT_SETTINGS['geometry']
 
 class Geometry:
     """
     Get the model geometry.
     """
-    def __init__(self, d=1, lx=1.0, ly=None, lz=None):
+    def __init__(self, d=ds[0], lx=ds[1], ly=ds[2], lz=ds[3]):
         self.d = int(d)
         self.lx = lx
         self.ly = ly
@@ -77,3 +79,10 @@ class Geometry:
             return [1, self.lx, self.ly, 0.0]
         else:  # 3D
             return [1, self.lx, self.ly, self.lz]
+
+    def printSettings(self):
+        """Return the settings as a string for file I/O
+        """
+        s = self.getSettings()
+        return ('Geometry={0},{1},{2},{3}\n'
+                 .format(s[0], s[1], s[2], s[3]))

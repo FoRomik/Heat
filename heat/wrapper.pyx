@@ -82,11 +82,11 @@ cdef class ComputeSeries:
     def __dealloc__(self):
         pass
 
-    def getSumForward(self, double tol):
+    def getSumForward(self, double tol, int flag, double t):
         """Get the forward sum.
 
         """
-        return self.baseptr.getSumForward(tol)
+        return self.baseptr.getSumForward(tol, flag, t)
 
     def getSumBackward(self, double tol):
         """ Get the backward sum.
