@@ -1,6 +1,9 @@
 import numbers
 import numpy as np
-from heat.geometry import Geometry
+from time import sleep
+import progressbar
+from .mesh import Mesh
+from .wrapper import Uniform
 from .utils import DEFAULT_SETTINGS
 
 ds = DEFAULT_SETTINGS['boundary']
@@ -8,12 +11,12 @@ ds = DEFAULT_SETTINGS['boundary']
 class Boundary:
     '''
     '''
-    def __init__(self, geometry=Geometry(), bcType=[ds[0], ds[1], ds[2]],
+    def __init__(self, mesh=Mesh(), bcType=[ds[0], ds[1], ds[2]],
                  g1=[ds[3], ds[4], ds[5]], a1=[ds[6], ds[7], ds[8]],
                  b1=[ds[9], ds[10], ds[11]], k1=[ds[12], ds[13], ds[14]],
                  g2=[ds[15], ds[16], ds[17]], a2=[ds[18], ds[19], ds[20]],
                  b2=[ds[21], ds[22], ds[23]], k2=[ds[24], ds[25], ds[26]]):
-        self.geometry = geometry
+        self.mesh = mesh
         self.bcType = bcType
         self.g1 = g1
         self.a1 = a1
@@ -28,13 +31,13 @@ class Boundary:
     def validateBoundary(self):
         '''Check that the user inputs are valid.
         '''
-        self.geometry.validateGeometry()
+        self.mesh.checkSize()
         self.checkBCType(self.bcType)
         self.checkfctType(self.g1)
         self.checkfctType(self.g2)
         #self.checkValue(self.a1, 'a1')
         #self.checkValue(self.a2, 'a2')
-        for i in range(0, self.geometry.d):
+        for i in range(0, self.mesh.geometry.d):
             if not self.g1[i]=='uniform':
                 self.checkValue(self.b1[i], 'b1')
             if not self.g2[i]=='uniform':
@@ -48,7 +51,7 @@ class Boundary:
     def checkBCType(self, bcList):
         '''Check that the boundary condition type is valid.
         '''
-        for i in range(0, self.geometry.d):
+        for i in range(0, self.mesh.geometry.d):
             if not (bcList[i]=='dirichlet' or
                     bcList[i]=='neumann' or
                     bcList[i]=='robin' or
@@ -61,7 +64,7 @@ class Boundary:
         '''Check that the boundary condition type is valid.
         '''
         # The check is only performed for the geometry dimension.
-        for i in range(0, self.geometry.d):
+        for i in range(0, self.mesh.geometry.d):
             if not (fctList[i]=='uniform' or
                     fctList[i]=='linear' or
                     fctList[i]=='exponential'):
@@ -74,7 +77,7 @@ class Boundary:
         Check that the property has a valid value.
         '''
         # The check is only performed for the geometry dimension.
-        for i in range(0, self.geometry.d):
+        for i in range(0, self.mesh.geometry.d):
             if not isinstance(valueList[i], numbers.Real):
                 raise ValueError('{0}[{1}]={2} is not a valid value.'
                                  .format(prop, i, valueList[i]))
@@ -88,10 +91,157 @@ class Boundary:
                         raise ValueError('{0} must be positive.'
                                          .format(prop))
 
+    def compute(self, tArray, alpha, tol=1e-20):
+        '''The values are computed for x in [0, l]. The origin is moved setting
+        x = x+l/2.
+        '''
+        sol = {}
+        bcType = self.bcType
+        Coords = self.mesh.getCoords()
+        ls = [self.mesh.geometry.lx, self.mesh.geometry.ly, self.mesh.geometry.lz]
+        dim = ['x', 'y', 'z']
+        sol['x'] = np.zeros((tArray.size, Coords['x'].size))  # row, column
+        sol['y'] = np.zeros((tArray.size, Coords['y'].size))  # row, column
+        sol['z'] = np.zeros((tArray.size, Coords['z'].size))  # row, column
+        term = 1  # 0 = Boundary term
+        n = 1.0 
+        for d in range(0, self.mesh.geometry.d):
+            if (self.g1[d]=='uniform' and self.g2[d]=='uniform'):
+                if bcType[d] == 'dirichlet':
+                    bc = 0  # 0 = dirichlet
+                else:
+                    print("Boundary term: The '{0}' boundary condition hasn't "\
+                          "been implemented yet.".format(bcType[d]))
+                    quit()
+                l = ls[d]
+                xArray = Coords[dim[d]]+l/2.0  # Uniform takes coordinates from 0 to l
+                dic = {'dim': self.mesh.geometry.d, 'x': xArray[0], 
+                       't': tArray[0], 'l': l, 'alpha': alpha}
+                u = Uniform(bc, term, dic, 0.0, self.a1[d], self.a2[d])
+                if self.mesh.geometry.d==1:
+                    sol[dim[d]] = self.getSolutionComponent(u, xArray, tArray, tol, dim[d], 'Boundary')
+                elif self.mesh.geometry.d==2:
+                    sol[dim[d]] = self.getSolutionComponent2D(u, xArray, tArray, tol, dim[d], 'Boundary')
+                else:  # dimension == 3
+                    sol[dim[d]] = self.getSolutionComponent3D(u, xArray, tArray, tol, dim[d], 'Boundary')
+            else:
+                print("Boundary term: The combination of options g1='{0}' and g2={1} hasn't"\
+                     " been implemented yet.".format(self.g1[d], self.g2[d]))
+                quit()
+        return self.getSolution(sol)
+
+    def getSolution(self, sol):
+        """The solution is just G1*G2*G3
+        """
+        d = self.mesh.geometry.d
+        if d==1:
+            solution = sol['x']
+        elif d==2:
+            # if a vertex sol is the average
+            solution = np.power(sol['x']*sol['y'], 1/d)
+            ind = self.mesh.getBoundariesIndex()
+            tArraySize = int(solution.size/self.mesh.getNumNodes())
+            #for i in range(0, tArraySize):
+            #    solution[i][ind]=1/d*(sol['x'][i][ind]+sol['y'][i][ind])
+
+        else:
+            solution = sol['x']+sol['y']+sol['z']
+        return solution
+
+    def getSolutionComponent3D(self, u, xArray, tArray, tol, component, term):
+        """
+        """
+        sol = np.zeros((tArray.size, xArray.size))
+        N = self.mesh.getCellNumPerDim()
+        Nx = N['Nx']
+        Ny = N['Ny']
+        Nz = N['Nz']
+        if component=='x':
+            #print(xArray)
+            indx = np.arange(0,(Nz+1)*(Ny+1)*(Nx+1),(Nz+1)*(Ny+1))
+            subXArray = np.take(xArray, indx)
+            solx = self.getSolutionComponent(u, subXArray, tArray, tol, component, term)
+            j = 0
+            for t in tArray:
+                for i in range(0, (Nx+1)):
+                    sol[j][i*(Nz+1)*(Ny+1):(i+1)*(Nz+1)*(Ny+1)] = solx[j][i]
+                j = j + 1
+        elif component=='y':
+            indy = np.arange(0,(Nz+1)*(Ny+1),Nz+1)
+            subYArray = np.take(xArray, indy)
+            soly = self.getSolutionComponent(u, subYArray, tArray, tol, component, term)
+            j = 0
+            for t in tArray:
+                for k in range(0, Nx+1):
+                    for i in range(0, (Ny+1)):
+                        sol[j][i*(Nz+1)+k*(Ny+1)*(Nz+1):(i+1)*(Nz+1)+k*(Ny+1)*(Nz+1)] = np.ones(Nz+1)*soly[j][i]
+                j = j + 1
+        else:  # z-component
+            indz=np.arange(0,Nz+1)
+            subZArray = np.take(xArray, indz)
+            solz = self.getSolutionComponent(u, subZArray, tArray, tol, component, term)
+            j = 0
+            for t in tArray:
+                for i in range(0, (Nx+1)*(Ny+1)):
+                    sol[j][i*(Nz+1):(i+1)*(Nz+1)] = solz[j]
+                j = j + 1
+        return sol   
+
+    def getSolutionComponent2D(self, u, xArray, tArray, tol, component, term):
+        """
+        """
+        sol = np.zeros((tArray.size, xArray.size))
+        N = self.mesh.getCellNumPerDim()
+        Nx = N['Nx']
+        Ny = N['Ny']
+        if component=='x':
+            indx=np.arange(0,Nx+1)
+            subXArray = np.take(xArray, indx)
+            solx = self.getSolutionComponent(u, subXArray, tArray, tol, component, term)
+            j = 0
+            for t in tArray:
+                for i in range(0, Ny+1):
+                    sol[j][i*(Nx+1):(i+1)*(Nx+1)] = solx[j]
+                j = j + 1
+        else:  # y-component
+            indy = np.arange(0,(Nx+1)*(Ny+1),Nx+1)
+            subYArray = np.take(xArray, indy)
+            soly = self.getSolutionComponent(u, subYArray, tArray, tol, component, term)
+            j = 0
+            for t in tArray:
+                for i in range(0, Ny+1):
+                    sol[j][i*(Nx+1):(i+1)*(Nx+1)] = soly[j][i]
+                j = j + 1
+        return sol   
+
+    def getSolutionComponent(self, u, xArray, tArray, tol, component, term):
+        """
+        """
+        sol = np.zeros((tArray.size, xArray.size))
+        i = 0
+        pgbar = [progressbar.Bar('=', '{0} term, {1}-contribution: ['.format(term, component),
+                 ']'), ' ', progressbar.Percentage()]
+        bar = progressbar.ProgressBar(maxval=tArray.size, \
+                                      widgets=pgbar)
+        for t in tArray:
+            u.setTime(t)
+            j = 0
+            bar.update(i+1)
+            sleep(0.0001)
+            for x in xArray:
+                u.setPosition(x)
+                sol[i][j] = u.getSumForward(tol)
+                if sol[i][j]<1e-3:
+                    sol[i][j] = 0.0
+                j = j + 1
+            i = i + 1
+        bar.finish()
+        return sol 
+
     def getSettings(self):
         '''Return the boundary settings.
         '''      
-        if self.geometry.d == 1:
+        if self.mesh.geometry.d == 1:
             return [self.bcType[0], None, None,
                     self.g1[0], None, None,
                     self.a1[0], 0.0, 0.0,
@@ -101,7 +251,7 @@ class Boundary:
                     self.a2[0], 0.0, 0.0,
                     self.b2[0], 0.0, 0.0,
                     self.k2[0], 0.0, 0.0]
-        elif self.geometry.d == 2:
+        elif self.mesh.geometry.d == 2:
             return [self.bcType[0], self.bcType[1], None,
                     self.g1[0], self.g1[1], None,
                     self.a1[0], self.a1[1], 0.0,

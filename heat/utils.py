@@ -53,41 +53,41 @@ DATA_DIR = BASE_DIR.child("data")
    boundary[25]: k2 in the y-direction 
    boundary[26]: k2 in the z-direction  
 """
-DEFAULT_SETTINGS_1D = {'geometry': [1, 1.0, None, None],
+DEFAULT_SETTINGS_1D = {'geometry': [1, 1.0e-2, None, None],
                        'mesh': 'coarse',
                        'material': ['Copper', 8960.0, 401.0, 385.0],
-                       'initial': ['uniform', 300.0, 0.0, 0.0],
+                       'initial': ['uniform', 0.0, 0.0, 0.0],
                        'source': [0.0, 0.0, 0.0, 0.1,
                                   'uniform', 0.0, 0.0],
                        'boundary': ['dirichlet', None, None,
                                     'uniform', None, None, 
-                                    250.0, 0.0, 0.0, 
+                                    434.6, 0.0, 0.0, 
                                     0.0, 0.0, 0.0,
                                     0.0, 0.0, 0.0,
                                     'uniform', None, None, 
-                                    325.0, 0.0, 0.0, 
+                                    325.8, 0.0, 0.0, 
                                     0.0, 0.0, 0.0, 
                                     0.0, 0.0, 0.0] 
                        }
 
-DEFAULT_SETTINGS_2D = {'geometry': [2, 1.0, 3.0, None],
-                       'mesh': 'coarse',
+DEFAULT_SETTINGS_2D = {'geometry': [2, 1.0e-2, 3.0e-2, None],
+                       'mesh': 'fine',
                        'material': ['Copper', 8960.0, 401.0, 385.0],
-                       'initial': ['uniform', 300.0, 0.0, 0.0],
+                       'initial': ['uniform', 0.0, 0.0, 0.0],
                        'source': [0.0, 0.0, 0.0, 0.1,
                                   'uniform', 0.0, 0.0],
                        'boundary': ['dirichlet', 'dirichlet', None,
                                     'uniform', 'uniform', None, 
-                                    250.0, 250.0, 0.0, 
+                                    434.6, 434.6, 0.0, 
                                     0.0, 0.0, 0.0,
                                     0.0, 0.0, 0.0,
                                     'uniform', 'uniform', None, 
-                                    325.0, 325.0, 0.0, 
+                                    434.6, 434.6, 0.0, 
                                     0.0, 0.0, 0.0, 
                                     0.0, 0.0, 0.0] 
                        }
 
-DEFAULT_SETTINGS_3D = {'geometry': [3, 1.0, 2.0, 3.0],
+DEFAULT_SETTINGS_3D = {'geometry': [3, 1.0e-2, 2.0e-2, 3.0e-2],
                        'mesh': 'normal',
                        'material': ['Copper', 8960.0, 401.0, 385.0],
                        'initial': ['uniform', 300.0, 0.0, 0.0],
@@ -103,4 +103,4 @@ DEFAULT_SETTINGS_3D = {'geometry': [3, 1.0, 2.0, 3.0],
                                     0.0, 0.0, 0.0, 
                                     0.0, 0.0, 0.0] 
                        }
-DEFAULT_SETTINGS = DEFAULT_SETTINGS_3D
+DEFAULT_SETTINGS = DEFAULT_SETTINGS_2D

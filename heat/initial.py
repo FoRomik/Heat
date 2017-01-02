@@ -1,8 +1,8 @@
 import numpy as np
 from time import sleep
 import progressbar
-from heat.mesh import Mesh
-from heat.wrapper import Uniform
+from .mesh import Mesh
+from .wrapper import Uniform
 from .utils import DEFAULT_SETTINGS
 
 ds = DEFAULT_SETTINGS['initial']
@@ -61,7 +61,7 @@ class Initial:
         d = self.mesh.geometry.d
         if d==1:
             solution = sol['x']
-        if d==2:
+        elif d==2:
             solution = sol['x']*sol['y']
         else:
             solution = sol['z']*sol['y']*sol['x']
@@ -138,7 +138,7 @@ class Initial:
         """
         sol = np.zeros((tArray.size, xArray.size))
         i = 0
-        pgbar = [progressbar.Bar('=', '{0} term, {1}-contribution: ['.format(term, component),
+        pgbar = [progressbar.Bar('=', '{0} term, {1}-contribution:  ['.format(term, component),
                  ']'), ' ', progressbar.Percentage()]
         bar = progressbar.ProgressBar(maxval=tArray.size, \
                                       widgets=pgbar)
@@ -150,7 +150,7 @@ class Initial:
             for x in xArray:
                 u.setPosition(x)
                 sol[i][j] = u.getSumForward(tol)
-                if sol[i][j]<1e-10:
+                if sol[i][j]<1e-3:
                     sol[i][j] = 0.0
                 j = j + 1
             i = i + 1

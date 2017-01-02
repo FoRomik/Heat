@@ -170,6 +170,54 @@ class Mesh:
             z = np.reshape(zg, n)
         return {'x': x, 'y': y, 'z': z}
 
+    def getVerticesIndex(self):
+        """
+        """
+        d = self.geometry.d
+        dic = self.getCellNumPerDim()
+        Nx = dic['Nx']
+        Ny = dic['Ny']
+        Nz = dic['Nz']
+        if d==1:
+            indices = [0, Nx]
+        elif d==2:
+            indices = [0, Nx,
+                      (Nx+1)*(Ny+1)-(Nx+1), (Nx+1)*(Ny+1)-1]
+        else:  #  d==3
+            indices = [0, Nz,
+                      (Nz+1)*(Ny+1)-(Nz+1), (Nz+1)*(Ny+1)-1,
+                      (Nz+1)*(Ny+1), (Nz+1)*(Ny+1)+Nz,
+                      (Nx+1)*(Ny+1)*(Nz+1)-(Nz+1), (Nx+1)*(Ny+1)*(Nz+1)-1]
+        return indices
+
+    def getBoundariesIndex(self):
+        """
+        """
+        d = self.geometry.d
+        Coords = self.getCoords()
+        x = Coords['x']
+        y = Coords['y']
+        z = Coords['z']
+        a = np.where(np.isclose(x,-self.geometry.lx/2))[0]
+        b = np.where(np.isclose(x,self.geometry.lx/2))[0]
+        indices_x = np.sort(np.concatenate((a,b),0))
+        if d==1:
+            indices = indices_x
+        elif d==2:
+            a = np.where(np.isclose(y,-self.geometry.ly/2))[0]
+            b = np.where(np.isclose(y,self.geometry.ly/2))[0]
+            indices_y = np.sort(np.concatenate((a,b),0))
+            indices = np.unique(np.concatenate((indices_x,indices_y),0))
+        else:  # d==3
+            a = np.where(np.isclose(y,-self.geometry.ly/2))[0]
+            b = np.where(np.isclose(y,self.geometry.ly/2))[0]
+            indices_y = np.sort(np.concatenate((a,b),0))
+            a = np.where(np.isclose(z,-self.geometry.lz/2))[0]
+            b = np.where(np.isclose(z,self.geometry.lz/2))[0]
+            indices_z = np.sort(np.concatenate((a,b),0))
+            indices = np.unique(np.concatenate((indices_x,indices_y,indices_z),0))
+        return indices
+
     def getConnectivity(self):
         '''
         Return the connectivity used in the VTU format.

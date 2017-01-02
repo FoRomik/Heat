@@ -1,6 +1,7 @@
 import six
 import numpy as np
 from heat.geometry import Geometry
+from heat.mesh import Mesh
 from heat.boundary import Boundary
 import unittest
 
@@ -9,7 +10,7 @@ class TestBoundaryStationary(unittest.TestCase):
     """Test the Boundary class with stationary conditions.
     """
     def setUp(self):
-        self.geometry = Geometry(3, 1.0, 1.0, 1.0)
+        self.mesh = Mesh('coarse', Geometry(3, 1.0, 1.0, 1.0))
         self.bcType = ['dirichlet', 'dirichlet', 'dirichlet']
         self.g1 = ['uniform', 'uniform', 'uniform']
         self.a1 = [0.0, 0.0, 1.0]
@@ -19,7 +20,7 @@ class TestBoundaryStationary(unittest.TestCase):
         self.a2 = [0.0, -1.0, 0.0]
         self.b2 = [0.0, 2.1, 0.0]
         self.k2 = [0.0, 0.0, 0.4]
-        self.bnd = Boundary(self.geometry, self.bcType, self.g1, self.a1, self.b1,
+        self.bnd = Boundary(self.mesh, self.bcType, self.g1, self.a1, self.b1,
                             self.k1, self.g2, self.a2, self.b2, self.k2)
 
 
@@ -34,7 +35,7 @@ class TestBoundaryStationary(unittest.TestCase):
         a2 = [0.0, -1.0, 0.0]
         b2 = [0.0, 2.1, 0.0]
         k2 = [0.0, 0.0, 0.4]
-        self.assertEqual(d, self.bnd.geometry.d)
+        self.assertEqual(d, self.bnd.mesh.geometry.d)
         self.assertEqual(bcType[0], self.bnd.bcType[0])
         self.assertEqual(bcType[1], self.bnd.bcType[1])
         self.assertEqual(bcType[2], self.bnd.bcType[2])

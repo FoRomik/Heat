@@ -168,16 +168,18 @@ class Model:
         alpha = self.material.getAlpha()
         Coords = self.mesh.getCoords()
         bc = self.boundary.bcType
+        # Temporary for testing:
+        print("alpha: {0}".format(alpha))
         print('Computing:')
         initTerm = self.initial.compute(bc, Coords, tArray, alpha)
+        bndTerm = self.boundary.compute(tArray, alpha)
         '''
-        srcTerm = source.compute(bc[0], Coords[dim[0]], tArray, alpha)
-        bndTerm = boundary.compute(bc[0], Coords[dim[0]], tArray, alpha)
+        srcTerm = self.source.compute(bc[0], Coords[dim[0]], tArray, alpha)
         '''
-        sol = initTerm  # + srcTerm + bndTerm
+        sol = initTerm + bndTerm  # + srcTerm
         self.solution.sol = sol  # np.random.rand(self.mesh.getNumNodes())
 
-    def getTimeList(self, coeff=100, length=101):
+    def getTimeList(self, coeff=16040.0, length=101):
         '''Return the simulation time list
         '''
         pass
@@ -386,7 +388,7 @@ class Model:
                 raise ValueError("Congiguration file [{0}]: exception on {1}."
                                  .format(section, option))
         try:
-            self.boundary = Boundary(self.geometry,
+            self.boundary = Boundary(self.mesh,
                                      dic['type'],
                                      dic['g1'],
                                      dic['a1'],

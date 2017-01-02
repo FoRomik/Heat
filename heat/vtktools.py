@@ -29,7 +29,7 @@ class VTK:
         '''Write the solution file
         '''
         fileName = model.output
-        indt = 50
+        indt = 0
         T = model.solution.getSolution(indt)
         coords = model.mesh.getCoords()
         x = coords['x']

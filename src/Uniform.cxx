@@ -76,15 +76,33 @@ void Uniform::getDirichletExpression(double *p_expression, double n){
             }
             break;
         case BOUNDARY:
-            if (n==0) {
-                // a1+(a2-a1)*nd.x/nd.l is only computed one time
-                *p_expression = a1+(a2-a1)*nd.x/nd.l+2.0/PI*1.0/(n+1.0)
-                *(pow(-1.0,n+1.0)*a2-a1)*sin(arg2*nd.x)
-                *exp(-nd.alpha*pow(arg2,2.0)*nd.t);
-            } else {
-                *p_expression = 2.0/PI*1.0/(n+1.0)
-                *(pow(-1.0,n+1.0)*a2-a1)*sin(arg2*nd.x)
-                *exp(-nd.alpha*pow(arg2,2.0)*nd.t);
+            if (a1==0.0 && a2==0.0){
+                *p_expression = 0.0;
+            } else if (nd.t == 0.0){
+                  if (n==0) {
+                      // if t = 0.0 and at the boundaries, the exact solution is the initial temperature
+                      if (nd.x<=0.0001){
+                        *p_expression = a1;
+                      } else if (nd.x>=0.9999*nd.l){
+                        *p_expression = a2;
+                      } else {
+                          // if t = 0, the exact solution is 0.0 on the domain
+                          *p_expression = 0.0;
+                      }
+                  } else {
+                      *p_expression = 0.0;
+                  }
+            }else {
+                if (n==0) {
+                    // a1+(a2-a1)*nd.x/nd.l is only computed one time
+                    *p_expression = a1+(a2-a1)*nd.x/nd.l+2.0/PI*1.0/(n+1.0)
+                    *(pow(-1.0,n+1.0)*a2-a1)*sin(arg2*nd.x)
+                    *exp(-nd.alpha*pow(arg2,2.0)*nd.t);
+                } else {
+                    *p_expression = 2.0/PI*1.0/(n+1.0)
+                    *(pow(-1.0,n+1.0)*a2-a1)*sin(arg2*nd.x)
+                    *exp(-nd.alpha*pow(arg2,2.0)*nd.t);
+                }
             }
             break;
         case SOURCE:
