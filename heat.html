@@ -51,7 +51,7 @@
 <span id="heat-boundary-module"></span><h2>heat.boundary module<a class="headerlink" href="#module-heat.boundary" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="heat.boundary.Boundary">
-<em class="property">class </em><code class="descclassname">heat.boundary.</code><code class="descname">Boundary</code><span class="sig-paren">(</span><em>geometry=&lt;heat.geometry.Geometry instance&gt;, bcType=['dirichlet', 'dirichlet', 'dirichlet'], g1=['uniform', 'uniform', 'uniform'], a1=[250.0, 250.0, 250.0], b1=[0.0, 0.0, 0.0], k1=[0.0, 0.0, 0.0], g2=['uniform', 'uniform', 'uniform'], a2=[325.0, 325.0, 325.0], b2=[0.0, 0.0, 0.0], k2=[0.0, 0.0, 0.0]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/boundary.html#Boundary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.boundary.Boundary" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">heat.boundary.</code><code class="descname">Boundary</code><span class="sig-paren">(</span><em>mesh=&lt;heat.mesh.Mesh instance&gt;, bcType=['dirichlet', 'dirichlet', None], g1=['uniform', 'uniform', None], a1=[434.6, 434.6, 0.0], b1=[0.0, 0.0, 0.0], k1=[0.0, 0.0, 0.0], g2=['uniform', 'uniform', None], a2=[434.6, 434.6, 0.0], b2=[0.0, 0.0, 0.0], k2=[0.0, 0.0, 0.0]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/boundary.html#Boundary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.boundary.Boundary" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="heat.boundary.Boundary.checkBCType">
 <code class="descname">checkBCType</code><span class="sig-paren">(</span><em>bcList</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/boundary.html#Boundary.checkBCType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.boundary.Boundary.checkBCType" title="Permalink to this definition">¶</a></dt>
@@ -71,10 +71,38 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="heat.boundary.Boundary.compute">
+<code class="descname">compute</code><span class="sig-paren">(</span><em>tArray</em>, <em>alpha</em>, <em>tol=1e-20</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/boundary.html#Boundary.compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.boundary.Boundary.compute" title="Permalink to this definition">¶</a></dt>
+<dd><p>The values are computed for x in [0, l]. The origin is moved setting
+x = x+l/2.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="heat.boundary.Boundary.getSettings">
 <code class="descname">getSettings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/boundary.html#Boundary.getSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.boundary.Boundary.getSettings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the boundary settings.</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="heat.boundary.Boundary.getSolution">
+<code class="descname">getSolution</code><span class="sig-paren">(</span><em>sol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/boundary.html#Boundary.getSolution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.boundary.Boundary.getSolution" title="Permalink to this definition">¶</a></dt>
+<dd><p>The solution is just G1*G2*G3</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="heat.boundary.Boundary.getSolutionComponent">
+<code class="descname">getSolutionComponent</code><span class="sig-paren">(</span><em>u</em>, <em>xArray</em>, <em>tArray</em>, <em>tol</em>, <em>component</em>, <em>term</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/boundary.html#Boundary.getSolutionComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.boundary.Boundary.getSolutionComponent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="heat.boundary.Boundary.getSolutionComponent2D">
+<code class="descname">getSolutionComponent2D</code><span class="sig-paren">(</span><em>u</em>, <em>xArray</em>, <em>tArray</em>, <em>tol</em>, <em>component</em>, <em>term</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/boundary.html#Boundary.getSolutionComponent2D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.boundary.Boundary.getSolutionComponent2D" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="heat.boundary.Boundary.getSolutionComponent3D">
+<code class="descname">getSolutionComponent3D</code><span class="sig-paren">(</span><em>u</em>, <em>xArray</em>, <em>tArray</em>, <em>tol</em>, <em>component</em>, <em>term</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/boundary.html#Boundary.getSolutionComponent3D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.boundary.Boundary.getSolutionComponent3D" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="heat.boundary.Boundary.printSettings">
@@ -141,7 +169,7 @@ False.</td>
 <span id="heat-geometry-module"></span><h2>heat.geometry module<a class="headerlink" href="#module-heat.geometry" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="heat.geometry.Geometry">
-<em class="property">class </em><code class="descclassname">heat.geometry.</code><code class="descname">Geometry</code><span class="sig-paren">(</span><em>d=3</em>, <em>lx=1.0</em>, <em>ly=2.0</em>, <em>lz=3.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/geometry.html#Geometry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.geometry.Geometry" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">heat.geometry.</code><code class="descname">Geometry</code><span class="sig-paren">(</span><em>d=2</em>, <em>lx=0.01</em>, <em>ly=0.03</em>, <em>lz=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/geometry.html#Geometry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.geometry.Geometry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the model geometry.</p>
 <dl class="method">
 <dt id="heat.geometry.Geometry.checkLength">
@@ -205,7 +233,7 @@ False.</td>
 <span id="heat-initial-module"></span><h2>heat.initial module<a class="headerlink" href="#module-heat.initial" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="heat.initial.Initial">
-<em class="property">class </em><code class="descclassname">heat.initial.</code><code class="descname">Initial</code><span class="sig-paren">(</span><em>mesh=&lt;heat.mesh.Mesh instance&gt;</em>, <em>fct='uniform'</em>, <em>a=300.0</em>, <em>b=0.0</em>, <em>c=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/initial.html#Initial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.initial.Initial" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">heat.initial.</code><code class="descname">Initial</code><span class="sig-paren">(</span><em>mesh=&lt;heat.mesh.Mesh instance&gt;</em>, <em>fct='uniform'</em>, <em>a=0.0</em>, <em>b=0.0</em>, <em>c=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/initial.html#Initial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.initial.Initial" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="heat.initial.Initial.compute">
 <code class="descname">compute</code><span class="sig-paren">(</span><em>bcType</em>, <em>Coords</em>, <em>tArray</em>, <em>alpha</em>, <em>tol=1e-20</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/initial.html#Initial.compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.initial.Initial.compute" title="Permalink to this definition">¶</a></dt>
@@ -291,12 +319,17 @@ x = x+l/2.</p>
 <span id="heat-mesh-module"></span><h2>heat.mesh module<a class="headerlink" href="#module-heat.mesh" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="heat.mesh.Mesh">
-<em class="property">class </em><code class="descclassname">heat.mesh.</code><code class="descname">Mesh</code><span class="sig-paren">(</span><em>size='normal'</em>, <em>geometry=&lt;heat.geometry.Geometry instance&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/mesh.html#Mesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.mesh.Mesh" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">heat.mesh.</code><code class="descname">Mesh</code><span class="sig-paren">(</span><em>size='fine'</em>, <em>geometry=&lt;heat.geometry.Geometry instance&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/mesh.html#Mesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.mesh.Mesh" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="heat.mesh.Mesh.checkSize">
 <code class="descname">checkSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/mesh.html#Mesh.checkSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.mesh.Mesh.checkSize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the mesh size is one of the three available options.</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="heat.mesh.Mesh.getBoundariesIndex">
+<code class="descname">getBoundariesIndex</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/mesh.html#Mesh.getBoundariesIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.mesh.Mesh.getBoundariesIndex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="heat.mesh.Mesh.getCellNumPerDim">
@@ -359,6 +392,11 @@ x = x+l/2.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="heat.mesh.Mesh.getVerticesIndex">
+<code class="descname">getVerticesIndex</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/mesh.html#Mesh.getVerticesIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.mesh.Mesh.getVerticesIndex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="heat.mesh.Mesh.printSettings">
 <code class="descname">printSettings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/mesh.html#Mesh.printSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.mesh.Mesh.printSettings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the settings as a string for file I/O</p>
@@ -398,7 +436,7 @@ x = x+l/2.</p>
 
 <dl class="method">
 <dt id="heat.model.Model.getTimeList">
-<code class="descname">getTimeList</code><span class="sig-paren">(</span><em>coeff=100</em>, <em>length=101</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/model.html#Model.getTimeList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.model.Model.getTimeList" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getTimeList</code><span class="sig-paren">(</span><em>coeff=16040.0</em>, <em>length=101</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/heat/model.html#Model.getTimeList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#heat.model.Model.getTimeList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the simulation time list</p>
 </dd></dl>
 
