@@ -46,7 +46,7 @@
 <h1>The Heat Equation<a class="headerlink" href="#the-heat-equation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="statement-of-the-problem">
 <h2>Statement of the Problem<a class="headerlink" href="#statement-of-the-problem" title="Permalink to this headline">¶</a></h2>
-<p>We want to solve the following equation in 1D, 2D, or 3D elements:</p>
+<p>We want to solve the following equation for a line (1D), a rectangle (2D), or a block (3D):</p>
 <div class="math" id="equation-3dnh">
 <span class="eqno">(1)</span>\[\mathcal{L}_{\mathbf{x},t}[T(\mathbf{x},t)] = \Phi(\mathbf{x},t),\qquad \textrm{for }\mathbf{x}\in \Omega\]</div>
 <p>with boundary conditions</p>
@@ -72,6 +72,10 @@
 boundary of the domain, i.e. <span class="math">\(\frac{\partial T(\mathbf{x},t)}{\partial n} = g(\mathbf{x},t)\)</span> for <span class="math">\(\mathbf{x} \in \Gamma\)</span>.</p>
 <p>3- <strong>Third boundary value problems</strong> (Robin): A linear relationship between the unknown function and its normal derivative is prescribed at the boundary of the domain, i.e. <span class="math">\(\frac{\partial T(\mathbf{x},t)}{\partial n} +kT(\mathbf{x},t)= g(\mathbf{x},t)\)</span> for <span class="math">\(\mathbf{x} \in \Gamma\)</span>. The Robin boundary condition can be used to represent natural convection at a boundary.</p>
 <p>4- <strong>Mixed boundary value problems</strong>: Conditions of various types, listed above, are set at different portions of the boundary <span class="math">\(\Gamma\)</span>.</p>
+</div>
+<div class="section" id="overview-of-the-method">
+<h2>Overview of the method<a class="headerlink" href="#overview-of-the-method" title="Permalink to this headline">¶</a></h2>
+<p>The heat equation can be solved using Green&#8217;s functions, The solution <span class="math">\(T(\mathbf{x}, t)\)</span> is composed of three terms: The initial contribution <span class="math">\(T_i(\mathbf{x}, t)\)</span>, the source contribution <span class="math">\(T_s(\mathbf{x}, t)\)</span>, and the boundary contribution <span class="math">\(T_b(\mathbf{x}, t)\)</span>. The idea is to get each of these contribution on each dimensions of the geometry using infinite series. The details presented her are for a line, a rectangle, and a block, but for sake of simplicity we only implemented a code giving the solution for a line, a square and a cube, i.e. when all the side lengths <span class="math">\(L\)</span> are equal.</p>
 </div>
 <div class="section" id="a-set-of-homogeneous-solutions">
 <h2>A Set of Homogeneous Solutions<a class="headerlink" href="#a-set-of-homogeneous-solutions" title="Permalink to this headline">¶</a></h2>
@@ -466,6 +470,7 @@ T(x,t) = u(x,t) + \int_0^t \int_{x_1}^{x_2} \rho(\xi)\sum_{n=1}^\infty q(\xi,t)\
   <ul>
 <li><a class="reference internal" href="#">The Heat Equation</a><ul>
 <li><a class="reference internal" href="#statement-of-the-problem">Statement of the Problem</a></li>
+<li><a class="reference internal" href="#overview-of-the-method">Overview of the method</a></li>
 <li><a class="reference internal" href="#a-set-of-homogeneous-solutions">A Set of Homogeneous Solutions</a><ul>
 <li><a class="reference internal" href="#the-method-of-separation-of-variable">The Method of Separation of Variable</a></li>
 <li><a class="reference internal" href="#the-1d-homogeneous-solutions">The 1D homogeneous solutions</a><ul>
