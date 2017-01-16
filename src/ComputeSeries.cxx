@@ -1,19 +1,19 @@
-//
-//  ComputeSeries.cxx
-//
-//  Created by Francois Roy on 2/24/16.
-//  Copyright © 2016 Francois Roy. All rights reserved.
-//
+/**
+ *  @file    ComputeSeries.cxx
+ *  @brief   A class defining different methods for series evaluation.
+ *  @author  Francois Roy
+ *  @date    2/20/2016
+ *  @version 1.0.0
+ */
 
 #include <iostream> // for debugging
 #include "ComputeSeries.h"
-//#include <gmpxx.h>
 
 // Constructor
 ComputeSeries::ComputeSeries() :
-    p_fct(&ComputeSeries::fct),
-    absErr(0.0),
-    nIt(0)
+p_fct(&ComputeSeries::fct),
+absErr(0.0),
+nIt(0)
 {
 }
 
@@ -25,15 +25,6 @@ ComputeSeries::~ComputeSeries()
 double ComputeSeries::getSumForward(double tol, int nMax)
 {
     double result = 0.0;
-    //mpz_class x("7612058254738945");
-    //mpz_class y("9263591128439081");
-    /*
-    cout << "    " << x << "\n"
-            << "*\n"
-            << "    " << y << "\n"
-            << "--------------------\n"
-            << x * y << "\n";
-    */
     try {
         result = sumForward(tol, nMax);
     } catch (exc_MaxItReached& e) {
@@ -42,11 +33,6 @@ double ComputeSeries::getSumForward(double tol, int nMax)
         result = e.getOutput();
     }
     return result;
-}
-
-double ComputeSeries::getSumBackward(double nmax)
-{
-    return sumBackward(nmax);
 }
 
 double ComputeSeries::getSumKahan(double tol)
@@ -69,7 +55,7 @@ double ComputeSeries::sumForward(double tol, int nMax)
 {
     //Assert tol >=1
     assert(tol<1.0); // this will terminate the execution if true
-
+    
     double out = 0.0;
     double temp = 0.0;
     double eps = 1.0; // eps > tol
@@ -89,23 +75,6 @@ double ComputeSeries::sumForward(double tol, int nMax)
     }
     absErr = eps;
     nIt = i;
-    return out;
-}
-
-// Use the function pointer to calculate the sum
-double ComputeSeries::sumBackward(double nmax)
-{
-    double out = 0.0;
-    double temp = 0.0;
-    double eps = 1.0;
-    for (int i=nmax; i>=0; i--) {
-        out = out  + (this->*p_fct)(i);
-        eps = abs(temp-out);
-        temp = out;
-        if (i==nmax-1) {
-            cout << eps << endl;
-        }
-    }
     return out;
 }
 

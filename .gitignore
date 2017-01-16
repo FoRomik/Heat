@@ -11,3 +11,4 @@ __pycache__/
 .coverage
 *.sublime-workspace
 *.sublime-project
+references/

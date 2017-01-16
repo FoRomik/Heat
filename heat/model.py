@@ -92,8 +92,9 @@ class Model:
             Config.add_section('Geometry')
             Config.set('Geometry', '# Set the geometry centered at the origin. The dimension d = 1, 2 or 3')
             Config.set('Geometry', '# l is a vector giving the length of the geometry in meters for each')
-            Config.set('Geometry', '# dimensions. The extra components of the vector are ignored')
-            Config.set('Geometry', '# if the dimension is smaller than 3.')
+            Config.set('Geometry', '# dimensions. For now different side lengths are not suported, i.e.')
+            Config.set('Geometry', '# the geometry can only be  a line, a square or a cube of length')
+            Config.set('Geometry', '# l[0]. l[1] and l[2] are set to l[0] in the code.')
             Config.set('Geometry', 'd', str(g[0]))
             Config.set('Geometry', 'l', '[{0}, {1}, {2}]'.format(g[1],g[2],g[3]))
             Config.add_section('Mesh')
@@ -169,7 +170,6 @@ class Model:
         Coords = self.mesh.getCoords()
         bc = self.boundary.bcType
         # Temporary for testing:
-        print("alpha: {0}".format(alpha))
         print('Computing:')
         initTerm = self.initial.compute(bc, Coords, tArray, alpha)
         bndTerm = self.boundary.compute(tArray, alpha)
@@ -253,10 +253,11 @@ class Model:
                 raise ValueError("Congiguration file [{0}]: exception on {1}."
                                  .format(section, option))
         try:
+            # For now only lines, square and cube are supported.
             self.geometry = Geometry(dic['d'],
                                      dic['l'][0],
-                                     dic['l'][1],
-                                     dic['l'][2])
+                                     dic['l'][0],  #[1]
+                                     dic['l'][0])  #[2]
         except:
             raise ValueError('Configuration file [{0}]: One or more options is missing.'
                              .format(section))

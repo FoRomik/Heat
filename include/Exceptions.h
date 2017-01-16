@@ -1,10 +1,10 @@
-//
-//  Exceptions.h
-//  heat
-//
-//  Created by Francois Roy on 2/27/16.
-//  Copyright © 2016 Francois Roy. All rights reserved.
-//
+/**
+ *  @file    Exceptions.h
+ *  @brief   A class defining defining exceptions for the project @c Series.
+ *  @author  Francois Roy
+ *  @date    2/20/2016
+ *  @version 1.0.0
+ */
 
 #ifndef Exceptions_h
 #define Exceptions_h

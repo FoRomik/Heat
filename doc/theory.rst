@@ -4,7 +4,7 @@ The Heat Equation
 Statement of the Problem
 ------------------------
 
-We want to solve the following equation in 1D, 2D, or 3D elements:
+We want to solve the following equation for a line (1D), a rectangle (2D), or a block (3D):
 
 .. math:: \mathcal{L}_{\mathbf{x},t}[T(\mathbf{x},t)] = \Phi(\mathbf{x},t),\qquad \textrm{for }\mathbf{x}\in \Omega
    :label: 3dnh
@@ -46,6 +46,11 @@ boundary of the domain, i.e. :math:`\frac{\partial T(\mathbf{x},t)}{\partial n} 
 3- **Third boundary value problems** (Robin): A linear relationship between the unknown function and its normal derivative is prescribed at the boundary of the domain, i.e. :math:`\frac{\partial T(\mathbf{x},t)}{\partial n} +kT(\mathbf{x},t)= g(\mathbf{x},t)` for :math:`\mathbf{x} \in \Gamma`. The Robin boundary condition can be used to represent natural convection at a boundary.  
 
 4- **Mixed boundary value problems**: Conditions of various types, listed above, are set at different portions of the boundary :math:`\Gamma`. 
+
+Overview of the method
+----------------------
+
+The heat equation can be solved using Green's functions, The solution :math:`T(\mathbf{x}, t)` is composed of three terms: The initial contribution :math:`T_i(\mathbf{x}, t)`, the source contribution :math:`T_s(\mathbf{x}, t)`, and the boundary contribution :math:`T_b(\mathbf{x}, t)`. The idea is to get each of these contribution on each dimensions of the geometry using infinite series. The details presented her are for a line, a rectangle, and a block, but for sake of simplicity we only implemented a code giving the solution for a line, a square and a cube, i.e. when all the side lengths :math:`L` are equal.
 
 A Set of Homogeneous Solutions
 --------------------------------

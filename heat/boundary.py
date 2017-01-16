@@ -92,7 +92,7 @@ class Boundary:
                                          .format(prop))
 
     def compute(self, tArray, alpha, tol=1e-20):
-        '''The values are computed for x in [0, l]. The origin is moved setting
+        '''The values are computed for x in [0, l]. The origin is moved as
         x = x+l/2.
         '''
         sol = {}
@@ -103,21 +103,28 @@ class Boundary:
         sol['x'] = np.zeros((tArray.size, Coords['x'].size))  # row, column
         sol['y'] = np.zeros((tArray.size, Coords['y'].size))  # row, column
         sol['z'] = np.zeros((tArray.size, Coords['z'].size))  # row, column
-        term = 1  # 0 = Boundary term
+        term = 'boundary'  # boundary = Boundary term
         n = 1.0 
         for d in range(0, self.mesh.geometry.d):
             if (self.g1[d]=='uniform' and self.g2[d]=='uniform'):
                 if bcType[d] == 'dirichlet':
-                    bc = 0  # 0 = dirichlet
+                    bc = 'd'  # d = dirichlet
                 else:
                     print("Boundary term: The '{0}' boundary condition hasn't "\
                           "been implemented yet.".format(bcType[d]))
                     quit()
                 l = ls[d]
                 xArray = Coords[dim[d]]+l/2.0  # Uniform takes coordinates from 0 to l
-                dic = {'dim': self.mesh.geometry.d, 'x': xArray[0], 
-                       't': tArray[0], 'l': l, 'alpha': alpha}
-                u = Uniform(bc, term, dic, 0.0, self.a1[d], self.a2[d])
+                node = {'dim': self.mesh.geometry.d,
+                        'axis': "x",
+                        'baxis': "x",
+                        'x': xArray[0], 'y': 0.0, 'z': 0.0,
+                        't': tArray[0],
+                        'l': l,
+                        'alpha': alpha}
+                params = {'a0': 0.0, 'a1': self.a1[d], 'a2': self.a2[d],
+                          'k1': 0.0, 'k2': 0.0}
+                u = Uniform(node, bc, term, params)
                 if self.mesh.geometry.d==1:
                     sol[dim[d]] = self.getSolutionComponent(u, xArray, tArray, tol, dim[d], 'Boundary')
                 elif self.mesh.geometry.d==2:
@@ -147,6 +154,9 @@ class Boundary:
         else:
             solution = sol['x']+sol['y']+sol['z']
         return solution
+
+    def getSolutionAxis(self, u, axis, tol):
+        pass
 
     def getSolutionComponent3D(self, u, xArray, tArray, tol, component, term):
         """
@@ -229,7 +239,7 @@ class Boundary:
             bar.update(i+1)
             sleep(0.0001)
             for x in xArray:
-                u.setPosition(x)
+                u.setXPosition(x)
                 sol[i][j] = u.getSumForward(tol)
                 if sol[i][j]<1e-3:
                     sol[i][j] = 0.0
