@@ -42,8 +42,8 @@ setup(
     author_email='francois@froy.ca',
     description=("Solve the heat equation with constant coefficients, heat "
                  "source, and usual boundary conditions using Green's "
-                 "function on a line (1D), a rectangle (2D), "
-                 "or a block (3D)."),
+                 "function on a line (1D), a square (2D), "
+                 "or a cube (3D)."),
     license='BSD-2',
     keywords="Heat transfer Green's functions",
     url='https://github.com/frRoy/Heat',
