@@ -1,3 +1,4 @@
+import pytest
 import numpy as np
 from heat.wrapper import Uniform
 
@@ -21,7 +22,7 @@ class TestUniform:
         u = Uniform(node, 'd', 'initial', params)
         res = u.getNode()['axis']
         assert res=="x" 
-
+    
     def test_getBcType(self):
         """
         """
