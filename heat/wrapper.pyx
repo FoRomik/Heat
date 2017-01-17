@@ -1,7 +1,9 @@
 # distutils: language = c++
-# distutils: extra_compile_args=['-Wno-unused-function', '-std=c++11']
+# distutils: extra_compile_args=['-g', '-O0', '-std=c++11']
 # distutils: sources = ['src/ComputeSeries.cxx', 'src/Uniform.cxx', 'src/Exceptions.cxx']
 # distutils: include_dirs = include/
+
+#'-Wno-unused-function'
 
 from libcpp.string cimport string
 import sys
