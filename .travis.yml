@@ -35,4 +35,5 @@ after_success:
   - bash <(curl -s https://codecov.io/bash)
 after_failure:
   - COREFILE=$(find . -maxdepth 1 -name "core*" | head -n 1) # find core file
-  - if [[ -f "$COREFILE" ]]; then gdb -c "$COREFILE" example -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
+  - $(find ./ -maxdepth 1 -name 'core*' -print)
+  #- if [[ -f "$COREFILE" ]]; then gdb -c "$COREFILE" $(pwd)/tests -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
