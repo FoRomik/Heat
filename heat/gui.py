@@ -1,11 +1,11 @@
 import sys
-import matplotlib
-matplotlib.use('TkAgg')
+#import matplotlib
+#matplotlib.use('TkAgg')
 from numpy import arange, sin, pi
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+#from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 # implement the default mpl key bindings
-from matplotlib.backend_bases import key_press_handler
-from matplotlib.figure import Figure
+#from matplotlib.backend_bases import key_press_handler
+#from matplotlib.figure import Figure
 
 if sys.version_info[0] < 3:
     import Tkinter as tk
