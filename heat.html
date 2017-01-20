@@ -652,12 +652,6 @@ boundary[26]: k2 in the z-direction</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Wrapper for the C++ class ComputeSeries.</p>
 <dl class="method">
-<dt id="heat.wrapper.ComputeSeries.fct">
-<code class="descname">fct</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#heat.wrapper.ComputeSeries.fct" title="Permalink to this definition">¶</a></dt>
-<dd><p>Define the function to be summed.</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="heat.wrapper.ComputeSeries.getLastAbsoluteError">
 <code class="descname">getLastAbsoluteError</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#heat.wrapper.ComputeSeries.getLastAbsoluteError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the absolute error.</p>
@@ -681,6 +675,18 @@ nMax = 50000.</p>
 <code class="descname">getSumKahan</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#heat.wrapper.ComputeSeries.getSumKahan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get lthe Kahan sum.</p>
 </dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="heat.wrapper.InvalidAxis">
+<em class="property">exception </em><code class="descclassname">heat.wrapper.</code><code class="descname">InvalidAxis</code><a class="headerlink" href="#heat.wrapper.InvalidAxis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<p>Exception for the axis enum.</p>
+<dl class="attribute">
+<dt id="heat.wrapper.InvalidAxis.message">
+<code class="descname">message</code><em class="property"> = 'Invalid Axis'</em><a class="headerlink" href="#heat.wrapper.InvalidAxis.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -713,6 +719,11 @@ nMax = 50000.</p>
 <em class="property">class </em><code class="descclassname">heat.wrapper.</code><code class="descname">Uniform</code><a class="headerlink" href="#heat.wrapper.Uniform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#heat.wrapper.ComputeSeries" title="heat.wrapper.ComputeSeries"><code class="xref py py-class docutils literal"><span class="pre">heat.wrapper.ComputeSeries</span></code></a></p>
 <p>Wrapper fro the C++ class Uniform. See detail in the c++ documentation <a class="reference external" href="https://frroy.github.io/Series/class_uniform.html">here</a></p>
+<dl class="method">
+<dt id="heat.wrapper.Uniform.getAxis">
+<code class="descname">getAxis</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#heat.wrapper.Uniform.getAxis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="heat.wrapper.Uniform.getBcType">
 <code class="descname">getBcType</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#heat.wrapper.Uniform.getBcType" title="Permalink to this definition">¶</a></dt>
@@ -780,9 +791,9 @@ nMax = 50000.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="heat.wrapper.getString">
-<code class="descclassname">heat.wrapper.</code><code class="descname">getString</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#heat.wrapper.getString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Wrapper for std::string</p>
+<dt id="heat.wrapper.getAxis">
+<code class="descclassname">heat.wrapper.</code><code class="descname">getAxis</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#heat.wrapper.getAxis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper for axis enum</p>
 </dd></dl>
 
 <dl class="function">
