@@ -2,7 +2,9 @@ recursive-include heat *.pyx
 include src/ComputeSeries.cxx
 include src/Exceptions.cxx
 include src/Uniform.cxx
+include src/Misc.cxx
 include include/ComputeSeries.h
 include include/Exceptions.h
 include include/Uniform.h
+include include/Misc.h
 include include/Utils.h

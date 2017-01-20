@@ -23,11 +23,11 @@ script:
   - mkdir -p build && cd build
   - cmake ..
   - make
-  #- ctest --verbose
+  - ctest --verbose
   - pip install -e .
   - heat -v
-  #- py.test --cov=heat tests/
-  #- python setup.py test
+  - py.test --cov=heat tests/
+  - python setup.py test
 after_success:
   - pip install ghp-import
   - make doc

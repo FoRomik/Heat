@@ -73,7 +73,7 @@ public:
      *  @return The last number of iterations computed by the series
      *  evaluation method.
      */
-    double getLastNumberOfIterations();
+    int getLastNumberOfIterations();
   
     
 protected:

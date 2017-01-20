@@ -45,7 +45,7 @@ double ComputeSeries::getLastAbsoluteError()
     return absErr;
 }
 
-double ComputeSeries::getLastNumberOfIterations()
+int ComputeSeries::getLastNumberOfIterations()
 {
     return nIt;
 }

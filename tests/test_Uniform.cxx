@@ -15,9 +15,9 @@ bcType bc;
 termType term;
 node nd;
 pUniform ps;
-std::string xstr ("x");
-std::string ystr ("y");
-std::string zstr ("z");
+e_axis xstr = XAXIS;
+e_axis ystr = YAXIS;
+e_axis zstr = ZAXIS;
 
 
 /**
@@ -27,8 +27,8 @@ TEST(UniformTest, testgetNode) {
     bc = DIRICHLET;
     term = INITIAL;
     nd.dim = 1;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -40,7 +40,7 @@ TEST(UniformTest, testgetNode) {
     ps.a2 = 0.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     node result;
     double expected = 1.3e-9;
@@ -55,8 +55,8 @@ TEST(UniformTest, testgetBcType) {
     bc = DIRICHLET;
     term = INITIAL;
     nd.dim = 1;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -68,7 +68,7 @@ TEST(UniformTest, testgetBcType) {
     ps.a2 = 0.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     bcType result;
     bcType expected = DIRICHLET;
@@ -83,8 +83,8 @@ TEST(UniformTest, testgetTermType) {
     bc = DIRICHLET;
     term = INITIAL;
     nd.dim = 1;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -96,7 +96,7 @@ TEST(UniformTest, testgetTermType) {
     ps.a2 = 0.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     termType result;
     termType expected = INITIAL;
@@ -111,8 +111,8 @@ TEST(UniformTest, testgetParams) {
     bc = DIRICHLET;
     term = INITIAL;
     nd.dim = 1;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -124,7 +124,7 @@ TEST(UniformTest, testgetParams) {
     ps.a2 = 0.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     pUniform result;
     double expected = 300.0;
@@ -140,8 +140,8 @@ TEST(UniformTest, testSteadyStateDirichletInitial1D) {
     bc = DIRICHLET;
     term = INITIAL;
     nd.dim = 1;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -153,7 +153,7 @@ TEST(UniformTest, testSteadyStateDirichletInitial1D) {
     ps.a2 = 0.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     double result = 0.0;
     double expected = 0.0;
@@ -163,35 +163,39 @@ TEST(UniformTest, testSteadyStateDirichletInitial1D) {
 
 /**
  *  \test Test the steady-state term for source term with the Dirichlet
- *  boundary condition in 1D. The results should be \f$a_0l^2/(6\alpha)\f$.
+ *  boundary condition in 1D. 
  */
 TEST(UniformTest, testSteadyStateDirichletSource1D) {
     bc = DIRICHLET;
     term = SOURCE;
     nd.dim = 1;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
-    nd.t = 0.0;
-    nd.l = 1.0;
-    nd.alpha = 1.0e-4;
-    ps.a0 = 300,0;
+    nd.t = 0.08602493766;
+    nd.l = 0.01;
+    nd.alpha = 0.0001162453618;
+    ps.a0 = 2898.8868275;
     ps.a1 = 0.0;
     ps.a2 = 0.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     double result = 0.0;
-    result = u.getSteadyStateDirichlet();
-    double expected = 0.0;
-    EXPECT_NEAR(expected, result, 1e-10);
-    u.setXPosition(0.1);
-    result = u.getSteadyStateDirichlet();
-    expected = ps.a0*pow(nd.l,2.0)/(6.0*nd.alpha);
-    EXPECT_NEAR(expected, result, 1e-10);
+    double expected [11] = {0.0, 112.2194518675402, 199.50124782644622,
+                            261.8453878324124, 299.2518718512202,
+                            311.72069986098154, 299.25187185279117,
+                            261.84538783432765, 199.5012478281343,
+                            112.21945186849355, 0.0 };
+    for (int i = 0; i < 11; i++)
+    {
+        u.setXPosition(i*nd.l/10.0);
+        result = u.getSteadyStateDirichlet();
+        EXPECT_NEAR(expected[i], result, 1e-2);
+    }
 }
 
 /**
@@ -202,8 +206,8 @@ TEST(UniformTest, testSteadyStateDirichletBoundary1D) {
     bc = DIRICHLET;
     term = BOUNDARY;
     nd.dim = 1;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -215,7 +219,7 @@ TEST(UniformTest, testSteadyStateDirichletBoundary1D) {
     ps.a2 = 256.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     //double expected = ps.a1 + (ps.a2-ps.a1)*nd.x/nd.l;
     double result = 0.0;
@@ -241,8 +245,8 @@ TEST(UniformTest, testDirichletInitial1D) {
     bc = DIRICHLET;
     term = INITIAL;
     nd.dim = 1;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -254,7 +258,7 @@ TEST(UniformTest, testDirichletInitial1D) {
     ps.a2 = 0.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     double result = 0.0;
     double expected [11] = { 0.00000000e+00, 1.56149963e+02, 2.52810233e+02,
@@ -278,8 +282,8 @@ TEST(UniformTest, testDirichletSource1D) {
     bc = DIRICHLET;
     term = SOURCE;
     nd.dim = 1;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -291,17 +295,19 @@ TEST(UniformTest, testDirichletSource1D) {
     ps.a2 = 0.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     double result = 0.0;
-    double expected [11] = { 0.0,  378.57381313,  345.14808317,  318.62252173,
-                             301.59286424, 295.72501482,  301.59286424,
-                             318.62252173, 345.14808317,  378.57381313, 0.0 };
+    double expected [11] = { 0.0, 75.24427632627258, 129.16891759689995,
+                             165.03892283877104, 185.44685106768966,
+                             192.05813963185633, 185.44685106855934,
+                             165.0389228397004, 129.16891759765625,
+                             75.24427632668458, 0.0};
     for (int i = 0; i < 11; i++)
     {
         u.setXPosition(i*nd.l/10.0);
         result = u.getSteadyStateDirichlet()-u.getSumForward(1e-20);
-        EXPECT_NEAR(expected[i], result, 1e-6);
+        EXPECT_NEAR(expected[i], result, 0.5);
     }
 }
 
@@ -317,8 +323,8 @@ TEST(UniformTest, testDirichletBoundary1D) {
     bc = DIRICHLET;
     term = BOUNDARY;
     nd.dim = 1;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -330,7 +336,7 @@ TEST(UniformTest, testDirichletBoundary1D) {
     ps.a2 = 325.8;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     double result = 0.0;
     double expected [11] = { 4.34600000e+02, 2.08390753e+02, 6.83622404e+01,
         1.47309454e+01, 2.04014071e+00, 3.09448431e-01,
@@ -352,8 +358,8 @@ TEST(UniformTest, testSteadyStateDirichletInitial2D) {
     bc = DIRICHLET;
     term = INITIAL;
     nd.dim = 2;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -365,7 +371,7 @@ TEST(UniformTest, testSteadyStateDirichletInitial2D) {
     ps.a2 = 0.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     double result = 0.0;
     double expected = 0.0;
@@ -381,8 +387,8 @@ TEST(UniformTest, testSteadyStateDirichletSource2D) {
     bc = DIRICHLET;
     term = SOURCE;
     nd.dim = 2;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -394,7 +400,7 @@ TEST(UniformTest, testSteadyStateDirichletSource2D) {
     ps.a2 = 0.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     double result = 0.0;
     result = u.getSteadyStateDirichlet();
@@ -416,8 +422,8 @@ TEST(UniformTest, testSteadyStateDirichletBoundary2D) {
     bc = DIRICHLET;
     term = BOUNDARY;
     nd.dim = 2;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -429,7 +435,7 @@ TEST(UniformTest, testSteadyStateDirichletBoundary2D) {
     ps.a2 = 256.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     //double expected = ps.a1 + (ps.a2-ps.a1)*nd.x/nd.l;
     double result = 0.0;
@@ -452,8 +458,8 @@ TEST(UniformTest, testDirichletInitial2D) {
     bc = DIRICHLET;
     term = INITIAL;
     nd.dim = 2;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -465,7 +471,7 @@ TEST(UniformTest, testDirichletInitial2D) {
     ps.a2 = 0.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     double resultx = 0.0;
     double resulty = 0.0;
@@ -500,8 +506,8 @@ TEST(UniformTest, testDirichletSource2D) {
     bc = DIRICHLET;
     term = SOURCE;
     nd.dim = 2;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -513,7 +519,7 @@ TEST(UniformTest, testDirichletSource2D) {
     ps.a2 = 0.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     double resultx = 0.0;
     double resulty = 0.0;
@@ -547,8 +553,8 @@ TEST(UniformTest, testDirichletBoundary2D) {
     bc = DIRICHLET;
     term = BOUNDARY;
     nd.dim = 2;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -560,7 +566,7 @@ TEST(UniformTest, testDirichletBoundary2D) {
     ps.a2 = 325.8;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     double resultx_x = 0.0;
     double resultx_y = 0.0;
@@ -616,8 +622,8 @@ TEST(UniformTest, testSteadyStateDirichletInitial3D) {
     bc = DIRICHLET;
     term = INITIAL;
     nd.dim = 3;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -629,7 +635,7 @@ TEST(UniformTest, testSteadyStateDirichletInitial3D) {
     ps.a2 = 0.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     double result = 0.0;
     double expected = 0.0;
@@ -646,8 +652,8 @@ TEST(UniformTest, testSteadyStateDirichletSource3D) {
     bc = DIRICHLET;
     term = SOURCE;
     nd.dim = 3;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -659,7 +665,7 @@ TEST(UniformTest, testSteadyStateDirichletSource3D) {
     ps.a2 = 0.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     double result = 0.0;
     result = u.getSteadyStateDirichlet();
@@ -682,8 +688,8 @@ TEST(UniformTest, testSteadyStateDirichletBoundary3D) {
     bc = DIRICHLET;
     term = BOUNDARY;
     nd.dim = 3;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -695,7 +701,7 @@ TEST(UniformTest, testSteadyStateDirichletBoundary3D) {
     ps.a2 = 256.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     //double expected = ps.a1 + (ps.a2-ps.a1)*nd.x/nd.l;
     double result = 0.0;
@@ -718,8 +724,8 @@ TEST(UniformTest, testDirichletInitial3D) {
     bc = DIRICHLET;
     term = INITIAL;
     nd.dim = 3;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -731,7 +737,7 @@ TEST(UniformTest, testDirichletInitial3D) {
     ps.a2 = 0.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     double resultx = 0.0;
     double resulty = 0.0;
@@ -772,8 +778,8 @@ TEST(UniformTest, testDirichletSource3D) {
     bc = DIRICHLET;
     term = SOURCE;
     nd.dim = 3;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -785,7 +791,7 @@ TEST(UniformTest, testDirichletSource3D) {
     ps.a2 = 0.0;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     double resultx = 0.0;
     double resulty = 0.0;
@@ -826,8 +832,8 @@ TEST(UniformTest, testDirichletBoundary3D) {
     bc = DIRICHLET;
     term = BOUNDARY;
     nd.dim = 3;
-    nd.axis = xstr;
-    nd.baxis = xstr;
+    e_axis axis = xstr;
+    e_axis baxis = xstr;
     nd.x = 0.0;
     nd.y = 0.0;
     nd.z = 0.0;
@@ -839,7 +845,7 @@ TEST(UniformTest, testDirichletBoundary3D) {
     ps.a2 = 325.8;
     ps.k1 = 0.0;
     ps.k2 =0.0;
-    Uniform u(nd, bc, term, ps);
+    Uniform u(nd, bc, term, ps, axis, baxis);
     
     double resultx_x = 0.0;
     double resultx_y = 0.0;

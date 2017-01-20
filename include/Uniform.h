@@ -24,14 +24,15 @@
  */
 class Uniform :public ComputeSeries {
 public:
-    Uniform(node nd, bcType bc, termType term, pUniform params);
+    Uniform(node nd, bcType bc, termType term, pUniform params,
+            e_axis axis, e_axis baxis);
     ~Uniform();
     void setTime(double t);
     void setXPosition(double x);
     void setYPosition(double y);
     void setZPosition(double z);
-    void setAxis(std::string axis);
-    void setBoundaryAxis(std::string baxis);
+    void setAxis(e_axis axis);
+    void setBoundaryAxis(e_axis baxis);
     node getNode();
     bcType getBcType();
     termType getTermType();
@@ -43,6 +44,8 @@ private:
     node nd;
     bcType bc;
     termType term;
+    e_axis axis;
+    e_axis baxis;
     double fct(int); //!< a member function.
     /**
      *  @brief Get the expressions for the Dirichlet boundary condition.
@@ -65,6 +68,14 @@ private:
      *  \f[\begin{equation}
      *  T(x,y,z,t) = T_i(x,y,z,t)+T_s(x,y,z,t)+T_b(x,y,z,t)
      *  \label{eq:1Ddistribution}
+     *  \end{equation}.\f]
+     *
+     *  The boudary contribution is composed of the summation of three
+     *  temperatures in 3D (one per axis), two in 2D, and one in 1D. For 
+     *  instance, in the 3D case we have:
+     *  \f[\begin{equation}
+     *  T_b(x,y,z,t) = T_b^{(x)}(x,y,z,t)+T_b^{(y)}(x,y,z,t)+T_b^{(z)}(x,y,z,t)
+     *  \label{eq:1DAxisBoundary}
      *  \end{equation}.\f]
      *
      *  The initial contribution has a zero steady-state solution, the source
@@ -225,63 +236,23 @@ private:
      *  \label{eq:1Dsrc6}
      *  \end{equation}.\f]
      *
-     *  The ratio \f$x/l\in [0,~1]\f$, allows to use the following
-     *  identities:
-     *  \f[\begin{align}
-     *  \sum_{n=1}^\infty \frac{1}{n^2} &= \frac{\pi^2}{6}
-     *  \label{eq:1Dsrc7id1}\\
-     *  \sum_{n=1}^\infty \frac{1}{n}\sin\left(\frac{n\pi x}{l}\right) &=
-     *  \frac{\pi}{2}\left(1-\frac{x}{l}\right)
-     *  \label{eq:1Dsrc7id2}\\
-     *  \sum_{n=1}^\infty \frac{(-1)^{n-1}}{n}\sin\left(\frac{n\pi x}{l}\right)
-     *  &=\frac{\pi}{2}\frac{x}{l}\label{eq:1Dsrc7id3}
-     *  \end{align}\f]
-     *
-     *  Substituting these identities in (\f$\ref{eq:1Dsrc6}\f$), we
-     *  obtain:
-     *  \f[\begin{equation}
-     *  \lim_{t\rightarrow \infty}T_{s}(x,t)=\frac{2a_0l^2}{\alpha\pi^3}
-     *  \left(\frac{\pi^2}{6}\left(\frac{\pi}{2}
-     *  \left(1-\frac{x}{l}\right)-\left(-\frac{\pi}{2}\frac{x}{l}\right)
-     *  \right)\right)
-     *  \label{eq:1Dsrc8}
-     *  \end{equation}\f]
-     *
-     *  which gives:
-     *  \f[\begin{equation}
-     *  \lim_{t\rightarrow \infty}T_{s}(x,t)=\frac{2a_0l^2}{\alpha\pi^3}
-     *  \frac{\pi^3}{12}
-     *  \label{eq:1Dsrc9}
-     *  \end{equation}.\f]
-     *
      *  For the transient term we have:
      *  \f[\begin{equation}
      *  T_{s,t}(x,t)= -\frac{2a_0}{l}\sum_{n=1}^\infty
-     *  \frac{1}{\alpha\lambda_n^{3/2}}
-     *  \left(1-(-1)^n\right)\phi_n(x)
+     *  \frac{l^3}{\alpha\pi^3}\frac{1}{n^3}
+     *  \left(1-(-1)^n\right)\sin\left(\frac{n\pi x}{l}\right)
      *  \exp\left(-\alpha \lambda_n t\right)
      *  \label{eq:1Dsrc10}
      *  \end{equation}.\f]
      *
-     *  Starting the summation from \f$n=0\f$ and using the expressions for the
-     *  eigenvalues and eigenfunctions defined above, we get:
-     *  \f[\begin{equation}
-     *  T_{s,t}(x,t)= -\frac{2a_0l^2}{\alpha\pi^3}\sum_{n=0}^\infty
-     *  \frac{2}{(2n+1)^3}
-     *  \sin\left(\frac{(2n+1)\pi x}{l}\right)
-     *  \exp\left(-\alpha \left(\frac{(2n+1)\pi}{l}\right)^2 t\right)
-     *  \label{eq:1Dsrc11}
-     *  \end{equation}.\f]
-     *
-     *  The temperature contribution for the one-dimensional uniform source
-     *  term is:
+     *  Starting the summation from \f$n=0\f$, the temperature contribution for
+     *  the one-dimensional uniform source term is:
      *  \f[\bbox[5px,border:2px solid red]{\begin{equation}
      *  T_{s}(x,t)= 2\frac{a_0l^2}{\alpha\pi^3}
-     *  \frac{\pi^3}{12}
-     *  -2\frac{a_0l^2}{\alpha\pi^3}\sum_{n=0}^\infty
-     *  \frac{2}{(2n+1)^3}
+     *  \sum_{n=0}^\infty \frac{2}{(2n+1)^3}
      *  \sin\left(\frac{(2n+1)\pi x}{l}\right)
-     *  \exp\left(-\alpha \left(\frac{(2n+1)\pi}{l}\right)^2 t\right)
+     *  \left(1-
+     *  \exp\left(-\alpha \left(\frac{(2n+1)\pi}{l}\right)^2 t\right)\right)
      *  \label{eq:1Dsrc12}
      *  \end{equation}.}\f]
      *
@@ -364,7 +335,17 @@ private:
      *  \label{eq:1Dbnd8}
      *  \end{equation}.\f]
      *
-     *  Using (\f$\ref{eq:1Dsrc7id2}\f$) and (\f$\ref{eq:1Dsrc7id3}\f$) in
+     *  The ratio \f$x/l\in [0,~1]\f$, allows to use the following
+     *  identities:
+     *  \f[\begin{align}
+     *  \sum_{n=1}^\infty \frac{1}{n}\sin\left(\frac{n\pi x}{l}\right) &=
+     *  \frac{\pi}{2}\left(1-\frac{x}{l}\right)
+     *  \label{eq:identitiesa}\\
+     *  \sum_{n=1}^\infty \frac{(-1)^{n-1}}{n}\sin\left(\frac{n\pi x}{l}\right)
+     *  &=\frac{\pi}{2}\frac{x}{l}\label{eq:identitiesb}
+     *  \end{align}\f]
+     *
+     *  Using (\f$\ref{eq:identitiesa}\f$) and (\f$\ref{eq:identitiesb}\f$) in
      *  (\f$\ref{eq:1Dbnd8}\f$) and the expressions for the eigenvalues and
      *  engenfunctions defined in (\f$\ref{eq:1Dlambda}\f$) and
      *  (\f$\ref{eq:1Dphix}\f$) we have:
@@ -529,7 +510,7 @@ private:
      *  \end{equation}.\f]
      *
      *  multiplying (\f$\ref{eq:2Dsrc4}\f$) by 1 using
-     *  \f$\lambda_n/\lambda_n\f$ we obtain:
+     *  \f$\sqrt{\lambda_n}/\sqrt{\lambda_n}\f$ we obtain:
      *  \f[\begin{equation}T_{s}(x,y,t) = \frac{4a_0}{\alpha l^2}
      *  \sum_{n=1}^\infty\sum_{m=1}^\infty
      *  \frac{1}{\lambda_n}
@@ -570,10 +551,11 @@ private:
      *  The first term of (\f$\ref{eq:2Dsrc8}\f$) is the steady-state
      *  solution as the term is independent of \f$t\f$. Using the identities 
      *  listed in equations 
-     *  (\f$\ref{eq:1Dsrc7id1}\f$-\f$\ref{eq:1Dsrc7id3}\f$) we obtain:
+     *  (\f$\ref{eq:identitiesa}\f$-\f$\ref{eq:identitiesb}\f$) we obtain:
      *  \f[\begin{equation}
-     *  \lim_{t\rightarrow \infty}T_{s}(x,y,t)=\frac{4a_0l^2}{2\alpha\pi^4}
-     *  \frac{\pi^4}{2(12)}
+     *  \lim_{t\rightarrow \infty}T_{s}(x,y,t)=\frac{a_0l^2}{\alpha\pi^3}
+     *  \sum_{n=0}^\infty \frac{2}{(2n+1)^3}
+     *  \sin\left(\frac{(2n+1)\pi x}{l}\right)
      *  \label{eq:2Dsrc9}
      *  \end{equation}.\f]
      *
@@ -612,7 +594,7 @@ private:
      *  The uniform **boundary term** along the \f$x\f$-axis is given by a 
      *  fixed temperature at the extremities of the axis.
      *  \f[\begin{equation}
-     *  T_{b}(x,y,t) = \alpha a_1\int_0^t\int_0^l \left[
+     *  T_{b}^{(x)}(x,y,t) = \alpha a_1\int_0^t\int_0^l \left[
      *  \frac{\partial}{\partial \xi}G(x,\xi,y,\eta,t-\tau)\right]_{\xi=0}
      *  d\eta d\tau
      *  -\alpha a_2\int_0^t\int_0^l \left[
@@ -641,7 +623,7 @@ private:
      *
      *  we have:
      *  \f[\begin{equation}
-     *  T_{b}(x,y,t) = \frac{4}{l^2}
+     *  T_{b}^{(x)}(x,y,t) = \frac{4}{l^2}
      *  \sum_{n=1}^\infty\sum_{m=1}^\infty \left(\alpha\int_0^t
      *  \exp\left(-\alpha \left(\lambda_n+\lambda_m\right)(t-\tau)\right)d\tau
      *  \right)\left(\phi_n(x)\phi_m(y)\int_0^l\phi_m(\eta)d\eta\right)\left(
@@ -667,7 +649,7 @@ private:
      *
      *  which gives:
      *  \f[\begin{equation}
-     *  T_{b}(x,y,t) = \frac{4}{l^2}
+     *  T_{b}^{(x)}(x,y,t) = \frac{4}{l^2}
      *  \sum_{n=1}^\infty\sum_{m=1}^\infty \left(\frac{1}
      *  {\left(\lambda_n+\lambda_m\right)}
      *  \left(1-\exp\left(-\alpha \left(\lambda_n+\lambda_m\right)t\right)
@@ -680,7 +662,7 @@ private:
      *  Using equation (\f$\ref{eq:2Dsrc7b}\f$) we
      *  obtain:
      *  \f[\begin{equation}
-     *  T_{b}(x,y,t) = \frac{2}{\pi^2}
+     *  T_{b}^{(x)}(x,y,t) = \frac{2}{\pi^2}
      *  \sum_{n=1}^\infty\sum_{m=1}^\infty
      *  \left(1-\exp\left(-\alpha \left(\lambda_n+\lambda_m\right)t\right)
      *  \right)\left(\frac{\phi_n(x)}{n}\frac{\phi_m(y)}{m}
@@ -691,7 +673,7 @@ private:
      *
      *  From (\f$\ref{eq:2Dbnd8}\f$), the steady-state solution is:
      *  \f[\begin{equation}
-     *  \lim_{t\rightarrow\infty} T_{b}(x,y,t) = \frac{2}{\pi^2}
+     *  \lim_{t\rightarrow\infty} T_{b}^{(x)}(x,y,t) = \frac{2}{\pi^2}
      *  \sum_{n=1}^\infty\sum_{m=1}^\infty
      *  \left(\frac{\phi_n(x)}{n}\frac{\phi_m(y)}{m}
      *  \left(1-(-1)^m\right)\right)\left(
@@ -702,14 +684,14 @@ private:
      *  Using the identities listed in equations
      *  (\f$\ref{eq:1Dsrc7id1}\f$-\f$\ref{eq:1Dsrc7id3}\f$) we obtain:
      *  \f[\begin{equation}
-     *  \lim_{t\rightarrow \infty}T_{b}(x,y,t)= \frac{1}{2}\left(
+     *  \lim_{t\rightarrow \infty}T_{b}^{(x)}(x,y,t)= \frac{1}{2}\left(
      *  a_1+\left(a_2-a_1\right)\frac{x}{l}\right)
      *  \label{eq:2Dbnd10}
      *  \end{equation}.\f]
      *
      *  Summing from \f$n=m=0\f$, the transient term is:
      *  \f[\bbox[5px,border:2px solid red]{\begin{equation}
-     *  T_{b,t}(x,y,t) = \frac{2}{\pi^2}\sum_{n=0}^\infty
+     *  T_{b,t}^{(x)}(x,y,t) = \frac{2}{\pi^2}\sum_{n=0}^\infty
      *  \frac{1}{n+1}\left((-1)^{n+1} a_2-a_1\right)
      *  \sin\left(\frac{(n+1)\pi x}{l}\right)
      *  \exp\left(-\alpha \frac{\pi^2(n+1)^2}{l^2}t\right)
@@ -720,18 +702,18 @@ private:
      *
      *  which can be expressed as:
      *  \f[\begin{equation}
-     *  T_{b,t}(x,y,t) = T_{b,t}(x,t)T_{b,t}(y,t)
+     *  T_{b,t}^{(x)}(x,y,t) = T_{b,t}^{(x)}(x,t)T_{b,t}^{(x)}(y,t)
      *  \label{eq:2Dbnd12}
      *  \end{equation}.\f]
      *
-     *  where \f$T_{b,t}(x,t)\f$ and \f$T_{b,t}(y,t)\f$ are given by:
+     *  where \f$T_{b,t}^{(x)}(x,t)\f$ and \f$T_{b,t}^{(x)}(y,t)\f$ are given by:
      *  \f[\begin{align}
-     *  T_{b,t}(x,t) &= \frac{2}{\sqrt{2}\pi}
+     *  T_{b,t}^{(x)}(x,t) &= \frac{2}{\sqrt{2}\pi}
      *  \sum_{n=0}^\infty \frac{1}{n+1}\left((-1)^{n+1} a_2-a_1\right)
      *  \sin\left(\frac{(n+1)\pi x}{l}\right)
      *  \exp\left(-\alpha \frac{\pi^2(n+1)^2}{l^2}t\right)
      *  \label{eq:2Dbnd13x}\\
-     *  T_{b,t}(y,t) &= \frac{2}{\sqrt{2}\pi}
+     *  T_{b,t}^{(x)}(y,t) &= \frac{2}{\sqrt{2}\pi}
      *  \sum_{m=0}^\infty \frac{2}{2m+1}
      *  \sin\left(\frac{(2m+1)\pi y}{l}\right)\exp\left(-\alpha
      *  \frac{\pi^2(2m+1)^2}{l^2}t\right)
@@ -742,7 +724,7 @@ private:
      *  By analogy to the \f$x\f$-axis case, the \f$y\f$-axis the
      *  steady-state temperature contribution is:
      *  \f[\begin{equation}
-     *  \lim_{t\rightarrow \infty}T_{b}(x,y,t)=
+     *  \lim_{t\rightarrow \infty}T_{b}^{(y)}(x,y,t)=
      *  a_1+\left(a_2-a_1\right)\frac{y}{l}
      *  \label{eq:2Dbnd14}
      *  \end{equation}.\f]
@@ -752,18 +734,19 @@ private:
      *
      *  The transient term is:
      *  \f[\begin{equation}
-     *  T_{b,t}(x,y,t) = T_{b,t}(x,t)T_{b,t}(y,t)
+     *  T_{b,t}^{(y)}(x,y,t) = T_{b,t}^{(y)}(x,t)T_{b,t}^{(y)}(y,t)
      *  \label{eq:2Dbnd15}
      *  \end{equation}.\f]
      *
-     *  where \f$T_{b,t}(x,t)\f$ and \f$T_{b,t}(y,t)\f$ are given by:
+     *  where \f$T_{b,t}^{(y)}(x,t)\f$ and \f$T_{b,t}^{(y)}(y,t)\f$ are 
+     *  given by:
      *  \f[\begin{align}
-     *  T_{b,t}(x,t) &= \frac{2}{\pi}
+     *  T_{b,t}^{(y)}(x,t) &= \frac{2}{\pi}
      *  \sum_{n=0}^\infty \frac{2}{2n+1}
      *  \sin\left(\frac{(2n+1)\pi x}{l}\right)\exp\left(-\alpha
      *  \frac{\pi^2(2n+1)^2}{l^2}t\right)
      *  \label{eq:2Dbnd16x}\\
-     *  T_{b,t}(y,t) &= \frac{2}{\pi}
+     *  T_{b,t}^{(y)}(y,t) &= \frac{2}{\pi}
      *  \sum_{m=0}^\infty \frac{1}{m+1}\left((-1)^{m+1} a_2-a_1\right)
      *  \sin\left(\frac{(m+1)\pi y}{l}\right)
      *  \exp\left(-\alpha \frac{\pi^2(m+1)^2}{l^2}t\right)
@@ -842,8 +825,9 @@ private:
      *
      *  we obtain the following steady-state solution:
      *  \f[\begin{equation}
-     *  \lim_{t\rightarrow\infty}T_{s}(x,y,z,t) = \frac{8a_0l^2}{3\alpha\pi^5}
-     *  \frac{\pi^5}{3(12)}
+     *  \lim_{t\rightarrow\infty}T_{s}(x,y,z,t) = 2\frac{a_0l^2}{3\alpha\pi^3}
+     *  \sum_{n=0}^\infty \frac{2}{(2n+1)^3}
+     *  \sin\left(\frac{(2n+1)\pi x}{l}\right)
      *  \label{eq:3Dsrc2}
      *  \end{equation}.\f]
      *
@@ -887,7 +871,7 @@ private:
      *  By analogy to the 2D case, the
      *  steady-state temperature contribution is:
      *  \f[\begin{equation}
-     *  \lim_{t\rightarrow \infty}T_{b}(x,y,z,t)=
+     *  \lim_{t\rightarrow \infty}T_{b}^{(x)}(x,y,z,t)=
      *  a_1+\left(a_2-a_1\right)\frac{x}{l}
      *  \label{eq:3Dbnd1}
      *  \end{equation}.\f]
@@ -897,24 +881,25 @@ private:
      *
      *  The transient term is:
      *  \f[\begin{equation}
-     *  T_{b,t}(x,y,z,t) = T_{b,t}(x,t)T_{b,t}(y,t)T_{b,t}(z,t)
+     *  T_{b,t}^{(x)}(x,y,z,t) = T_{b,t}^{(x)}(x,t)T_{b,t}^{(x)}(y,t)
+     *  T_{b,t}^{(x)}(z,t)
      *  \label{eq:3Dbnd2}
      *  \end{equation}.\f]
      *
-     *  where \f$T_{b,t}(x,t)\f$, \f$T_{b,t}(y,t)\f$, and \f$T_{b,t}(z,t)\f$
-     *  are given by:
+     *  where \f$T_{b,t}^{(x)}(x,t)\f$, \f$T_{b,t}^{(x)}(y,t)\f$, and 
+     *  \f$T_{b,t}^{(x)}(z,t)\f$ are given by:
      *  \f[\begin{align}
-     *  T_{b,t}(x,t) &= \frac{2}{3^{1/3}\pi}
+     *  T_{b,t}^{(x)}(x,t) &= \frac{2}{3^{1/3}\pi}
      *  \sum_{n=0}^\infty \frac{1}{n+1}\left((-1)^{n+1} a_2-a_1\right)
      *  \sin\left(\frac{(n+1)\pi x}{l}\right)
      *  \exp\left(-\alpha \frac{\pi^2(n+1)^2}{l^2}t\right)
      *  \label{eq:3Dbnd3x}\\
-     *  T_{b,t}(y,t) &= \frac{2}{3^{1/3}\pi}
+     *  T_{b,t}^{(x)}(y,t) &= \frac{2}{3^{1/3}\pi}
      *  \sum_{m=0}^\infty \frac{2}{2m+1}
      *  \sin\left(\frac{(2m+1)\pi y}{l}\right)\exp\left(-\alpha
      *  \frac{\pi^2(2m+1)^2}{l^2}t\right)
      *  \label{eq:3Dbnd3y}\\
-     *  T_{b,t}(z,t) &= \frac{2}{3^{1/3}\pi}
+     *  T_{b,t}^{(x)}(z,t) &= \frac{2}{3^{1/3}\pi}
      *  \sum_{k=0}^\infty \frac{2}{2k+1}
      *  \sin\left(\frac{(2k+1)\pi z}{l}\right)\exp\left(-\alpha
      *  \frac{\pi^2(2k+1)^2}{l^2}t\right)
@@ -925,7 +910,7 @@ private:
      *  By analogy to the \f$x\f$-axis case, the \f$y\f$-axis
      *  steady-state temperature contribution is:
      *  \f[\begin{equation}
-     *  \lim_{t\rightarrow \infty}T_{b}(x,y,z,t)=
+     *  \lim_{t\rightarrow \infty}T_{b}^{(y)}(x,y,z,t)=
      *  a_1+\left(a_2-a_1\right)\frac{y}{l}
      *  \label{eq:3Dbnd4}
      *  \end{equation}.\f]
@@ -935,24 +920,25 @@ private:
      *
      *  The transient term is:
      *  \f[\begin{equation}
-     *  T_{b,t}(x,y,z,t) = T_{b,t}(x,t)T_{b,t}(y,t)T_{b,t}(z,t)
+     *  T_{b,t}^{(y)}(x,y,z,t) = T_{b,t}^{(y)}(x,t)T_{b,t}^{(y)}(y,t)
+     *  T_{b,t}^{(y)}(z,t)
      *  \label{eq:3Dbnd5}
      *  \end{equation}.\f]
      *
-     *  where \f$T_{b,t}(x,t)\f$, \f$T_{b,t}(y,t)\f$, and \f$T_{b,t}(z,t)\f$
-     *  are given by:
+     *  where \f$T_{b,t}^{(y)}(x,t)\f$, \f$T_{b,t}^{(y)}(y,t)\f$, and 
+     *  \f$T_{b,t}^{(y)}(z,t)\f$ are given by:
      *  \f[\begin{align}
-     *  T_{b,t}(x,t) &= \frac{2}{3^{1/3}\pi}
+     *  T_{b,t}^{(y)}(x,t) &= \frac{2}{3^{1/3}\pi}
      *  \sum_{n=0}^\infty \frac{2}{2n+1}
      *  \sin\left(\frac{(2n+1)\pi x}{l}\right)\exp\left(-\alpha
      *  \frac{\pi^2(2n+1)^2}{l^2}t\right)
      *  \label{eq:3Dbnd6x}\\
-     *  T_{b,t}(y,t) &= \frac{2}{3^{1/3}\pi}
+     *  T_{b,t}^{(y)}(y,t) &= \frac{2}{3^{1/3}\pi}
      *  \sum_{m=0}^\infty \frac{1}{m+1}\left((-1)^{m+1} a_2-a_1\right)
      *  \sin\left(\frac{(m+1)\pi y}{l}\right)
      *  \exp\left(-\alpha \frac{\pi^2(m+1)^2}{l^2}t\right)
      *  \label{eq:3Dbnd6y}\\
-     *  T_{b,t}(z,t) &= \frac{2}{3^{1/3}\pi}
+     *  T_{b,t}^{(y)}(z,t) &= \frac{2}{3^{1/3}\pi}
      *  \sum_{k=0}^\infty \frac{2}{2k+1}
      *  \sin\left(\frac{(2k+1)\pi z}{l}\right)\exp\left(-\alpha
      *  \frac{\pi^2(2k+1)^2}{l^2}t\right)
@@ -963,7 +949,7 @@ private:
      *  By analogy to the two preceding cases, the \f$z\f$-axis
      *  steady-state temperature contribution is:
      *  \f[\begin{equation}
-     *  \lim_{t\rightarrow \infty}T_{b}(x,y,z,t)=
+     *  \lim_{t\rightarrow \infty}T_{b}^{(z)}(x,y,z,t)=
      *  a_1+\left(a_2-a_1\right)\frac{z}{l}
      *  \label{eq:3Dbnd7}
      *  \end{equation}.\f]
@@ -973,24 +959,25 @@ private:
      *
      *  The transient term is:
      *  \f[\begin{equation}
-     *  T_{b,t}(x,y,z,t) = T_{b,t}(x,t)T_{b,t}(y,t)T_{b,t}(z,t)
+     *  T_{b,t}^{(z)}(x,y,z,t) = T_{b,t}^{(z)}(x,t)T_{b,t}^{(z)}(y,t)
+     *  T_{b,t}^{(z)}(z,t)
      *  \label{eq:3Dbnd8}
      *  \end{equation}.\f]
      *
-     *  where \f$T_{b,t}(x,t)\f$, \f$T_{b,t}(y,t)\f$, and \f$T_{b,t}(z,t)\f$
-     *  are given by:
+     *  where \f$T_{b,t}^{(z)}(x,t)\f$, \f$T_{b,t}^{(z)}(y,t)\f$, and 
+     *  \f$T_{b,t}^{(z)}(z,t)\f$ are given by:
      *  \f[\begin{align}
-     *  T_{b,t}(x,t) &= \frac{2}{3^{1/3}\pi}
+     *  T_{b,t}^{(z)}(x,t) &= \frac{2}{3^{1/3}\pi}
      *  \sum_{n=0}^\infty \frac{2}{2n+1}
      *  \sin\left(\frac{(2n+1)\pi x}{l}\right)\exp\left(-\alpha
      *  \frac{\pi^2(2n+1)^2}{l^2}t\right)
      *  \label{eq:3Dbnd9x}\\
-     *  T_{b,t}(y,t) &= \frac{2}{3^{1/3}\pi}
+     *  T_{b,t}^{(z)}(y,t) &= \frac{2}{3^{1/3}\pi}
      *  \sum_{m=0}^\infty \frac{2}{2m+1}
      *  \sin\left(\frac{(2m+1)\pi y}{l}\right)\exp\left(-\alpha
      *  \frac{\pi^2(2m+1)^2}{l^2}t\right)
      *  \label{eq:3Dbnd9y}\\
-     *  T_{b,t}(z,t) &= \frac{2}{3^{1/3}\pi}
+     *  T_{b,t}^{(z)}(z,t) &= \frac{2}{3^{1/3}\pi}
      *  \sum_{k=0}^\infty \frac{1}{k+1}\left((-1)^{k+1} a_2-a_1\right)
      *  \sin\left(\frac{(k+1)\pi z}{l}\right)
      *  \exp\left(-\alpha \frac{\pi^2(k+1)^2}{l^2}t\right)

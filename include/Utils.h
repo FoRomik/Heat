@@ -38,12 +38,18 @@ enum termType {
     SOURCE /**< Source contribution..*/
 };
 
+/** An enum type to define the axis.
+ */
+enum e_axis {
+    XAXIS, /**< x-axis.*/
+    YAXIS, /**< y-axis.*/
+    ZAXIS /**< z-axis.*/
+};
+
 /** An struct type to hold parameters specific to the node.
  */
 struct node {
     int dim; /**< The dimension of the geometry.*/
-    std::string axis; /**< The dimension axis.*/
-    std::string baxis; /**< The boundary axis.*/
     double x; /**< X-coordinate of the node.*/
     double y; /**< Y-coordinate of the node.*/
     double z; /**< Z-coordinate of the node.*/
@@ -60,6 +66,13 @@ struct pUniform {
     double a2; /**< Second boundary constant on the axis.*/
     double k1; /**< Robin constant for the first boundary.*/
     double k2; /**< Robin constant for the second boundary.*/
+};
+
+/** An enum type to describe an expression to be evaluated.
+ */
+enum miscFct {
+    SINN3, /**< \f$\sum_{n=1}^\infty \frac{\sin(nx)}{n^3}\f$.*/
+    ALTSINN3, /**< \f$\sum_{n=1}^\infty (-1)^n\frac{\sin(nx)}{n^3}\f$.*/
 };
 
 #endif /* Utils_h */

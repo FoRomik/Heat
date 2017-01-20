@@ -1,6 +1,6 @@
 # distutils: language = c++
 # distutils: extra_compile_args=['-Wno-unused-function', '-std=c++11']
-# distutils: sources = ['src/ComputeSeries.cxx', 'src/Uniform.cxx', 'src/Exceptions.cxx']
+# distutils: sources = ['src/ComputeSeries.cxx', 'src/Uniform.cxx', 'src/Exceptions.cxx', 'src/Misc.cxx']
 # distutils: include_dirs = include/
 
 
@@ -39,11 +39,66 @@ class InvalidTermType(Exception):
     def __str__(self):
         return repr(self.value)
 
-def getString(str):
-    """Wrapper for std::string
+class InvalidAxis(Exception):
+    """Exception for the axis enum.
     """
-    cdef string s = str.encode('utf-8')
-    return s
+    message = "Invalid Axis"
+
+    def __init__(self, value):
+        self.value = value
+        self.message = "Invalid axis, you must choose one "+\
+                       "of the following options: 'x', 'y' or 'z'. "+\
+                       "AXIS={0} is not a valid option.".format(value)
+
+    def __str__(self):
+        return repr(self.value)
+
+"""
+class InvalidMiscFct(Exception):
+    '''Exception for the miscFct enum.
+    '''
+    message = "Invalid Function"
+
+    def __init__(self, value):
+        self.value = value
+        self.message = "Invalid function, you must choose one "+\
+                       "of the following options: 'SINN3' or 'ALTSINN3'. "+\
+                       "FCT={0} is not a valid option.".format(value)
+
+    def __str__(self):
+        return repr(self.value)
+"""
+
+def getAxis(str):
+    """Wrapper for axis enum
+    """
+    l = ['x', 'y', 'z']
+    if str not in l:
+        raise InvalidAxis(str)
+    cdef w.e_axis axis
+    options = {
+        'x': w.XAXIS,
+        'y': w.YAXIS,
+        'z': w.ZAXIS
+    }
+    axis = options[str]
+    return axis
+
+"""
+def getMiscFct(str):
+    '''Wrapper for miscFct enum
+    '''
+    l = ['SINN3', 'ALTSINN3']
+    if str not in l:
+        raise InvalidMiscFct(str)
+    cdef w.miscFct fctName
+    options = {
+        'SINN3': w.SINN3,
+        'ALTSINN3': w.ALTSINN3
+    }
+    fctName = options[str]
+    return fctName
+"""
 
 def getbcType(str):
     """Wrapper for bcType enum.
@@ -120,12 +175,13 @@ cdef class ComputeSeries:
         """
         return self.baseptr.getLastNumberOfIterations()
 
+'''
     def fct(self, int n):
         """Define the function to be summed.
 
         """
         pass
-
+'''
 
 cdef class Uniform(ComputeSeries):
     """Wrapper fro the C++ class Uniform. See detail in the c++ documentation `here <https://frroy.github.io/Series/class_uniform.html>`_ 
@@ -136,14 +192,17 @@ cdef class Uniform(ComputeSeries):
     cdef w.bcType bc
     cdef w.termType term
     cdef w.pUniform params
+    cdef w.e_axis axis
+    cdef w.e_axis baxis
 
-    def __cinit__(self, d1, bc, term, d2):
+    def __cinit__(self, d1, bc, term, d2,
+                  axis, baxis):
         try:
             self.bc = getbcType(bc)
             self.term = gettermType(term)
             self.nd.dim = d1['dim']
-            self.nd.axis = getString(d1['axis'])
-            self.nd.baxis = getString(d1['baxis'])
+            self.axis = getAxis(axis)
+            self.baxis = getAxis(baxis)
             self.nd.x = d1['x']
             self.nd.y = d1['y']
             self.nd.z = d1['z']
@@ -159,7 +218,10 @@ cdef class Uniform(ComputeSeries):
             sys.exit(e.message)
         except InvalidTermType as e:
             sys.exit(e.message)
-        self.derivedptr = new w.Uniform(self.nd, self.bc, self.term, self.params)
+        except InvalidAxis as e:
+            sys.exit(e.message)
+        self.derivedptr = new w.Uniform(self.nd, self.bc, self.term, self.params,
+                                        self.axis, self.baxis)
         self.baseptr = self.derivedptr
 
     def __dealloc__(self):
@@ -189,13 +251,13 @@ cdef class Uniform(ComputeSeries):
         """
         self.derivedptr.setZPosition(z)
 
-    def setAxis(self, string axis):
+    def setAxis(self, axis):
         """Set the position for the series evaluation.
 
         """
         self.derivedptr.setAxis(axis)
 
-    def setBoundaryAxis(self, string baxis):
+    def setBoundaryAxis(self, baxis):
         """Set the position for the series evaluation.
 
         """
@@ -208,14 +270,22 @@ cdef class Uniform(ComputeSeries):
         nd = self.derivedptr.getNode()
         out = {
             'dim': nd.dim,
-            'axis': nd.axis.decode('utf-8'),
-            'baxis': nd.baxis.decode('utf-8'),
             'x': nd.x, 'y': nd.y, 'z': nd.z,
             't': nd.t,
             'l': nd.l,
             'alpha': nd.alpha
         }
         return out
+
+    def getAxis(self, axis):
+        """
+        """
+        if axis==w.XAXIS:
+            return 'x'
+        elif axis==w.YAXIS:
+            return 'y'
+        else:
+            return 'z'
 
     def getBcType(self):
         """
@@ -259,3 +329,67 @@ cdef class Uniform(ComputeSeries):
 
         """
         return self.derivedptr.getSteadyStateDirichlet()
+
+'''
+cdef class Misc(ComputeSeries):
+    """Wrapper fro the C++ class Misc. 
+
+    """
+    cdef w.Misc *derivedptr1
+    cdef w.axis axis
+    cdef w.miscFct fctName
+    cdef double x 
+
+    def __cinit__(self, d1, x):
+        try:
+            self.fctName = getMiscFct(d1)
+            self.x = x
+        except InvalidBCType as e:
+            sys.exit(e.message)
+        except InvalidMiscFct as e:
+            sys.exit(e.message)
+        self.derivedptr1 = new w.Misc(self.fctName, self.x)
+        self.baseptr = self.derivedptr1
+
+    def __dealloc__(self):
+        del self.derivedptr1
+
+    def  setX(self, x):
+        """
+        """
+        self.derivedptr1.setX(x)
+
+    def setFct(self, fctName):
+        """
+        """
+        self.derivedptr1.setFct(fctName)
+
+    def getFct(self):
+        """
+        """
+        return self.derivedptr1.getFct()
+        
+    def getX(self):
+        """
+        """
+        return self.derivedptr1.getX()
+
+    def getResult(self, double tol, nMax=None):
+        """Get the forward sum. If nMax equals None, use the default argument
+        nMax = 50000.
+        """
+        if nMax is not None:
+            return self.derivedptr1.getResult(tol, nMax)
+        else:
+            return self.derivedptr1.getResult(tol)
+
+    def getNbrIt(self):
+        """
+        """
+        return self.derivedptr1.getNbrIt()
+        
+    def getErr(self):
+        """
+        """
+        return self.derivedptr1.getErr()
+'''

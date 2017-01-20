@@ -1,5 +1,3 @@
-from libcpp.string cimport string
-
 cdef extern from "Exceptions.h":
     pass
 
@@ -16,10 +14,13 @@ cdef extern from "Utils.h":
         BOUNDARY,
         SOURCE
 
+    enum e_axis:
+        XAXIS,
+        YAXIS,
+        ZAXIS
+
     struct node:
         int dim
-        string axis
-        string baxis
         double x
         double y
         double z
@@ -46,15 +47,37 @@ cdef extern from "ComputeSeries.h":
 
 cdef extern from "Uniform.h":
     cdef cppclass Uniform(ComputeSeries):
-        Uniform(node nd, bcType bc, termType term, pUniform params) except +
+        Uniform(node nd, bcType bc, termType term, pUniform params,
+                e_axis axis, e_axis baxis) except +
         void setTime(double t) except +
         void setXPosition(double x) except +
         void setYPosition(double y) except +
         void setZPosition(double z) except +
-        void setAxis(string axis) except +
-        void setBoundaryAxis(string baxis) except +
+        void setAxis(e_axis axis) except +
+        void setBoundaryAxis(e_axis baxis) except +
         node getNode() except +
         bcType getBcType() except +
         termType getTermType() except +
         pUniform getParams() except +
         double getSteadyStateDirichlet() except +
+
+cdef extern from "Misc.h":
+    cdef cppclass Misc(ComputeSeries):
+        pass
+
+
+"""
+Misc(miscFct fctName, double x) except +
+void setX(double x) except +
+void setFct(miscFct fctName) except +
+miscFct getFct() except +
+double getX() except +
+double getResult(double tol, int nMax) except +
+double getResult(double tol) except +
+int getNbrIt() except +
+double getErr() except +
+
+    enum miscFct:
+        SINN3,
+        ALTSINN3
+"""

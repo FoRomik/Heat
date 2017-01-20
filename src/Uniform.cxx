@@ -9,12 +9,16 @@
 
 #include <iostream> // for debugging
 #include "Uniform.h"
+#include "Misc.h"
 
-Uniform::Uniform(node nd, bcType bc, termType term, pUniform params)
+Uniform::Uniform(node nd, bcType bc, termType term, pUniform params,
+                 e_axis axis, e_axis baxis)
 : params(params)
 , nd(nd)
 , bc(bc)
 , term(term)
+, axis(axis)
+, baxis(baxis)
 {
 }
 
@@ -38,12 +42,12 @@ void Uniform::setZPosition(double z){
     nd.z = z;
 }
 
-void Uniform::setAxis(std::string axis){
-    nd.axis = axis;
+void Uniform::setAxis(e_axis Axis){
+    axis = Axis;
 }
 
-void Uniform::setBoundaryAxis(std::string baxis){
-    nd.baxis = baxis;
+void Uniform::setBoundaryAxis(e_axis Baxis){
+    baxis = Baxis;
 }
 
 node Uniform::getNode(){
@@ -69,10 +73,10 @@ double Uniform::getSteadyStateDirichlet(){
             // The steady-state solution is always zero for the initial term.
             break;
         case BOUNDARY:
-            if (nd.baxis.compare("x")==0){
+            if (baxis==XAXIS){
                 sol = 1.0/(double)nd.dim*
                       (params.a1 + (params.a2-params.a1)*nd.x/nd.l);
-            } else if (nd.baxis.compare("y")==0){
+            } else if (baxis==YAXIS){
                 sol = 1.0/(double)nd.dim*
                       (params.a1 + (params.a2-params.a1)*nd.y/nd.l);
             } else{
@@ -92,7 +96,12 @@ double Uniform::getSteadyStateDirichlet(){
                 sol = 0.0;
             } else {
                 if (nd.dim==1){
-                    sol = params.a0*pow(nd.l,2.0)/(6.0*nd.alpha);
+                    miscFct f1 = SINN3;
+                    miscFct f2 = ALTSINN3;
+                    Misc m1(f1 ,nd.x/nd.l*PI);
+                    Misc m2(f2 ,nd.x/nd.l*PI);
+                    sol = 2.0*params.a0*pow(nd.l,2.0)/(pow(PI,3.0)*nd.alpha)*(
+                          m1.getResult(1e-20)-m2.getResult(1e-20));
                 } else if (nd.dim==2) {
                     sol = params.a0*pow(nd.l,2.0)/(12.0*nd.alpha);
                 } else {
@@ -131,10 +140,10 @@ void Uniform::getDirichletTransientExpression(double *p_expression, double n){
     double arg1 = (2.0*n+1.0)*PI/nd.l;
     double arg2 = (n+1.0)*PI/nd.l;
     double x = nd.x;
-    if(nd.axis == "y") {
+    if(axis == YAXIS) {
         x = nd.y;
     }
-    if(nd.axis == "z"){
+    if(axis == ZAXIS){
         x = nd.z;
      }
     switch (term) {
@@ -174,8 +183,8 @@ void Uniform::getDirichletTransientExpression(double *p_expression, double n){
                     *p_expression = 0.0;
                 }
             } else {
-                if(nd.axis=="x"){
-                    if (nd.baxis=="x") {
+                if(axis==XAXIS){
+                    if (baxis==XAXIS) {
                         *p_expression = 2.0/
                         (PI*pow((double)nd.dim,1/(double)nd.dim))*1.0/(n+1.0)
                         *(pow(-1.0,n+1.0)*params.a2-params.a1)*sin(arg2*x)
@@ -187,8 +196,8 @@ void Uniform::getDirichletTransientExpression(double *p_expression, double n){
                         exp(-nd.alpha*pow(arg1,2.0)*nd.t);
                     }
 
-                } else if(nd.axis=="y"){
-                    if (nd.baxis=="y") {
+                } else if(axis==YAXIS){
+                    if (baxis==YAXIS) {
                         *p_expression = 2.0/
                         (PI*pow((double)nd.dim,1/(double)nd.dim))*1.0/(n+1.0)
                         *(pow(-1.0,n+1.0)*params.a2-params.a1)*sin(arg2*x)
@@ -200,7 +209,7 @@ void Uniform::getDirichletTransientExpression(double *p_expression, double n){
                         exp(-nd.alpha*pow(arg1,2.0)*nd.t);
                     }
                 } else {
-                    if (nd.baxis=="z") {
+                    if (baxis==ZAXIS) {
                         *p_expression = 2.0/
                         (PI*pow((double)nd.dim,1/(double)nd.dim))*1.0/(n+1.0)
                         *(pow(-1.0,n+1.0)*params.a2-params.a1)*sin(arg2*x)
@@ -229,7 +238,7 @@ void Uniform::getDirichletTransientExpression(double *p_expression, double n){
                     *p_expression = 0.0;
                 }
             } else {
-                if(nd.axis.compare("x")==0){
+                if(axis==XAXIS){
                     *p_expression = 2.0*pow(aini,1.0/(double)nd.dim)*
                     2.0/pow(2.0*n+1.0,3.0)*sin(arg1*x)*
                     exp(-nd.alpha*pow(arg1,2.0)*nd.t);

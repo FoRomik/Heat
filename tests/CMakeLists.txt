@@ -3,7 +3,11 @@
 #========================================================================================
 file(GLOB SOURCES *.cxx)
 
-add_executable(cxx_test ${SOURCES} ${CMAKE_SOURCE_DIR}/src/ComputeSeries.cxx ${CMAKE_SOURCE_DIR}/src/Uniform.cxx ${CMAKE_SOURCE_DIR}/src/Exceptions.cxx)
+add_executable(cxx_test ${SOURCES}
+               ${CMAKE_SOURCE_DIR}/src/ComputeSeries.cxx
+               ${CMAKE_SOURCE_DIR}/src/Uniform.cxx
+               ${CMAKE_SOURCE_DIR}/src/Misc.cxx
+               ${CMAKE_SOURCE_DIR}/src/Exceptions.cxx)
 
 target_link_libraries(cxx_test gtest)
 
