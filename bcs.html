@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Boundary Conditions &#8212; heat 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Modules" href="modules.html" />
+    <link rel="prev" title="The Heat Equation" href="theory.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="boundary-conditions">
+<h1>Boundary Conditions<a class="headerlink" href="#boundary-conditions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="temperature-dirichlet">
+<h2>Temperature (Dirichlet)<a class="headerlink" href="#temperature-dirichlet" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="flux-neumann">
+<h2>Flux (Neumann)<a class="headerlink" href="#flux-neumann" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="convection-robin">
+<h2>Convection (Robin)<a class="headerlink" href="#convection-robin" title="Permalink to this headline">¶</a></h2>
+<p>The Robin problem has a more complicated solution than the other boundary value problems since the eigenvalues can&#8217;t be expressed in a closed-form.</p>
+<p>From equation <a class="reference internal" href="theory.html#equation-sl1">(10)</a>, we get</p>
+<div class="math">
+\[\frac{\partial^2 \varphi(x)}{\partial x^2} + \lambda \varphi(x)  =  0\]</div>
+<p>The Robin conditions are generally expressed substituing <span class="math">\(s_1=s_2=1\)</span>, <span class="math">\(k_1&lt;0\)</span>, and <span class="math">\(k_2&gt;0\)</span> in equations <a class="reference internal" href="theory.html#equation-slbc1">(11)</a> and <a class="reference internal" href="theory.html#equation-slbc2">(12)</a>. If, for simplicity, we choose <span class="math">\(x_1=0\)</span> and <span class="math">\(x_2=L\)</span> we get:</p>
+<div class="math">
+\[\begin{split}\begin{eqnarray}
+\frac{d \varphi(x)}{dx} - k_1'\varphi(x) &amp; = &amp; 0,\qquad \textrm{at }x=0\\
+\frac{d \varphi(x)}{dx} + k_2\varphi(x) &amp; = &amp; 0,\qquad \textrm{at }x=L
+\end{eqnarray}\end{split}\]</div>
+<p>Where <span class="math">\(k_1'=|k_1|\)</span>. From <a class="reference internal" href="theory.html#equation-general">(14)</a> and the boundary conditions we get</p>
+<div class="math">
+\[\frac{\partial \varphi_n(x)}{\partial x} = \sqrt{\lambda_n}\Big(B_n\cos(\sqrt{\lambda_n}x) - A_n\sin(\sqrt{\lambda_n}x)\Big)\]</div>
+<p>At <span class="math">\(x=0\)</span> we have</p>
+<div class="math">
+\[\begin{split}\begin{eqnarray}
+k_1'\varphi_n(0) &amp; = &amp; \frac{\partial \varphi_n(x)}{\partial x}\Big|_{x=0}\\
+k_1'A_n &amp; = &amp; \sqrt{\lambda_n}B_n
+\end{eqnarray}\end{split}\]</div>
+<p>and equation <a class="reference internal" href="theory.html#equation-general">(14)</a> becomes:</p>
+<div class="math">
+\[\varphi_n(x) = \Big(\frac{k_1'}{\sqrt{\lambda_n}}\cos(\sqrt{\lambda_n}x) + \sin(\sqrt{\lambda_n}x)\Big)B_n\]</div>
+<p>Similarly, using the boundary conditions at <span class="math">\(x=L\)</span> we get</p>
+<div class="math">
+\[\begin{split}\begin{eqnarray}
+-k_2\Big(\frac{\sqrt{\lambda_n}}{k_1'}\cos(\sqrt{\lambda_n}x)+\sin(\sqrt{\lambda_n}x)\Big) &amp; = &amp; \sqrt{\lambda_n}\Big(\cos(\sqrt{\lambda_n}x)-\frac{\sqrt{\lambda_n}}{k_1'}\sin(\sqrt{\lambda_n}x)\Big)\\
+-k_2\sin(\sqrt{\lambda_n}x)+\frac{\lambda_n}{k_1'}\sin(\sqrt{\lambda_n}x) &amp; = &amp; \frac{k_2\lambda_n}{k_1'}\cos(\sqrt{\lambda_n}x)+\sqrt{\lambda_n}\cos(\sqrt{\lambda_n}x)\\
+\sin(\sqrt{\lambda_n}x)\Big(\frac{\lambda_n}{k_1'}-k_2\Big) &amp; = &amp; \sqrt{\lambda_n}\cos(\sqrt{\lambda_n}x)\Big(\frac{k_2}{k_1'}+1\Big)\\
+\frac{\sin(\sqrt{\lambda_n}x)}{\sqrt{\lambda_n}\cos(\sqrt{\lambda_n}x)} &amp; = &amp; \frac{k_2 + k_1'}{\lambda_n - k_1'k_2}
+\end{eqnarray}\end{split}\]</div>
+<p>Which gives the transcendental equation</p>
+<div class="math" id="equation-transcendental">
+<span id="transcendental"></span><span class="eqno">(1)<a class="headerlink" href="#equation-transcendental" title="Permalink to this equation">¶</a></span>\[\frac{\tan(\sqrt{\lambda_n}x)}{\sqrt{\lambda_n}} = \frac{k_2 + k_1'}{\lambda_n - k_1'k_2}.\]</div>
+<p>Thus the solution is:</p>
+<div class="math" id="equation-eqrobin">
+<span id="eqrobin"></span><span class="eqno">(2)<a class="headerlink" href="#equation-eqrobin" title="Permalink to this equation">¶</a></span>\[\varphi(x) = \sum_{n=1}^\infty B_n\Big(\frac{k_1'}{\sqrt{\lambda_n}}\cos(\sqrt{\lambda_n}x) + \sin(\sqrt{\lambda_n}x)\Big)\]</div>
+<p>with eigenvalues obtained from <a class="reference internal" href="#equation-transcendental">(1)</a>.</p>
+</div>
+<div class="section" id="mixed-i">
+<h2>Mixed I<a class="headerlink" href="#mixed-i" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="mixed-ii">
+<h2>Mixed II<a class="headerlink" href="#mixed-ii" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/heat.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Boundary Conditions</a><ul>
+<li><a class="reference internal" href="#temperature-dirichlet">Temperature (Dirichlet)</a></li>
+<li><a class="reference internal" href="#flux-neumann">Flux (Neumann)</a></li>
+<li><a class="reference internal" href="#convection-robin">Convection (Robin)</a></li>
+<li><a class="reference internal" href="#mixed-i">Mixed I</a></li>
+<li><a class="reference internal" href="#mixed-ii">Mixed II</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="theory.html" title="previous chapter">The Heat Equation</a></li>
+      <li>Next: <a href="modules.html" title="next chapter">Modules</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/bcs.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Francois Roy.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/bcs.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

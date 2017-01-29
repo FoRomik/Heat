@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>The Heat Equation &mdash; heat 0.1.0 documentation</title>
+    <title>The Heat Equation &#8212; heat 0.1.0 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,15 +17,17 @@
         VERSION:     '0.1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="heat 0.1.0 documentation" href="index.html" />
-    <link rel="next" title="Modules" href="modules.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Boundary Conditions" href="bcs.html" />
     <link rel="prev" title="Usage" href="usage.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -46,18 +48,18 @@
 <h1>The Heat Equation<a class="headerlink" href="#the-heat-equation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="statement-of-the-problem">
 <h2>Statement of the Problem<a class="headerlink" href="#statement-of-the-problem" title="Permalink to this headline">¶</a></h2>
-<p>We want to solve the following equation for a line (1D), a rectangle (2D), or a block (3D):</p>
+<p>Solve the following equation on a line (1D), a rectangle (2D) or a block (3D):</p>
 <div class="math" id="equation-3dnh">
-<span class="eqno">(1)</span>\[\mathcal{L}_{\mathbf{x},t}[T(\mathbf{x},t)] = \Phi(\mathbf{x},t),\qquad \textrm{for }\mathbf{x}\in \Omega\]</div>
+<span class="eqno">(1)<a class="headerlink" href="#equation-3dnh" title="Permalink to this equation">¶</a></span>\[\frac{\partial}{\partial t}T(\mathbf{x},t)-\mathcal{L}_{\mathbf{x}}[T(\mathbf{x},t)] = \Phi(\mathbf{x},t),\qquad \textrm{for }\mathbf{x}\in \Omega\]</div>
 <p>with boundary conditions</p>
 <div class="math" id="equation-3dnhbc">
-<span class="eqno">(2)</span>\[\mathcal{l}_{\mathbf{x},t}[T(\mathbf{x},t)] = g(\mathbf{x},t),\qquad \textrm{for }\mathbf{x}\in \Gamma\]</div>
-<p>and initial condition</p>
+<span class="eqno">(2)<a class="headerlink" href="#equation-3dnhbc" title="Permalink to this equation">¶</a></span>\[\mathcal{G}_{\mathbf{x}}[T(\mathbf{x},t)] = g(\mathbf{x},t),\qquad \textrm{for }\mathbf{x}\in \Gamma\]</div>
+<p>and initial temperature distribution</p>
 <div class="math" id="equation-3dnhini">
-<span class="eqno">(3)</span>\[T(\mathbf{x},0)=T_0(\mathbf{x}),\qquad \textrm{at }t=0.\]</div>
-<p>The operator <span class="math">\(\mathcal{L}_{\mathbf{x},t}[T(\mathbf{x},t)]\)</span> is the linear second order differential operator defined by:</p>
+<span class="eqno">(3)<a class="headerlink" href="#equation-3dnhini" title="Permalink to this equation">¶</a></span>\[T(\mathbf{x},0)=T_0(\mathbf{x}),\qquad \textrm{at }t=0.\]</div>
+<p>The operator <span class="math">\(\mathcal{L}_{\mathbf{x}}[T(\mathbf{x},t)]\)</span> is the linear second order differential operator defined by:</p>
 <div class="math">
-\[\mathcal{L}_{\mathbf{x},t}[T(\mathbf{x},t)] = \frac{\partial T(\mathbf{x},t)}{\partial t}-\alpha \nabla^2 T(\mathbf{x},t)\]</div>
+\[\mathcal{L}_{\mathbf{x}}[T(\mathbf{x},t)] = \alpha \nabla^2 T(\mathbf{x},t)\]</div>
 <p>The coefficient <span class="math">\(\alpha\)</span>, here considered constant, is the material diffusivity defined as:</p>
 <div class="math">
 \[\alpha = \frac{k}{\rho C_p}\]</div>
@@ -66,125 +68,111 @@
 <p class="first admonition-title">Note</p>
 <p class="last">We consider here <span class="math">\(\alpha\)</span> a constant larger than zero.</p>
 </div>
-<p>The operator <span class="math">\(\mathcal{l}^{(i)}_{\mathbf{x},t}[T(\mathbf{x},t)]\)</span> is a linear first order differential operator defined at the <span class="math">\(i^\textrm{th}\)</span> boundary in <span class="math">\(\Gamma\)</span>. The latter can be expressed differently depending on the type of boundary condition. These are classified into four categories:</p>
-<p>1- <strong>First boundary value problems</strong> (Dirichlet): The function <span class="math">\(T(\mathbf{x},t)\)</span> takes prescribed values at the boundary of the domain, i.e. <span class="math">\(T(\mathbf{x},t) = g(\mathbf{x},t)\)</span> for <span class="math">\(\mathbf{x} \in \Gamma\)</span>.</p>
-<p>2- <strong>Second boundary value problems</strong> (Neumann): The derivative along the (outward) normal is prescribed at the
-boundary of the domain, i.e. <span class="math">\(\frac{\partial T(\mathbf{x},t)}{\partial n} = g(\mathbf{x},t)\)</span> for <span class="math">\(\mathbf{x} \in \Gamma\)</span>.</p>
-<p>3- <strong>Third boundary value problems</strong> (Robin): A linear relationship between the unknown function and its normal derivative is prescribed at the boundary of the domain, i.e. <span class="math">\(\frac{\partial T(\mathbf{x},t)}{\partial n} +kT(\mathbf{x},t)= g(\mathbf{x},t)\)</span> for <span class="math">\(\mathbf{x} \in \Gamma\)</span>. The Robin boundary condition can be used to represent natural convection at a boundary.</p>
-<p>4- <strong>Mixed boundary value problems</strong>: Conditions of various types, listed above, are set at different portions of the boundary <span class="math">\(\Gamma\)</span>.</p>
+<p>The operator <span class="math">\(\mathcal{G}^{(i)}_{\mathbf{x}}[T(\mathbf{x},t)]\)</span> is a linear first order differential operator defined at the <span class="math">\(i^\textrm{th}\)</span> boundary in <span class="math">\(\Gamma\)</span>.</p>
+<div class="math" id="equation-eqbc">
+<span class="eqno">(4)<a class="headerlink" href="#equation-eqbc" title="Permalink to this equation">¶</a></span>\[\mathcal{G}^{(i)}_{\mathbf{x}}[T(\mathbf{x},t)] = s_i\frac{\partial}{\partial \mathbf{\hat{n}}}\varphi(\mathbf{x}) + k_i\varphi(\mathbf{x}),\qquad \textrm{for }\mathbf{x}\in \Gamma^{(i)}\]</div>
+<p>Where <span class="math">\(\frac{\partial}{\partial \mathbf{\hat{n}}}\)</span> is the (outward) normal derivative at the boundary.</p>
+<p>The operator <span class="math">\(\mathcal{G}^{(i)}_{\mathbf{x}}[T(\mathbf{x},t)]\)</span> can be expressed differently depending on the type of boundary condition. These are classified into four categories:</p>
+<p>1- <strong>Temperature</strong> (Dirichlet): The function <span class="math">\(T(\mathbf{x},t)\)</span> takes prescribed values at the boundary of the domain, <span class="math">\(s_i=0\)</span>.</p>
+<p>2- <strong>Heat Flux</strong> (Neumann): The derivative along the (outward) normal is prescribed at the
+boundary of the domain, <span class="math">\(k_i=0\)</span>.</p>
+<p>3- <strong>Natural Convection</strong> (Robin): A linear relationship between the unknown function and its normal derivative is prescribed at the boundary of the domain.</p>
+<p>4- <strong>Mixed</strong>: Conditions of various types, listed above, are set at different portions of the boundary <span class="math">\(\Gamma\)</span>.</p>
 </div>
 <div class="section" id="overview-of-the-method">
 <h2>Overview of the method<a class="headerlink" href="#overview-of-the-method" title="Permalink to this headline">¶</a></h2>
-<p>The heat equation can be solved using Green&#8217;s functions, The solution <span class="math">\(T(\mathbf{x}, t)\)</span> is composed of three terms: The initial contribution <span class="math">\(T_i(\mathbf{x}, t)\)</span>, the source contribution <span class="math">\(T_s(\mathbf{x}, t)\)</span>, and the boundary contribution <span class="math">\(T_b(\mathbf{x}, t)\)</span>. The idea is to get each of these contribution on each dimensions of the geometry using infinite series. The details presented her are for a line, a rectangle, and a block, but for sake of simplicity we only implemented a code giving the solution for a line, a square and a cube, i.e. when all the side lengths <span class="math">\(L\)</span> are equal.</p>
+<p>The heat equation can be solved using <a class="reference internal" href="#greensfcts"><span class="std std-ref">Green&#8217;s Functions</span></a>. The use of these functions allows defining a solution by superposition:</p>
+<div class="math">
+\[T(\mathbf{x}, t) = T_i(\mathbf{x}, t)+T_s(\mathbf{x}, t)+T_b^{(i)}(\mathbf{x}, t)\]</div>
+<p>Where <span class="math">\(T_i(\mathbf{x}, t)\)</span> is the initial temperature distribution term, <span class="math">\(T_s(\mathbf{x}, t)\)</span> is the source term, and <span class="math">\(T_b^{(i)}(\mathbf{x}, t)\)</span> is the <span class="math">\(i^\textrm{th}\)</span> boundary contribution.</p>
+<p>The Green&#8217;s function can be represented in the product form:</p>
+<div class="math">
+\[G(x,y,z,\xi,\eta,\zeta,t) = G_1(x,\xi,t)G_2(y,\eta,t)G_3(z,\zeta,t)\]</div>
+<p>where <span class="math">\(G_1(x,\xi,t)\)</span>, <span class="math">\(G_2(y,\eta,t)\)</span>, and <span class="math">\(G_3(z,\zeta,t)\)</span> are the Green&#8217;s functions of the one-dimensional boundary value problem defined along the <span class="math">\(x\)</span>-, <span class="math">\(y\)</span>-, and <span class="math">\(z\)</span>-axis.</p>
+<p>The idea is to multiply the one-dimensional solutions for each temperature contributions and simply add these contributions to obtain the solution.</p>
 </div>
-<div class="section" id="a-set-of-homogeneous-solutions">
-<h2>A Set of Homogeneous Solutions<a class="headerlink" href="#a-set-of-homogeneous-solutions" title="Permalink to this headline">¶</a></h2>
-<p>The approach taken to solve the inhomogeneous problem defined by equations <a href="#equation-3dnh">(1)</a>-<a href="#equation-3dnhini">(3)</a> is through an eigenfunction expansion. The idea is to utilize the linearity of the operator <span class="math">\(\mathcal{L}_{x,t}[T(x,t)]\)</span> by constructing a solution as a superposition of a set of function <span class="math">\(\{T_n(x,t)\}\)</span> solution of the <strong>homogeneous</strong> equation <span class="math">\(\mathcal{L}_{\mathbf{x},t}[T(\mathbf{x},t)] = 0\)</span>. In other words,</p>
-<div class="math">
-\[\Phi(\mathbf{x},t) = \sum_n b_n T_n(x,t)\]</div>
-<p>Where the <span class="math">\(b_n\textrm{s}\)</span> are constants to be determined.</p>
-<div class="section" id="the-method-of-separation-of-variable">
-<h3>The Method of Separation of Variable<a class="headerlink" href="#the-method-of-separation-of-variable" title="Permalink to this headline">¶</a></h3>
-<p>Using the method of separation of variable we express a particular <strong>homogeneous</strong> solution as</p>
-<div class="math">
-\[T(\mathbf{x},t) = \varphi(\mathbf{x})\psi(t)\]</div>
-<p>or in a more sophisticated form:</p>
-<div class="math">
-\[T(\mathbf{x},t) = \varphi_x(x)\psi_x(t)\varphi_y(y)\psi_y(t)\varphi_z(z)\psi_z(t)\]</div>
-<p>where <span class="math">\(\varphi_x(x)\psi_x(t)\)</span>, <span class="math">\(\varphi_y(y)\psi_y(t)\)</span>, and <span class="math">\(\varphi_z(z)\psi_z(t)\)</span> are the solutions to the one-dimensional heat equation on the <span class="math">\(x\)</span>, <span class="math">\(y\)</span>, and <span class="math">\(z\)</span> directions.</p>
-<p>Using the method of separation of variable we can find a solution to the 3D homogeneous problem using a product of functions solution of the homogeneous 1D problem.</p>
-</div>
-<div class="section" id="the-1d-homogeneous-solutions">
-<h3>The 1D homogeneous solutions<a class="headerlink" href="#the-1d-homogeneous-solutions" title="Permalink to this headline">¶</a></h3>
-<p>If we choose <span class="math">\(x\)</span> as the 1D spatial coordinate, the 1D homogeneous problem can be written</p>
+<div class="section" id="the-homogeneous-solution-in-1d">
+<h2>The Homogeneous Solution in 1D<a class="headerlink" href="#the-homogeneous-solution-in-1d" title="Permalink to this headline">¶</a></h2>
+<p>Using the method of separation of variable we can find a solution to the 3D homogeneous problem using a product of functions solution of the homogeneous 1D problem. If we choose <span class="math">\(x\)</span> as the 1D spatial coordinate, the 1D homogeneous problem can be written as:</p>
 <div class="math" id="equation-1dh">
-<span class="eqno">(4)</span>\[\mathcal{L}_{x,t}[T(x,t)] = 0\]</div>
+<span class="eqno">(5)<a class="headerlink" href="#equation-1dh" title="Permalink to this equation">¶</a></span>\[\frac{\partial}{\partial t}T(x,t)-\mathcal{L}_{x}[T(x,t)] = 0\]</div>
 <p>with homogeneous boundary conditions</p>
 <div class="math" id="equation-1dhbc">
-<span class="eqno">(5)</span>\[\mathcal{l}_{x,t}[T(x,t)] = 0,\qquad \textrm{for }x\in \Gamma\]</div>
+<span class="eqno">(6)<a class="headerlink" href="#equation-1dhbc" title="Permalink to this equation">¶</a></span>\[\mathcal{G}_{x}[T(x,t)] = 0,\qquad \textrm{for }x\in \Gamma\]</div>
 <p>and initial condition</p>
 <div class="math" id="equation-1dhini">
-<span class="eqno">(6)</span>\[T(x,0)=T_0(x),\qquad \textrm{at }t=0.\]</div>
-<p>Substituting <span class="math">\(T(x,t) = \varphi(x)\psi(t)\)</span> in equation <a href="#equation-1dh">(4)</a> we obtain the following equations</p>
+<span class="eqno">(7)<a class="headerlink" href="#equation-1dhini" title="Permalink to this equation">¶</a></span>\[T(x,0)=T_0(x),\qquad \textrm{at }t=0.\]</div>
+<p>Substituting <span class="math">\(T(x,t) = \varphi(x)\psi(t)\)</span> in equation <a class="reference internal" href="#equation-1dh">(5)</a> we obtain the following equations</p>
 <div class="math" id="equation-eigen1">
-<span class="eqno">(7)</span>\[\frac{\partial^2 \varphi(x)}{\partial x^2} + \lambda \varphi(x)  =  0\]</div>
+<span class="eqno">(8)<a class="headerlink" href="#equation-eigen1" title="Permalink to this equation">¶</a></span>\[\frac{\partial^2 \varphi(x)}{\partial x^2} + \lambda \varphi(x)  =  0\]</div>
 <div class="math" id="equation-eigen2">
-<span class="eqno">(8)</span>\[\frac{\partial \psi(t)}{\partial t} + \lambda \alpha\psi(t)  =  0\]</div>
+<span class="eqno">(9)<a class="headerlink" href="#equation-eigen2" title="Permalink to this equation">¶</a></span>\[\frac{\partial \psi(t)}{\partial t} + \lambda \alpha\psi(t)  =  0\]</div>
 <p>where <span class="math">\(\lambda\)</span> is the separation variable.</p>
-<p>The spatial part of equations <a href="#equation-1dh">(4)</a> to <a href="#equation-1dhini">(6)</a> can be expresssed as a Sturm-Liouville boundary problem, i.e.</p>
+<p>The eigenfunctions solutions of equation <a class="reference internal" href="#equation-eigen2">(9)</a> are obtained by direct integration:</p>
+<div class="math">
+\[\psi_n(t) = C_n\exp(-\lambda_N\alpha t)\]</div>
+<p>The spatial part of equations <a class="reference internal" href="#equation-1dh">(5)</a> to <a class="reference internal" href="#equation-1dhini">(7)</a> can be expresssed as a Sturm-Liouville boundary problem, i.e.</p>
 <div class="math" id="equation-sl1">
-<span class="eqno">(9)</span>\[\mathcal{L}_{sl}[\varphi(x)]+\lambda\rho(x)\varphi(x)=0,\qquad \textrm{for }x\in [x_1,x_2]\]</div>
+<span class="eqno">(10)<a class="headerlink" href="#equation-sl1" title="Permalink to this equation">¶</a></span>\[\mathcal{L}_{sl}[\varphi(x)]+\lambda\rho(x)\varphi(x)=0,\qquad \textrm{for }x\in [x_1,x_2]\]</div>
 <p>with general homogeneous boundary conditions defined as</p>
 <div class="math" id="equation-slbc1">
-<span class="eqno">(10)</span>\[s_1\frac{d \varphi(x)}{dx} + k_1\varphi(x)  =  0,\qquad \textrm{at }x=x_1\]</div>
+<span class="eqno">(11)<a class="headerlink" href="#equation-slbc1" title="Permalink to this equation">¶</a></span>\[s_1\frac{d \varphi(x)}{dx} + k_1\varphi(x)  =  0,\qquad \textrm{at }x=x_1\]</div>
 <div class="math" id="equation-slbc2">
-<span class="eqno">(11)</span>\[s_2\frac{d \varphi(x)}{dx} + k_2\varphi(x)  =  0,\qquad \textrm{at }x=x_2\]</div>
+<span class="eqno">(12)<a class="headerlink" href="#equation-slbc2" title="Permalink to this equation">¶</a></span>\[s_2\frac{d \varphi(x)}{dx} + k_2\varphi(x)  =  0,\qquad \textrm{at }x=x_2\]</div>
 <p>and initial condition</p>
 <div class="math" id="equation-sl2">
-<span class="eqno">(12)</span>\[\varphi_0(x) = T(x,0)\]</div>
+<span class="eqno">(13)<a class="headerlink" href="#equation-sl2" title="Permalink to this equation">¶</a></span>\[\varphi_0(x) = T(x,0)\]</div>
 <p>where</p>
 <div class="math">
 \[\mathcal{L}_{sl}[\varphi(x)]=\frac{d }{d x} \big(p(x)\frac{d\varphi(x)}{dx}\big)+q(x)\varphi(x)\]</div>
-<p>With <span class="math">\(p(x)=1\)</span>, <span class="math">\(q(x)=0\)</span>, and <span class="math">\(\rho(x)=1\)</span>, and where the <span class="math">\(s_i\)</span> and <span class="math">\(k_i\)</span> are constants that depends on the type of boundary conditions &#8211; see <a class="reference internal" href="#table-eigen"><span>Table 1</span></a>.</p>
-<p>From the Sturm-Liouville theory, it can be demonstrated that the eigenvalues <span class="math">\(\lambda_n\)</span> of the homogeneous problem are real and positive. For <span class="math">\(\lambda_n&gt;0\)</span>, the eigenfunctions of equation <a href="#equation-eigen1">(7)</a> have the form:</p>
-<div class="math">
-\[\varphi_n(x) = A_n\exp(-i\sqrt{\lambda_n}x)\]</div>
-<p>or in a more conveniently,</p>
+<p>With <span class="math">\(p(x)=1\)</span>, <span class="math">\(q(x)=0\)</span>, and <span class="math">\(\rho(x)=1\)</span>, and where the <span class="math">\(s_i\)</span> and <span class="math">\(k_i\)</span> are constants that depends on the type of boundary conditions &#8211; see <a class="reference internal" href="#table-eigen"><span class="std std-ref">Table 1</span></a>.</p>
+<p>From the Sturm-Liouville theory, it can be demonstrated that the eigenvalues <span class="math">\(\lambda_n\)</span> of the homogeneous problem are real and positive. For <span class="math">\(\lambda_n&gt;0\)</span>, the eigenfunctions of equation <a class="reference internal" href="#equation-eigen1">(8)</a> have the form:</p>
 <div class="math" id="equation-general">
-<span class="eqno">(13)</span>\[\varphi_n(x) = A_n\cos(\sqrt{\lambda_n}x) + B_n\sin(\sqrt{\lambda_n}x)\]</div>
-<p>The eigenfunctions solutions of equation <a href="#equation-eigen2">(8)</a> are obtained by direct integration:</p>
-<div class="math">
-\[\psi_n(t) = C_n\exp(-\lambda_N\alpha t)\]</div>
-<p>From the principle of superposition, we obtain a series solution of the form:</p>
+<span class="eqno">(14)<a class="headerlink" href="#equation-general" title="Permalink to this equation">¶</a></span>\[\varphi_n(x) = A_n\cos(\sqrt{\lambda_n}x) + B_n\sin(\sqrt{\lambda_n}x)\]</div>
+<p>The Sturm-Liouville theory shows that, in general, there is an infinite set of eigenvalues <span class="math">\(\lambda_n\)</span> satisfying the given equation and the associated boundary conditions, and that these eigenvalues increase to infinity.</p>
+<p>Corresponding to these eigenvalues, there is an infinite set of orthogonal eigenfunctions <span class="math">\(\{\varphi_n(x)\}\)</span> so that the linear superposition principle can be applied to find the convergent infinite series solution of the given problem. Formally, the regular Sturm-Liouville system can be expanded in an absolutely and uniformly convergent series:</p>
 <div class="math" id="equation-1dsol">
-<span class="eqno">(14)</span>\[T(x,t) = \sum_{n=1}^\infty a_n \varphi_n(x)\psi_n(t)\]</div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The summation in equation <a href="#equation-1dsol">(14)</a> starts at <span class="math">\(n=1\)</span> since the eigenfunction associated to <span class="math">\(\lambda_0\)</span> (<span class="math">\(n=0\)</span>) is just the trivial solution.</p>
-</div>
+<span class="eqno">(15)<a class="headerlink" href="#equation-1dsol" title="Permalink to this equation">¶</a></span>\[\varphi(x) = \sum_{n=1}^\infty a_n\varphi_n(x)\]</div>
+<p>where the coefficients <span class="math">\(a_n\)</span> are defined using the properties of the regular Sturm-Liouville operator, i.e.</p>
+<ol class="arabic simple">
+<li>The eigenfunctions of the adjoint problem have the same eigenvalues as the original problem.</li>
+<li>Eigenfunctions corresponding to different eigenvalues are orthogonal.</li>
+</ol>
+<p>These properties giving:</p>
+<div class="math">
+\[a_n = \frac{1}{\int_{x_1}^{x_2} \varphi_n^2(\xi)d\xi}\int_{x_1}^{x_2} \varphi_n(\xi)\varphi(\xi)d\xi\]</div>
+<p>Where <span class="math">\(x_1\)</span> and <span class="math">\(x_2\)</span> are the location of the boundaries along the <span class="math">\(x\)</span>-axis, and where <span class="math">\(\xi\)</span> is the integration variable.</p>
+<p>For instance, if we substitute the initial condition <span class="math">\(\varphi_0(x)=T(x,0)\)</span> in equation <a class="reference internal" href="#equation-1dsol">(15)</a>, we get</p>
+<div class="math" id="equation-fourier0">
+<span class="eqno">(16)<a class="headerlink" href="#equation-fourier0" title="Permalink to this equation">¶</a></span>\[\varphi_0(x) = \sum_{n=1}^\infty a_n\varphi_n(x)\]</div>
+<p>If we multiply both side of equation <a class="reference internal" href="#equation-fourier0">(16)</a> by <span class="math">\(\sum_{n=1}^\infty \varphi_n(x)\)</span> we obtain</p>
+<div class="math">
+\[\sum_{n=1}^\infty \varphi_n(x)\varphi_0(x) = \sum_{n=1}^\infty \varphi_n(x)\sum_{n=1}^\infty a_n \varphi_n(x)\]</div>
+<p>then, knowing that:</p>
+<div class="math">
+\[\begin{split}\int_{x_1}^{x_2} \varphi_n(x)\varphi_m(x)dx = \left\{
+\begin{array}{rl}
+1 &amp; \text{if } m = n,\\
+0 &amp; \text{if } m\neq n.
+\end{array} \right.\end{split}\]</div>
+<p>integrate on the interval <span class="math">\([x_1,x_2]\)</span></p>
+<div class="math">
+\[\begin{split}\begin{eqnarray}
+\int_{x_1}^{x_2}\sum_{n=1}^\infty \varphi_n(\xi)\varphi_0(\xi)d\xi &amp; = &amp; \int_{x_1}^{x_2}\sum_{n=1}^\infty \varphi_n(\xi)\sum_{n=1}^\infty a_n \varphi_n(\xi)d\xi\\
+\sum_{n=1}^\infty \int_{x_1}^{x_2} \varphi_n(\xi)\varphi_0(\xi)d\xi &amp; = &amp; \sum_{n=1}^\infty \int_{x_1}^{x_2}  a_n \varphi_n^2(\xi)d\xi
+\end{eqnarray}\end{split}\]</div>
+<p>the coefficients <span class="math">\(a_n\)</span> become</p>
+<div class="math">
+\[a_n = \frac{1}{||\varphi_n||^2}\int_{x_1}^{x_2} \varphi_n(\xi)\varphi_0(\xi)d\xi\]</div>
+<p>where</p>
+<div class="math">
+\[||\varphi_n||^2 = \int_{x_1}^{x_2} \varphi_n^2(\xi)d\xi\]</div>
+<p>where <span class="math">\(\xi\)</span> is a free parameter (integration variable).</p>
 <div class="section" id="eigenvalues-and-eigenfunctions">
-<h4>Eigenvalues and Eigenfunctions<a class="headerlink" href="#eigenvalues-and-eigenfunctions" title="Permalink to this headline">¶</a></h4>
-<p>The eigenvalues <span class="math">\(\lambda_n\)</span> and their associated eigenfunctions <span class="math">\(\varphi_n(x)\)</span> are obtained from the boundary conditions. <a class="reference internal" href="#table-eigen"><span>Table 1</span></a> shows the typical eigenvalues and eigenfunctions encountered in Sturm-Liouville boundary problems.</p>
-<p>For sake of completness we can briefly demonstrate how to obtain the eigenvalues and eigenfunctions for a typical Sturm-Liouville boundary value problem. We choose here the third boundary value problem (Robin). This problem has a more complicated solution than the other boundary value problems since the eigenvalues can&#8217;t be expressed in a closed-form.</p>
-<p>From equation <a href="#equation-sl1">(9)</a>, we get</p>
-<div class="math">
-\[\frac{\partial^2 \varphi(x)}{\partial x^2} + \lambda \varphi(x)  =  0\]</div>
-<p>The Robin conditions are generally expressed substituing <span class="math">\(s_1=s_2=1\)</span>, <span class="math">\(k_1&lt;0\)</span>, and <span class="math">\(k_2&gt;0\)</span> in equations <a href="#equation-slbc1">(10)</a> and <a href="#equation-slbc2">(11)</a>. If, for simplicity, we choose <span class="math">\(x_1=0\)</span> and <span class="math">\(x_2=L\)</span> we get:</p>
-<div class="math">
-\[\begin{split}\begin{eqnarray}
-\frac{d \varphi(x)}{dx} - k_1'\varphi(x) &amp; = &amp; 0,\qquad \textrm{at }x=0\\
-\frac{d \varphi(x)}{dx} + k_2\varphi(x) &amp; = &amp; 0,\qquad \textrm{at }x=L
-\end{eqnarray}\end{split}\]</div>
-<p>Where <span class="math">\(k_1'=|k_1|\)</span>. From <a href="#equation-general">(13)</a> and the boundary conditions we get</p>
-<div class="math">
-\[\frac{\partial \varphi_n(x)}{\partial x} = \sqrt{\lambda_n}\Big(B_n\cos(\sqrt{\lambda_n}x) - A_n\sin(\sqrt{\lambda_n}x)\Big)\]</div>
-<p>At <span class="math">\(x=0\)</span> we have</p>
-<div class="math">
-\[\begin{split}\begin{eqnarray}
-k_1'\varphi_n(0) &amp; = &amp; \frac{\partial \varphi_n(x)}{\partial x}\Big|_{x=0}\\
-k_1'A_n &amp; = &amp; \sqrt{\lambda_n}B_n
-\end{eqnarray}\end{split}\]</div>
-<p>and equation <a href="#equation-general">(13)</a> becomes:</p>
-<div class="math">
-\[\varphi_n(x) = \Big(\frac{k_1'}{\sqrt{\lambda_n}}\cos(\sqrt{\lambda_n}x) + \sin(\sqrt{\lambda_n}x)\Big)B_n\]</div>
-<p>Similarly, using the boundary conditions at <span class="math">\(x=L\)</span> we get</p>
-<div class="math">
-\[\begin{split}\begin{eqnarray}
--k_2\Big(\frac{\sqrt{\lambda_n}}{k_1'}\cos(\sqrt{\lambda_n}x)+\sin(\sqrt{\lambda_n}x)\Big) &amp; = &amp; \sqrt{\lambda_n}\Big(\cos(\sqrt{\lambda_n}x)-\frac{\sqrt{\lambda_n}}{k_1'}\sin(\sqrt{\lambda_n}x)\Big)\\
--k_2\sin(\sqrt{\lambda_n}x)+\frac{\lambda_n}{k_1'}\sin(\sqrt{\lambda_n}x) &amp; = &amp; \frac{k_2\lambda_n}{k_1'}\cos(\sqrt{\lambda_n}x)+\sqrt{\lambda_n}\cos(\sqrt{\lambda_n}x)\\
-\sin(\sqrt{\lambda_n}x)\Big(\frac{\lambda_n}{k_1'}-k_2\Big) &amp; = &amp; \sqrt{\lambda_n}\cos(\sqrt{\lambda_n}x)\Big(\frac{k_2}{k_1'}+1\Big)\\
-\frac{\sin(\sqrt{\lambda_n}x)}{\sqrt{\lambda_n}\cos(\sqrt{\lambda_n}x)} &amp; = &amp; \frac{k_2 + k_1'}{\lambda_n - k_1'k_2}
-\end{eqnarray}\end{split}\]</div>
-<p>Which gives the transcendental equation</p>
-<div class="math" id="equation-transcendental">
-<span class="eqno">(15)</span>\[\frac{\tan(\sqrt{\lambda_n}x)}{\sqrt{\lambda_n}} = \frac{k_2 + k_1'}{\lambda_n - k_1'k_2}.\]</div>
-<p>Thus the solution is:</p>
-<div class="math" id="equation-eqrobin">
-<span class="eqno">(16)</span>\[\varphi(x) = \sum_{n=1}^\infty B_n\Big(\frac{k_1'}{\sqrt{\lambda_n}}\cos(\sqrt{\lambda_n}x) + \sin(\sqrt{\lambda_n}x)\Big)\]</div>
-<p>with eigenvalues obtained from <a href="#equation-transcendental">(15)</a>.</p>
-<p><a class="reference internal" href="#table-eigen"><span>Table 1</span></a> summarizes the eigenvalues and eigenfunctions for the different boundary conditions of the regular Sturm-Liouville boundary problems.</p>
-<table border="1" class="docutils" id="id4">
-<span id="table-eigen"></span><caption><span class="caption-text">Table 1: Eigenvalues and Eigenfunctions for Different Homogeneous Boundary Type.</span><a class="headerlink" href="#id4" title="Permalink to this table">¶</a></caption>
+<h3>Eigenvalues and Eigenfunctions<a class="headerlink" href="#eigenvalues-and-eigenfunctions" title="Permalink to this headline">¶</a></h3>
+<p>The eigenvalues <span class="math">\(\lambda_n\)</span> and their associated eigenfunctions <span class="math">\(\varphi_n(x)\)</span> are obtained from the boundary conditions. <a class="reference internal" href="#table-eigen"><span class="std std-ref">Table 1</span></a> summarizes the eigenvalues and eigenfunctions for the different boundary conditions of the regular Sturm-Liouville boundary problems. The Section on <a class="reference internal" href="bcs.html#boundary-conditions"><span class="std std-ref">Boundary Conditions</span></a> shows how these expressions are obtained.</p>
+<table border="1" class="colwidths-given docutils" id="id1">
+<span id="table-eigen"></span><caption><span class="caption-text">Table 1: Eigenvalues and Eigenfunctions for Different Homogeneous Boundary Type.</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col width="40%" />
 <col width="4%" />
@@ -226,8 +214,8 @@ k_1'A_n &amp; = &amp; \sqrt{\lambda_n}B_n
 <td>&gt;0</td>
 <td>1</td>
 <td>1</td>
-<td>eq. <a href="#equation-transcendental">(15)</a></td>
-<td>eq. <a href="#equation-eqrobin">(16)</a></td>
+<td>eq. <a class="reference internal" href="bcs.html#transcendental"><span class="std std-ref">(b1)</span></a></td>
+<td>eq. <a class="reference internal" href="bcs.html#eqrobin"><span class="std std-ref">(b2)</span></a></td>
 </tr>
 <tr class="row-odd"><td>Mixed I</td>
 <td>1</td>
@@ -248,210 +236,50 @@ k_1'A_n &amp; = &amp; \sqrt{\lambda_n}B_n
 </tbody>
 </table>
 </div>
-<div class="section" id="transformations-leading-to-homogeneous-boundary-conditions">
-<span id="transformation"></span><h4>Transformations Leading to Homogeneous Boundary Conditions<a class="headerlink" href="#transformations-leading-to-homogeneous-boundary-conditions" title="Permalink to this headline">¶</a></h4>
-<p>A linear problem with arbitrary nonhomogeneous boundary conditions,</p>
-<div class="math">
-\[l^{(i)}_{x,t}[T(x,t)] = g^{(i)}(x,t),\quad\textrm{for } x\in \Gamma\]</div>
-<p>can be reduced to a linear problem with homogeneous boundary conditions. To this end, one should perform the change of variable</p>
-<div class="math">
-\[T(x,t) = w(x,t) + u(x,t)\]</div>
-<p>where <span class="math">\(w(x,t)\)</span> is the new unknown function and where <span class="math">\(u(x,t)\)</span> is any function that satisfies the inhomogeneous boundary condition, i.e.</p>
-<div class="math">
-\[l^{(i)}_{x,t}[u(x,t)] = g^{(i)}(x,t),\quad\textrm{for } x\in \Gamma\]</div>
-<p>The selection of the function <span class="math">\(u(x,t)\)</span> is of a purely algebraic nature. The following list shows examples of valid transformations for <span class="math">\(x_1 = 0\)</span> and <span class="math">\(x_2 = L\)</span> &#8211; see <a class="reference internal" href="#polyanin2001" id="id1">[Polyanin2001]</a></p>
-<table border="1" class="docutils" id="id5">
-<span id="table-transformation"></span><caption><span class="caption-text">Table 2: Transformation Leading to Different Homogeneous Boundary Type.</span><a class="headerlink" href="#id5" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col width="35%" />
-<col width="15%" />
-<col width="15%" />
-<col width="36%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Boundary Type</th>
-<th class="head">at <span class="math">\(x_1=0\)</span></th>
-<th class="head">at <span class="math">\(x_2=L\)</span></th>
-<th class="head"><span class="math">\(u(x,t)\)</span></th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even"><td>Fisrt, Dirichlet</td>
-<td><span class="math">\(T=g_1(t)\)</span></td>
-<td><span class="math">\(T=g_2(t)\)</span></td>
-<td><span class="math">\(g_1(t)+\frac{x}{L}\Big(g_2(t)-g_1(t)\Big)\)</span></td>
-</tr>
-<tr class="row-odd"><td>Second, Neumann</td>
-<td><span class="math">\(\frac{\partial T}{\partial x}=g_1(t)\)</span></td>
-<td><span class="math">\(\frac{\partial T}{\partial x}=g_2(t)\)</span></td>
-<td><span class="math">\(xg_1(t) + \frac{x^2}{2L}\Big(g_2(t)-g_1(t)\Big)\)</span></td>
-</tr>
-<tr class="row-even"><td>Third, Robin <span class="math">\(k_1&lt;0\)</span>, <span class="math">\(k_2&gt;0\)</span></td>
-<td><span class="math">\(\frac{\partial T}{\partial x}+k_1T=g_1(t)\)</span></td>
-<td><span class="math">\(\frac{\partial T}{\partial x}+k_2T=g_2(t)\)</span></td>
-<td><span class="math">\(\frac{(k_2x-1-k_2L)g_1(t)+(1-k_1x)g_2(t)}{k_2-k_1-k_1k_2L}\)</span></td>
-</tr>
-<tr class="row-odd"><td>Mixed I</td>
-<td><span class="math">\(T=g_1(t)\)</span></td>
-<td><span class="math">\(\frac{\partial T}{\partial x}=g_2(t)\)</span></td>
-<td><span class="math">\(g_1(t)+xg_2(t)\)</span></td>
-</tr>
-<tr class="row-even"><td>Mixed II</td>
-<td><span class="math">\(\frac{\partial T}{\partial x}=g_1(t)\)</span></td>
-<td><span class="math">\(T=g_2(t)\)</span></td>
-<td><span class="math">\((x-L)g_1(t)+g_2(t)\)</span></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="section" id="eigenfunction-expansions">
-<h3>Eigenfunction expansions<a class="headerlink" href="#eigenfunction-expansions" title="Permalink to this headline">¶</a></h3>
-<p>The Sturm-Liouville theory shows that, in general, there is an infinite set of eigenvalues <span class="math">\(\lambda_n\)</span> satisfying the given equation and the associated boundary conditions, and that these eigenvalues increase to infinity. Corresponding to these eigenvalues, there is an infinite set of orthogonal eigenfunctions <span class="math">\(\{\varphi_n(x)\}\)</span> so that the linear superposition principle can be applied to find the convergent infinite series solution of the given problem. Formally, the regular Sturm-Liouville system can be expanded in an absolutely and uniformly convergent series:</p>
-<div class="math" id="equation-fourier">
-<span class="eqno">(17)</span>\[\varphi(x) = \sum_{n=1}^\infty a_n\varphi_n(x)\]</div>
-<p>where the coefficients <span class="math">\(a_n\)</span> are defined using the properties of the regular Sturm-Liouville operator, i.e.</p>
-<p>1 - The eigenfunctions of the adjoint problem have the same eigenvalues as the original problem.
-2 - Eigenfunctions corresponding to different eigenvalues are orthogonal.</p>
-<p>These properties giving:</p>
-<div class="math">
-\[a_n = \frac{1}{\int_{x_1}^{x_2} \rho(x)\varphi_n^2(x)dx}\int_{x_1}^{x_2} \rho(x)\varphi_n(x)\varphi(x)dx\]</div>
-<p>For instance, if we substitute the initial condition <span class="math">\(\varphi_0(x)=T(x,0)\)</span> in equation <a href="#equation-1dsol">(14)</a>, we get</p>
-<div class="math" id="equation-fourier0">
-<span class="eqno">(18)</span>\[\varphi_0(x) = \sum_{n=1}^\infty a_n\varphi_n(x)\]</div>
-<p>If we multiply both side of equation <a href="#equation-fourier0">(18)</a> by <span class="math">\(\sum_{n=1}^\infty \rho(x)\varphi_n(x)\)</span> we obtain</p>
-<div class="math">
-\[\sum_{n=1}^\infty \rho(x)\varphi_n(x)\varphi_0(x) = \sum_{n=1}^\infty \rho(x)\varphi_n(x)\sum_{n=1}^\infty a_n \varphi_n(x)\]</div>
-<p>then, knowing that:</p>
-<div class="math">
-\[\begin{split}\int_{x_1}^{x_2} \rho(x)\varphi_n(x)\varphi_m(x)dx = \left\{
-\begin{array}{rl}
-1 &amp; \text{if } m = n,\\
-0 &amp; \text{if } m\neq n.
-\end{array} \right.\end{split}\]</div>
-<p>integrate on the interval <span class="math">\([x_1,x_2]\)</span></p>
-<div class="math">
-\[\begin{split}\begin{eqnarray}
-\int_{x_1}^{x_2}\sum_{n=1}^\infty \rho(\xi)\varphi_n(\xi)\varphi_0(\xi)d\xi &amp; = &amp; \int_{x_1}^{x_2}\sum_{n=1}^\infty \rho(\xi)\varphi_n(\xi)\sum_{n=1}^\infty a_n \varphi_n(\xi)d\xi\\
-\sum_{n=1}^\infty \int_{x_1}^{x_2} \rho(\xi)\varphi_n(\xi)\varphi_0(\xi)d\xi &amp; = &amp; \sum_{n=1}^\infty \int_{x_1}^{x_2} \rho(\xi) a_n \varphi_n^2(\xi)d\xi
-\end{eqnarray}\end{split}\]</div>
-<p>the coefficients <span class="math">\(a_n\)</span> become</p>
-<div class="math">
-\[a_n = \frac{1}{||\varphi_n||^2}\int_{x_1}^{x_2} \rho(\xi)\varphi_n(\xi)\varphi_0(\xi)d\xi\]</div>
-<p>where</p>
-<div class="math">
-\[||\varphi_n||^2 = \int_{x_1}^{x_2} \rho(\xi)\varphi_n^2(\xi)d\xi\]</div>
-<p>where <span class="math">\(\xi\)</span> is a free parameter (integration variable).</p>
-<p>If we go back to the original problem of solving the heat equation with a source term <span class="math">\(\Phi(x,t)\)</span> and inhomogeneous boundary conditions <span class="math">\(g(x,t)\)</span>.</p>
-<p>We can first transform the inhomogeneous boundary conditions using the change of variable described in <a class="reference internal" href="#transformation"><span>Transformations Leading to Homogeneous Boundary Conditions</span></a> and obtain the following equations:</p>
-<div class="math" id="equation-1dwnh">
-<span class="eqno">(19)</span>\[\mathcal{L}_{x,t}[w(x,t)] = q(x,t)\]</div>
-<p>with homogeneous boundary conditions</p>
-<div class="math">
-\[\mathcal{l}_{x,t}[w(x,t)] = 0,\qquad \textrm{for }x\in \Gamma\]</div>
-<p>and initial condition</p>
-<div class="math">
-\[w(x,0)=w_0(x),\qquad \textrm{at }t=0.\]</div>
-<p>Where</p>
-<div class="math">
-\[\begin{split}\begin{eqnarray}
-w(x,t) &amp; = &amp; T(x,t)-u(x,t)\\
-q(x,t) &amp; = &amp; \Phi(x,t)-\mathcal{L}_{x,t}[u(x,t)]\\
-w_0(x,t) &amp; = &amp; T_0(x)-u(x,0).
-\end{eqnarray}\end{split}\]</div>
-<p>For the self-adjoint problem <span class="math">\(w(x,t)\)</span> and <span class="math">\(q(x,t)\)</span> are expressed in terms of generalized Fourier series:</p>
-<div class="math">
-\[\begin{split}\begin{eqnarray}
-  w(x,t) &amp; = &amp; \sum_{n=1}^\infty W_n(\lambda_n,t)\varphi_n(x)\\
-  q(x,t) &amp; = &amp; \sum_{n=1}^\infty Q_n(\lambda,t)\varphi_n(x)
-\end{eqnarray}\end{split}\]</div>
-<p>where <span class="math">\(W_n(\lambda_n,t)\)</span> and <span class="math">\(Q(\lambda_n,t)\)</span> are the finite Fourier transforms of <span class="math">\(w(x,t)\)</span> and <span class="math">\(q(x,t)\)</span></p>
-<div class="math">
-\[\begin{split}\begin{eqnarray}
-  W_n(\lambda_n,t) &amp; = &amp; \mathcal{F}[w(x,t)] = \frac{1}{||\varphi_n||^2}\int_{x_1}^{x_2} \rho(\xi)\varphi_n(\xi)w(\xi,t)d\xi\\
-  Q_n(\lambda_n,t) &amp; = &amp; \mathcal{F}[q(x,t)] = \frac{1}{||\varphi_n||^2}\int_{x_1}^{x_2} \rho(\xi)\varphi_n(\xi)q(\xi,t)d\xi
-\end{eqnarray}\end{split}\]</div>
-<p>Recall from <a href="#equation-general">(13)</a> that the eigenfunctions <span class="math">\(\varphi_n(x)\)</span> are of the form</p>
-<div class="math">
-\[\varphi_n(x) = A_n\cos(\sqrt{\lambda_n} x)+B_n\sin(\sqrt{\lambda_n} x)\]</div>
-<p>we can see that for generalized homogeneous Sturm-Liouville boundary conditions the finite Fourrier transform of <span class="math">\(\frac{d^2 }{dx^2}w(x,t)\)</span> is:</p>
-<div class="math">
-\[\mathcal{F}\Big[\frac{d^2}{dx^2}w(x,t)\Big]= -\lambda_n \mathcal{F}[w(x,t)]\]</div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">From the superposition of the general solution we see a generalized Fourrier series. We can obtain the finite Fourier transform of the second derivative using integration by part see <a class="reference internal" href="#myintu2007" id="id2">[MyintU2007]</a> page 500. the extra terms cancels for the generalized Sturm-Liouville BCs. e.g. 2*n/pi*f(0) - 2/pi*f&#8217;(0) = 0 if k1 = 2*n/pi and s1 = -2/pi ...</p>
-</div>
-<p>Performing the finite Fourier transform on both side of equation <a href="#equation-1dwnh">(19)</a> we obtain:</p>
-<div class="math" id="equation-fourier1">
-<span class="eqno">(20)</span>\[\frac{d }{dt}W_n(\lambda_n,t) + \lambda_nW_n(\lambda_n,t) = Q_n(\lambda_n,t)\]</div>
-<p>Multiplying both side of equation <a href="#equation-fourier1">(20)</a> by <span class="math">\(\exp(\lambda_n t)\)</span> we get</p>
-<div class="math">
-\[\frac{d }{dt}W_n(\lambda_n,t)\exp(\lambda_n t) + \lambda_nW_n(\lambda_n,t\exp(\lambda_n t) = Q_n(\lambda_n,t)\exp(\lambda_n t)\]</div>
-<p>which is equivalent to</p>
-<div class="math">
-\[\frac{d}{dt} \Big(W_n(\lambda_n,t)\exp(\lambda_n t)\Big) = Q_n(\lambda_n,t)\exp(\lambda_n t)\]</div>
-<p>then integrating</p>
-<div class="math">
-\[W_n(\lambda_n,t)\exp(\lambda_n t) = \int_{0}^{t} Q_n(\lambda_n,t)\exp(\lambda_n \tau)d\tau + W_n(\lambda_n,0)\]</div>
-<p>Where <span class="math">\(W_n(\lambda_n,0)\)</span> is a constant comming from the integration and where <span class="math">\(\tau\)</span> is a free parameter.</p>
-<p>Isolating <span class="math">\(W_n(\lambda_n,t)\)</span> we get</p>
-<div class="math">
-\[W_n(\lambda_n,t) = \int_{0}^{t} Q_n(\lambda_n,t)\exp(-\lambda_n(t-\tau))d\tau + W_n(\lambda_n,0)\exp(-\lambda_nt)\]</div>
-<p>Doing the inverse transformation we finally obtain</p>
-<div class="math">
-\[\begin{split}\begin{multline}
-T(x,t) = u(x,t) + \int_0^t \int_{x_1}^{x_2} \rho(\xi)\sum_{n=1}^\infty q(\xi,t)\frac{\varphi_n(\xi)\varphi_n(x)}{||\varphi_n||^2}\exp(-\lambda_n(t-\tau)) d\xi d\tau\\ + \int_{x_1}^{x_2} \rho(\xi)\sum_{n=1}^\infty w(\xi,0)\frac{\varphi_n(\xi)\varphi_n(x)}{||\varphi_n||^2}\exp(-\lambda_nt)d\xi
-\end{multline}\end{split}\]</div>
-</div>
 </div>
 <div class="section" id="green-s-functions">
-<h2>Green&#8217;s Functions<a class="headerlink" href="#green-s-functions" title="Permalink to this headline">¶</a></h2>
+<span id="greensfcts"></span><h2>Green&#8217;s Functions<a class="headerlink" href="#green-s-functions" title="Permalink to this headline">¶</a></h2>
+<p>The Green&#8217;s function <span class="math">\(G(x,\mathbf{\xi},t)\)</span> satisfy the homogeneous equation</p>
+<div class="math">
+\[\frac{\partial}{\partial t}G - \mathcal{L}_{x}[G] = 0\]</div>
+<p>with the inhomogeneous initial condition</p>
+<div class="math">
+\[G = \delta(x,\xi), \qquad \textrm{at }t=\tau\]</div>
+<p>and homogeneous boundary conditions</p>
+<div class="math">
+\[s_1\frac{\partial }{\partial x}G + k_1 G = 0, \qquad \textrm{at }x=x_1\]</div>
+<div class="math">
+\[s_2\frac{\partial }{\partial x}G + k_2 G = 0, \qquad \textrm{at }x=x_2\]</div>
+<p>From the <a class="reference external" href="https://en.wikipedia.org/wiki/Green's_identities">Green&#8217;s second identity</a> we have</p>
+<blockquote>
+<div><div class="math" id="equation-2identity">
+<span class="eqno">(17)<a class="headerlink" href="#equation-2identity" title="Permalink to this equation">¶</a></span>\[\int_\Omega \left(G(x, \xi)\nabla^2\varphi-\varphi(\xi)\nabla^2G\right)d\xi - \int_\Gamma \left(G(x,\xi)\frac{\partial}{\partial \mathbf{\hat{n}}}\varphi-\varphi(\xi)\frac{\partial}{\partial \mathbf{\hat{n}}}G\right)dx = 0\]</div>
+</div></blockquote>
 <p>with</p>
 <div class="math">
-\[G(x,\xi,t) = \rho(\xi)\sum_{n=1}^\infty \frac{\varphi_n(\xi)\varphi_n(x)}{||\varphi_n||^2}\exp(-\lambda_nt)\]</div>
+\[G(x,\xi,t) = \sum_{n=1}^\infty \frac{\varphi_n(\xi)\varphi_n(x)}{||\varphi_n||^2}\psi_n(t)\]</div>
+<p>and</p>
+<div class="math">
+\[T_0(x) = \lim_{t\rightarrow \tau}\int_{x_1}^{x_2}T_0(\xi)G(x,\xi,t-\tau)d\xi\]</div>
 <p>we get</p>
 <blockquote>
 <div><div class="math" id="equation-final">
-<span class="eqno">(21)</span>\[\begin{split}T(x,t) = u(x,t) + \int_0^t \int_{x_1}^{x_2} q(\xi,t)G(x,\xi,t-\tau) d\xi d\tau\\ + \int_{x_1}^{x_2} w(\xi,0)G(x,\xi,t)d\xi\end{split}\]</div>
+<span class="eqno">(18)<a class="headerlink" href="#equation-final" title="Permalink to this equation">¶</a></span>\[\begin{split}T(x,t) = \int_{x_1}^{x_2} T_0(\xi)G(x,\xi,t)d\xi +\\ \int_0^t \int_{x_1}^{x_2} \Phi(\xi,t-\tau)G(x,\xi,t-\tau) d\xi d\tau +\\ \alpha\int_0^t \int_{x_1}^{x_2} g_1(\xi,t-\tau)\Lambda_1(x,\xi,t,\tau)d\xi d\tau +\\ \alpha\int_0^t \int_{x_1}^{x_2} g_2(\xi,t-\tau)\Lambda_2(x,\xi,t,\tau)d\xi d\tau\end{split}\]</div>
 </div></blockquote>
-<p>The kernel <span class="math">\(G(x,\xi,t)\)</span> is called the Green&#8217;s function.</p>
-<div class="section" id="properties">
-<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
-<p>The Green&#8217;s function <span class="math">\(G(\mathbf{x},\mathbf{\xi},t-\tau)\)</span> satisfy the homogeneous equation</p>
-<div class="math">
-\[\mathcal{L}_{\mathbf{x},t}[G] = 0\]</div>
-<p>with the inhomogeneous initial condition</p>
-<div class="math">
-\[G = \delta(\mathbf{x},\mathbf{\xi}), \qquad \textrm{at }t=\tau\]</div>
-<p>and homogeneous boundary conditions</p>
-<div class="math">
-\[\mathcal{l}_{\mathbf{x},t}[G] = 0,\qquad \textrm{for }\mathbf{x}\in\Gamma.\]</div>
-<p>More generally, we can see that <a href="#equation-final">(21)</a> can be rewritten as the sum of three contributions. One for the boundary, one for the source term and one for the initial condition.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Add boundary contribution from Green&#8217;s second theorem <a class="reference internal" href="#myintu2007" id="id3">[MyintU2007]</a>.</p>
-</div>
-</div>
-<div class="section" id="extending-to-multiple-spatial-dimensions">
-<h3>Extending to multiple spatial dimensions<a class="headerlink" href="#extending-to-multiple-spatial-dimensions" title="Permalink to this headline">¶</a></h3>
-<p>For the heat equation without source, i.e. with <span class="math">\(\Phi(\mathbf{x},t) = 0\)</span>, the Green&#8217;s function can be represented in the product form:</p>
-<div class="math">
-\[G(x,y,z,\xi,\eta,\zeta,t) = G_1(x,\xi,t)G_2(y,\eta,t)G_3(z,\zeta,t)\]</div>
-<p>where <span class="math">\(G_1(x,\xi,t)\)</span>, <span class="math">\(G_2(y,\eta,t)\)</span>, and <span class="math">\(G_3(z,\zeta,t)\)</span> are the Green&#8217;s functions of the corresponding 1D boundary value problems.</p>
-</div>
+<p>Where <span class="math">\(\Lambda_i\)</span> is a function defined by the boundary conditions. &#8211; See [Polyanin2001].</p>
 </div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <table class="docutils citation" frame="void" id="polyanin2001" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[Polyanin2001]</a></td><td><a class="reference external" href="http://goo.gl/jVjUFX">Andrei D. Polyanin, Handbook of Linear Partial Differential Equations for Engineers and Scientists, Chapman and Hall/CRC 2001</a></td></tr>
+<tr><td class="label">[Polyanin2001]</td><td><a class="reference external" href="http://goo.gl/jVjUFX">Andrei D. Polyanin, Handbook of Linear Partial Differential Equations for Engineers and Scientists, Chapman and Hall/CRC 2001</a></td></tr>
 </tbody>
 </table>
 <table class="docutils citation" frame="void" id="myintu2007" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[MyintU2007]</td><td><em>(<a class="fn-backref" href="#id2">1</a>, <a class="fn-backref" href="#id3">2</a>)</em> <a class="reference external" href="http://goo.gl/1YIGSz">Tyn Myint-U, and Lokenath Debnath, Linear Partial Differential Equations for Scientists and Engineers, 4th edition, Birkhauser 2007</a></td></tr>
+<tr><td class="label">[MyintU2007]</td><td><a class="reference external" href="http://goo.gl/1YIGSz">Tyn Myint-U, and Lokenath Debnath, Linear Partial Differential Equations for Scientists and Engineers, 4th edition, Birkhauser 2007</a></td></tr>
 </tbody>
 </table>
 </div>
@@ -471,21 +299,11 @@ T(x,t) = u(x,t) + \int_0^t \int_{x_1}^{x_2} \rho(\xi)\sum_{n=1}^\infty q(\xi,t)\
 <li><a class="reference internal" href="#">The Heat Equation</a><ul>
 <li><a class="reference internal" href="#statement-of-the-problem">Statement of the Problem</a></li>
 <li><a class="reference internal" href="#overview-of-the-method">Overview of the method</a></li>
-<li><a class="reference internal" href="#a-set-of-homogeneous-solutions">A Set of Homogeneous Solutions</a><ul>
-<li><a class="reference internal" href="#the-method-of-separation-of-variable">The Method of Separation of Variable</a></li>
-<li><a class="reference internal" href="#the-1d-homogeneous-solutions">The 1D homogeneous solutions</a><ul>
+<li><a class="reference internal" href="#the-homogeneous-solution-in-1d">The Homogeneous Solution in 1D</a><ul>
 <li><a class="reference internal" href="#eigenvalues-and-eigenfunctions">Eigenvalues and Eigenfunctions</a></li>
-<li><a class="reference internal" href="#transformations-leading-to-homogeneous-boundary-conditions">Transformations Leading to Homogeneous Boundary Conditions</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#eigenfunction-expansions">Eigenfunction expansions</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#green-s-functions">Green&#8217;s Functions</a><ul>
-<li><a class="reference internal" href="#properties">Properties</a></li>
-<li><a class="reference internal" href="#extending-to-multiple-spatial-dimensions">Extending to multiple spatial dimensions</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#green-s-functions">Green&#8217;s Functions</a></li>
 <li><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
@@ -495,28 +313,25 @@ T(x,t) = u(x,t) + \int_0^t \int_{x_1}^{x_2} \rho(\xi)\sum_{n=1}^\infty q(\xi,t)\
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="usage.html" title="previous chapter">Usage</a></li>
-      <li>Next: <a href="modules.html" title="next chapter">Modules</a></li>
+      <li>Next: <a href="bcs.html" title="next chapter">Boundary Conditions</a></li>
   </ul></li>
 </ul>
 </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/theory.txt"
+      <li><a href="_sources/theory.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -527,11 +342,11 @@ T(x,t) = u(x,t) + \int_0^t \int_{x_1}^{x_2} \rho(\xi)\sum_{n=1}^\infty q(\xi,t)\
       &copy;2016, Francois Roy.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.5</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |
-      <a href="_sources/theory.txt"
+      <a href="_sources/theory.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

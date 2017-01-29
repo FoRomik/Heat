@@ -13,4 +13,5 @@ Contents:
    installation
    usage
    theory
+   bcs
    modules
