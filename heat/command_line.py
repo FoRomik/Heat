@@ -38,7 +38,7 @@ def editConfig(filename):
     """
     Launch VI and allow editing the configuration file.
     VI is the default text editor in Unix systems.
-        :param filename: The name of the configuration file.
+    :param filename: The name of the configuration file.
     """
     subprocess.call(['vi', filename])
 
