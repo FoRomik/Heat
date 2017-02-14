@@ -4,7 +4,6 @@
 # distutils: include_dirs = include/
 
 
-from libcpp.string cimport string
 import sys
 cimport w
 
@@ -53,22 +52,6 @@ class InvalidAxis(Exception):
     def __str__(self):
         return repr(self.value)
 
-"""
-class InvalidMiscFct(Exception):
-    '''Exception for the miscFct enum.
-    '''
-    message = "Invalid Function"
-
-    def __init__(self, value):
-        self.value = value
-        self.message = "Invalid function, you must choose one "+\
-                       "of the following options: 'SINN3' or 'ALTSINN3'. "+\
-                       "FCT={0} is not a valid option.".format(value)
-
-    def __str__(self):
-        return repr(self.value)
-"""
-
 def getAxis(str):
     """Wrapper for axis enum
     """
@@ -83,22 +66,6 @@ def getAxis(str):
     }
     axis = options[str]
     return axis
-
-"""
-def getMiscFct(str):
-    '''Wrapper for miscFct enum
-    '''
-    l = ['SINN3', 'ALTSINN3']
-    if str not in l:
-        raise InvalidMiscFct(str)
-    cdef w.miscFct fctName
-    options = {
-        'SINN3': w.SINN3,
-        'ALTSINN3': w.ALTSINN3
-    }
-    fctName = options[str]
-    return fctName
-"""
 
 def getbcType(str):
     """Wrapper for bcType enum.
@@ -117,7 +84,6 @@ def getbcType(str):
     }
     bc = options[str]
     return bc
-
 
 def gettermType(str):
     """Wrapper for termType enum.
@@ -175,13 +141,6 @@ cdef class ComputeSeries:
         """
         return self.baseptr.getLastNumberOfIterations()
 
-'''
-    def fct(self, int n):
-        """Define the function to be summed.
-
-        """
-        pass
-'''
 
 cdef class Uniform(ComputeSeries):
     """Wrapper fro the C++ class Uniform. See detail in the c++ documentation `here <https://frroy.github.io/Series/class_uniform.html>`_ 
@@ -329,67 +288,3 @@ cdef class Uniform(ComputeSeries):
 
         """
         return self.derivedptr.getSteadyStateDirichlet()
-
-'''
-cdef class Misc(ComputeSeries):
-    """Wrapper fro the C++ class Misc. 
-
-    """
-    cdef w.Misc *derivedptr1
-    cdef w.axis axis
-    cdef w.miscFct fctName
-    cdef double x 
-
-    def __cinit__(self, d1, x):
-        try:
-            self.fctName = getMiscFct(d1)
-            self.x = x
-        except InvalidBCType as e:
-            sys.exit(e.message)
-        except InvalidMiscFct as e:
-            sys.exit(e.message)
-        self.derivedptr1 = new w.Misc(self.fctName, self.x)
-        self.baseptr = self.derivedptr1
-
-    def __dealloc__(self):
-        del self.derivedptr1
-
-    def  setX(self, x):
-        """
-        """
-        self.derivedptr1.setX(x)
-
-    def setFct(self, fctName):
-        """
-        """
-        self.derivedptr1.setFct(fctName)
-
-    def getFct(self):
-        """
-        """
-        return self.derivedptr1.getFct()
-        
-    def getX(self):
-        """
-        """
-        return self.derivedptr1.getX()
-
-    def getResult(self, double tol, nMax=None):
-        """Get the forward sum. If nMax equals None, use the default argument
-        nMax = 50000.
-        """
-        if nMax is not None:
-            return self.derivedptr1.getResult(tol, nMax)
-        else:
-            return self.derivedptr1.getResult(tol)
-
-    def getNbrIt(self):
-        """
-        """
-        return self.derivedptr1.getNbrIt()
-        
-    def getErr(self):
-        """
-        """
-        return self.derivedptr1.getErr()
-'''

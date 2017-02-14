@@ -41,15 +41,13 @@ class Initial:
                 l = ls[d]
                 xArray = Coords[dim[d]]+l/2.0  # Uniform takes coordinates from 0 to l
                 node = {'dim': self.mesh.geometry.d,
-                        'axis': "x",
-                        'baxis': "x",
                         'x': xArray[0], 'y': 0.0, 'z': 0.0,
                         't': tArray[0],
                         'l': l,
                         'alpha': alpha}
                 params = {'a0': self.a, 'a1': 0.0, 'a2': 0.0,
                           'k1': 0.0, 'k2': 0.0}
-                u = Uniform(node, bc, term, params)
+                u = Uniform(node, bc, term, params, 'x', 'x')
                 if self.mesh.geometry.d==1:
                     sol[dim[d]] = self.getSolutionComponent(u, xArray, tArray, tol, dim[d], 'Initial')
                 elif self.mesh.geometry.d==2:

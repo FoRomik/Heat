@@ -64,20 +64,3 @@ cdef extern from "Uniform.h":
 cdef extern from "Misc.h":
     cdef cppclass Misc(ComputeSeries):
         pass
-
-
-"""
-Misc(miscFct fctName, double x) except +
-void setX(double x) except +
-void setFct(miscFct fctName) except +
-miscFct getFct() except +
-double getX() except +
-double getResult(double tol, int nMax) except +
-double getResult(double tol) except +
-int getNbrIt() except +
-double getErr() except +
-
-    enum miscFct:
-        SINN3,
-        ALTSINN3
-"""

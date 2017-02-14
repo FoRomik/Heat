@@ -10,7 +10,7 @@ Heat
 - `Build and test history <https://travis-ci.org/frRoy/Heat/builds>`_
 - Licensed under BSD-2
 
-Solve the heat equation with constant coefficients, heat source, and usual boundary conditions using Green's function on a line (1D), a rectangle (2D), or a block (3D). Documentation is available `here <http://frRoy.github.io/Heat>`_ 
+Solve the heat equation with constant coefficients, heat source, and usual boundary conditions using Green's function on a line (1D), a rectangle (2D), or a block (3D). The documentation is available `here <http://frRoy.github.io/Heat>`_ 
 
 Requirements
 ------------
@@ -31,4 +31,4 @@ Download and test
 6. pip install -e .
 7. cmake ..
 8. make
-9. ctest
+9. ctest --verbose

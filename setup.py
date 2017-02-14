@@ -64,7 +64,7 @@ setup(
     test_suite='tests.test_class',
     tests_require=['pytest', ],
     zip_safe=False,
-    ext_modules=cythonize('heat/*.pyx'),
+    ext_modules=cythonize('heat/*.pyx', gdb_debug=True),
     classifiers=[
         'Intended Audience :: Developers',
         'Natural Language :: English',

@@ -1,10 +1,5 @@
-heat's Documentation
-==========================
-
-`GitHub repository <https://github.com/frRoy/Heat>`_ 
-
 Contents:
----------
+=========
 
 .. toctree::
    :maxdepth: 1
@@ -15,3 +10,5 @@ Contents:
    theory
    bcs
    modules
+
+`GitHub repository <https://github.com/frRoy/Heat>`_ 
