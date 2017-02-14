@@ -399,6 +399,17 @@ Using :eq:`tb1`, and integrating both side of :eq:`tb7` over :math:`\tau` gives
  .. math:: \int_0^t\int_{x_1}^{x_2}\left(T_b\frac{\partial}{\partial \tau}G + G\frac{\partial}{\partial \tau}T_b\right)d\xi d\tau=\alpha\int_0^t\left[T_b\frac{\partial}{\partial \xi}G - G\frac{\partial}{\partial \xi}T_b\right]_{\xi=x_1}^{\xi=x_2}d\tau
   :label: tb8
 
+which is equivalent to
+
+ .. math:: \int_0^t\int_{x_1}^{x_2}\frac{\partial}{\partial \tau}\left(T_bG\right)d\xi d\tau=\alpha\int_0^t\left[T_b\frac{\partial}{\partial \xi}G - G\frac{\partial}{\partial \xi}T_b\right]_{\xi=x_1}^{\xi=x_2}d\tau
+  :label: tb9
+
+or using the Green function definition to 
+
+ .. math:: T_b(x,t)=\alpha\int_0^t\left[T_b\frac{\partial}{\partial \xi}G - G\frac{\partial}{\partial \xi}T_b\right]_{\xi=x_1}^{\xi=x_2}d\tau
+  :label: tb10
+
+
 **Solution**
 
 Combining all these terms gives:
@@ -406,7 +417,7 @@ Combining all these terms gives:
  .. math:: T(x,t) = \int_{x_1}^{x_2} T_0(\xi)G(x,\xi,t)d\xi +\\ \int_0^t \int_{x_1}^{x_2} \Phi(\xi,t-\tau)G(x,\xi,t-\tau) d\xi d\tau +\\ \alpha\int_0^t  g_1(\xi,t-\tau)\Lambda_1(x,\xi,t,\tau) d\tau +\\ \alpha\int_0^t  g_2(\xi,t-\tau)\Lambda_2(x,\xi,t,\tau) d\tau 
     :label: final
 
-Where :math:`\Lambda_i` is a function defined by the boundary conditions.
+Where :math:`\Lambda_i` is a function defined by the boundary conditions and :eq:`eqG3`, :eq:`eqG4`.
 
 .. _table_Lambda:
 .. csv-table:: Table 2: :math:`\Lambda_i` for Different Homogeneous Boundary Type.
