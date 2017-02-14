@@ -356,13 +356,23 @@ boundary of the domain, <span class="math">\(k_i=0\)</span>.</p>
 <div><div class="math" id="equation-tb8">
 <span class="eqno">(46)<a class="headerlink" href="#equation-tb8" title="Permalink to this equation">¶</a></span>\[\int_0^t\int_{x_1}^{x_2}\left(T_b\frac{\partial}{\partial \tau}G + G\frac{\partial}{\partial \tau}T_b\right)d\xi d\tau=\alpha\int_0^t\left[T_b\frac{\partial}{\partial \xi}G - G\frac{\partial}{\partial \xi}T_b\right]_{\xi=x_1}^{\xi=x_2}d\tau\]</div>
 </div></blockquote>
+<p>which is equivalent to</p>
+<blockquote>
+<div><div class="math" id="equation-tb9">
+<span class="eqno">(47)<a class="headerlink" href="#equation-tb9" title="Permalink to this equation">¶</a></span>\[\int_0^t\int_{x_1}^{x_2}\frac{\partial}{\partial \tau}\left(T_bG\right)d\xi d\tau=\alpha\int_0^t\left[T_b\frac{\partial}{\partial \xi}G - G\frac{\partial}{\partial \xi}T_b\right]_{\xi=x_1}^{\xi=x_2}d\tau\]</div>
+</div></blockquote>
+<p>or using the Green function definition to</p>
+<blockquote>
+<div><div class="math" id="equation-tb10">
+<span class="eqno">(48)<a class="headerlink" href="#equation-tb10" title="Permalink to this equation">¶</a></span>\[T_b(x,t)=\alpha\int_0^t\left[T_b\frac{\partial}{\partial \xi}G - G\frac{\partial}{\partial \xi}T_b\right]_{\xi=x_1}^{\xi=x_2}d\tau\]</div>
+</div></blockquote>
 <p><strong>Solution</strong></p>
 <p>Combining all these terms gives:</p>
 <blockquote>
 <div><div class="math" id="equation-final">
-<span class="eqno">(47)<a class="headerlink" href="#equation-final" title="Permalink to this equation">¶</a></span>\[\begin{split}T(x,t) = \int_{x_1}^{x_2} T_0(\xi)G(x,\xi,t)d\xi +\\ \int_0^t \int_{x_1}^{x_2} \Phi(\xi,t-\tau)G(x,\xi,t-\tau) d\xi d\tau +\\ \alpha\int_0^t  g_1(\xi,t-\tau)\Lambda_1(x,\xi,t,\tau) d\tau +\\ \alpha\int_0^t  g_2(\xi,t-\tau)\Lambda_2(x,\xi,t,\tau) d\tau\end{split}\]</div>
+<span class="eqno">(49)<a class="headerlink" href="#equation-final" title="Permalink to this equation">¶</a></span>\[\begin{split}T(x,t) = \int_{x_1}^{x_2} T_0(\xi)G(x,\xi,t)d\xi +\\ \int_0^t \int_{x_1}^{x_2} \Phi(\xi,t-\tau)G(x,\xi,t-\tau) d\xi d\tau +\\ \alpha\int_0^t  g_1(\xi,t-\tau)\Lambda_1(x,\xi,t,\tau) d\tau +\\ \alpha\int_0^t  g_2(\xi,t-\tau)\Lambda_2(x,\xi,t,\tau) d\tau\end{split}\]</div>
 </div></blockquote>
-<p>Where <span class="math">\(\Lambda_i\)</span> is a function defined by the boundary conditions.</p>
+<p>Where <span class="math">\(\Lambda_i\)</span> is a function defined by the boundary conditions and <a class="reference internal" href="#equation-eqG3">(22)</a>, <a class="reference internal" href="#equation-eqG4">(23)</a>.</p>
 <table border="1" class="colwidths-given docutils" id="id2">
 <span id="table-lambda"></span><caption><span class="caption-text">Table 2: <span class="math">\(\Lambda_i\)</span> for Different Homogeneous Boundary Type.</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
 <colgroup>
