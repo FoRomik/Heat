@@ -57,13 +57,13 @@
 <p>and initial temperature distribution</p>
 <div class="math" id="equation-3dnhini">
 <span class="eqno">(3)<a class="headerlink" href="#equation-3dnhini" title="Permalink to this equation">¶</a></span>\[T(\mathbf{x},0)=T_0(\mathbf{x}),\qquad \textrm{at }t=0.\]</div>
-<p>The operator <span class="math">\(\mathcal{L}_{\mathbf{x}}[T(\mathbf{x},t)]\)</span> is the linear second order differential operator defined by:</p>
+<p>Where <span class="math">\(\Phi\)</span> is an heat source (K/s), and where the operator <span class="math">\(\mathcal{L}_{\mathbf{x}}[T(\mathbf{x},t)]\)</span> is the linear second order differential operator defined by:</p>
 <div class="math">
 \[\mathcal{L}_{\mathbf{x}}[T(\mathbf{x},t)] = \alpha \nabla^2 T(\mathbf{x},t)\]</div>
 <p>The coefficient <span class="math">\(\alpha\)</span>, here considered constant, is the material diffusivity defined as:</p>
 <div class="math">
-\[\alpha = \frac{k}{\rho C_p}\]</div>
-<p>where <span class="math">\(k\)</span> is the thermal conductivity, <span class="math">\(\rho\)</span> is the density, and <span class="math">\(C_p\)</span> is the specific heat capacity.</p>
+\[\alpha = \frac{\kappa}{\rho C_p}\]</div>
+<p>where <span class="math">\(\kappa\)</span> is the thermal conductivity, <span class="math">\(\rho\)</span> is the density, and <span class="math">\(C_p\)</span> is the specific heat capacity.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">We consider here <span class="math">\(\alpha\)</span> a constant larger than zero.</p>
@@ -72,19 +72,18 @@
 <div class="math" id="equation-eqbc">
 <span class="eqno">(4)<a class="headerlink" href="#equation-eqbc" title="Permalink to this equation">¶</a></span>\[\mathcal{G}^{(i)}_{\mathbf{x}}[T(\mathbf{x},t)] = s_i\frac{\partial}{\partial \mathbf{\hat{n}}}\varphi(\mathbf{x}) + k_i\varphi(\mathbf{x}),\qquad \textrm{for }\mathbf{x}\in \Gamma^{(i)}\]</div>
 <p>Where <span class="math">\(\frac{\partial}{\partial \mathbf{\hat{n}}}\)</span> is the (outward) normal derivative at the boundary.</p>
-<p>The operator <span class="math">\(\mathcal{G}^{(i)}_{\mathbf{x}}[T(\mathbf{x},t)]\)</span> can be expressed differently depending on the type of boundary condition. These are classified into four categories:</p>
+<p>The operator <span class="math">\(\mathcal{G}^{(i)}_{\mathbf{x}}[T(\mathbf{x},t)]\)</span> can be expressed differently depending on the type of boundary condition. These are classified into three main categories:</p>
 <p>1- <strong>Temperature</strong> (Dirichlet): The function <span class="math">\(T(\mathbf{x},t)\)</span> takes prescribed values at the boundary of the domain, <span class="math">\(s_i=0\)</span>.</p>
 <p>2- <strong>Heat Flux</strong> (Neumann): The derivative along the (outward) normal is prescribed at the
 boundary of the domain, <span class="math">\(k_i=0\)</span>.</p>
-<p>3- <strong>Natural Convection</strong> (Robin): A linear relationship between the unknown function and its normal derivative is prescribed at the boundary of the domain.</p>
-<p>4- <strong>Mixed</strong>: Conditions of various types, listed above, are set at different portions of the boundary <span class="math">\(\Gamma\)</span>.</p>
+<p>3- <strong>Convection</strong> (Robin): A linear relationship between the unknown function and its normal derivative is prescribed at the boundary of the domain, <span class="math">\(s_i\neq 0\)</span> and <span class="math">\(k_i\neq 0\)</span>.</p>
 </div>
 <div class="section" id="overview-of-the-method">
 <h2>Overview of the method<a class="headerlink" href="#overview-of-the-method" title="Permalink to this headline">¶</a></h2>
 <p>The heat equation can be solved using <a class="reference internal" href="#greensfcts"><span class="std std-ref">Green&#8217;s Functions</span></a>. The use of these functions allows defining a solution by superposition:</p>
 <div class="math">
 \[T(\mathbf{x}, t) = T_i(\mathbf{x}, t)+T_s(\mathbf{x}, t)+T_b^{(i)}(\mathbf{x}, t)\]</div>
-<p>Where <span class="math">\(T_i(\mathbf{x}, t)\)</span> is the initial temperature distribution term, <span class="math">\(T_s(\mathbf{x}, t)\)</span> is the source term, and <span class="math">\(T_b^{(i)}(\mathbf{x}, t)\)</span> is the <span class="math">\(i^\textrm{th}\)</span> boundary contribution.</p>
+<p>Where <span class="math">\(T_i(\mathbf{x}, t)\)</span> is the initial term, <span class="math">\(T_s(\mathbf{x}, t)\)</span> is the source term, and <span class="math">\(T_b^{(i)}(\mathbf{x}, t)\)</span> is the <span class="math">\(i^\textrm{th}\)</span> boundary term.</p>
 <p>The Green&#8217;s function can be represented in the product form:</p>
 <div class="math">
 \[G(x,y,z,\xi,\eta,\zeta,t) = G_1(x,\xi,t)G_2(y,\eta,t)G_3(z,\zeta,t)\]</div>
@@ -109,43 +108,40 @@ boundary of the domain, <span class="math">\(k_i=0\)</span>.</p>
 <span class="eqno">(9)<a class="headerlink" href="#equation-eigen2" title="Permalink to this equation">¶</a></span>\[\frac{\partial \psi(t)}{\partial t} + \lambda \alpha\psi(t)  =  0\]</div>
 <p>where <span class="math">\(\lambda\)</span> is the separation variable.</p>
 <p>The eigenfunctions solutions of equation <a class="reference internal" href="#equation-eigen2">(9)</a> are obtained by direct integration:</p>
-<div class="math">
-\[\psi_n(t) = C_n\exp(-\lambda_N\alpha t)\]</div>
+<div class="math" id="equation-transient">
+<span class="eqno">(10)<a class="headerlink" href="#equation-transient" title="Permalink to this equation">¶</a></span>\[\psi_n(t) = C_n\exp(-\lambda_n\alpha t)\]</div>
 <p>The spatial part of equations <a class="reference internal" href="#equation-1dh">(5)</a> to <a class="reference internal" href="#equation-1dhini">(7)</a> can be expresssed as a Sturm-Liouville boundary problem, i.e.</p>
 <div class="math" id="equation-sl1">
-<span class="eqno">(10)<a class="headerlink" href="#equation-sl1" title="Permalink to this equation">¶</a></span>\[\mathcal{L}_{sl}[\varphi(x)]+\lambda\rho(x)\varphi(x)=0,\qquad \textrm{for }x\in [x_1,x_2]\]</div>
+<span class="eqno">(11)<a class="headerlink" href="#equation-sl1" title="Permalink to this equation">¶</a></span>\[\mathcal{L}_{sl}[\varphi(x)]+\lambda\rho(x)\varphi(x)=0,\qquad \textrm{for }x\in [x_1,x_2]\]</div>
 <p>with general homogeneous boundary conditions defined as</p>
 <div class="math" id="equation-slbc1">
-<span class="eqno">(11)<a class="headerlink" href="#equation-slbc1" title="Permalink to this equation">¶</a></span>\[s_1\frac{d \varphi(x)}{dx} + k_1\varphi(x)  =  0,\qquad \textrm{at }x=x_1\]</div>
+<span class="eqno">(12)<a class="headerlink" href="#equation-slbc1" title="Permalink to this equation">¶</a></span>\[s_1\frac{d \varphi(x)}{dx} + k_1\varphi(x)  =  0,\qquad \textrm{at }x=x_1\]</div>
 <div class="math" id="equation-slbc2">
-<span class="eqno">(12)<a class="headerlink" href="#equation-slbc2" title="Permalink to this equation">¶</a></span>\[s_2\frac{d \varphi(x)}{dx} + k_2\varphi(x)  =  0,\qquad \textrm{at }x=x_2\]</div>
+<span class="eqno">(13)<a class="headerlink" href="#equation-slbc2" title="Permalink to this equation">¶</a></span>\[s_2\frac{d \varphi(x)}{dx} + k_2\varphi(x)  =  0,\qquad \textrm{at }x=x_2\]</div>
 <p>and initial condition</p>
 <div class="math" id="equation-sl2">
-<span class="eqno">(13)<a class="headerlink" href="#equation-sl2" title="Permalink to this equation">¶</a></span>\[\varphi_0(x) = T(x,0)\]</div>
+<span class="eqno">(14)<a class="headerlink" href="#equation-sl2" title="Permalink to this equation">¶</a></span>\[\varphi_0(x) = T(x,0)\]</div>
 <p>where</p>
 <div class="math">
 \[\mathcal{L}_{sl}[\varphi(x)]=\frac{d }{d x} \big(p(x)\frac{d\varphi(x)}{dx}\big)+q(x)\varphi(x)\]</div>
 <p>With <span class="math">\(p(x)=1\)</span>, <span class="math">\(q(x)=0\)</span>, and <span class="math">\(\rho(x)=1\)</span>, and where the <span class="math">\(s_i\)</span> and <span class="math">\(k_i\)</span> are constants that depends on the type of boundary conditions &#8211; see <a class="reference internal" href="#table-eigen"><span class="std std-ref">Table 1</span></a>.</p>
 <p>From the Sturm-Liouville theory, it can be demonstrated that the eigenvalues <span class="math">\(\lambda_n\)</span> of the homogeneous problem are real and positive. For <span class="math">\(\lambda_n&gt;0\)</span>, the eigenfunctions of equation <a class="reference internal" href="#equation-eigen1">(8)</a> have the form:</p>
 <div class="math" id="equation-general">
-<span class="eqno">(14)<a class="headerlink" href="#equation-general" title="Permalink to this equation">¶</a></span>\[\varphi_n(x) = A_n\cos(\sqrt{\lambda_n}x) + B_n\sin(\sqrt{\lambda_n}x)\]</div>
+<span class="eqno">(15)<a class="headerlink" href="#equation-general" title="Permalink to this equation">¶</a></span>\[\varphi_n(x) = A_n\cos(\sqrt{\lambda_n}x) + B_n\sin(\sqrt{\lambda_n}x)\]</div>
 <p>The Sturm-Liouville theory shows that, in general, there is an infinite set of eigenvalues <span class="math">\(\lambda_n\)</span> satisfying the given equation and the associated boundary conditions, and that these eigenvalues increase to infinity.</p>
-<p>Corresponding to these eigenvalues, there is an infinite set of orthogonal eigenfunctions <span class="math">\(\{\varphi_n(x)\}\)</span> so that the linear superposition principle can be applied to find the convergent infinite series solution of the given problem. Formally, the regular Sturm-Liouville system can be expanded in an absolutely and uniformly convergent series:</p>
+<p>Corresponding to these eigenvalues, there exist an infinite set of orthogonal eigenfunctions <span class="math">\(\{\varphi_n(x)\}\)</span> so that the linear superposition principle can be applied to find the convergent infinite series solution of the given problem. Formally, the regular Sturm-Liouville system can be expanded in an absolutely and uniformly convergent series:</p>
 <div class="math" id="equation-1dsol">
-<span class="eqno">(15)<a class="headerlink" href="#equation-1dsol" title="Permalink to this equation">¶</a></span>\[\varphi(x) = \sum_{n=1}^\infty a_n\varphi_n(x)\]</div>
+<span class="eqno">(16)<a class="headerlink" href="#equation-1dsol" title="Permalink to this equation">¶</a></span>\[\varphi(x) = \sum_{n=1}^\infty a_n\varphi_n(x)\]</div>
 <p>where the coefficients <span class="math">\(a_n\)</span> are defined using the properties of the regular Sturm-Liouville operator, i.e.</p>
 <ol class="arabic simple">
 <li>The eigenfunctions of the adjoint problem have the same eigenvalues as the original problem.</li>
 <li>Eigenfunctions corresponding to different eigenvalues are orthogonal.</li>
 </ol>
 <p>These properties giving:</p>
-<div class="math">
-\[a_n = \frac{1}{\int_{x_1}^{x_2} \varphi_n^2(\xi)d\xi}\int_{x_1}^{x_2} \varphi_n(\xi)\varphi(\xi)d\xi\]</div>
-<p>Where <span class="math">\(x_1\)</span> and <span class="math">\(x_2\)</span> are the location of the boundaries along the <span class="math">\(x\)</span>-axis, and where <span class="math">\(\xi\)</span> is the integration variable.</p>
-<p>For instance, if we substitute the initial condition <span class="math">\(\varphi_0(x)=T(x,0)\)</span> in equation <a class="reference internal" href="#equation-1dsol">(15)</a>, we get</p>
+<p>The coefficients <span class="math">\(a_n\)</span> are obtained using the inititial temperature distribution. If we substitute the initial condition <span class="math">\(\varphi_0(x)=T(x,0)\)</span> in equation <a class="reference internal" href="#equation-1dsol">(16)</a>, we get</p>
 <div class="math" id="equation-fourier0">
-<span class="eqno">(16)<a class="headerlink" href="#equation-fourier0" title="Permalink to this equation">¶</a></span>\[\varphi_0(x) = \sum_{n=1}^\infty a_n\varphi_n(x)\]</div>
-<p>If we multiply both side of equation <a class="reference internal" href="#equation-fourier0">(16)</a> by <span class="math">\(\sum_{n=1}^\infty \varphi_n(x)\)</span> we obtain</p>
+<span class="eqno">(17)<a class="headerlink" href="#equation-fourier0" title="Permalink to this equation">¶</a></span>\[\varphi_0(x) = \sum_{n=1}^\infty a_n\varphi_n(x)\]</div>
+<p>If we multiply both side of equation <a class="reference internal" href="#equation-fourier0">(17)</a> by <span class="math">\(\sum_{n=1}^\infty \varphi_n(x)\)</span> we obtain</p>
 <div class="math">
 \[\sum_{n=1}^\infty \varphi_n(x)\varphi_0(x) = \sum_{n=1}^\infty \varphi_n(x)\sum_{n=1}^\infty a_n \varphi_n(x)\]</div>
 <p>then, knowing that:</p>
@@ -155,32 +151,32 @@ boundary of the domain, <span class="math">\(k_i=0\)</span>.</p>
 1 &amp; \text{if } m = n,\\
 0 &amp; \text{if } m\neq n.
 \end{array} \right.\end{split}\]</div>
-<p>integrate on the interval <span class="math">\([x_1,x_2]\)</span></p>
+<p>and integrating on the interval <span class="math">\([x_1,x_2]\)</span></p>
 <div class="math">
 \[\begin{split}\begin{eqnarray}
 \int_{x_1}^{x_2}\sum_{n=1}^\infty \varphi_n(\xi)\varphi_0(\xi)d\xi &amp; = &amp; \int_{x_1}^{x_2}\sum_{n=1}^\infty \varphi_n(\xi)\sum_{n=1}^\infty a_n \varphi_n(\xi)d\xi\\
 \sum_{n=1}^\infty \int_{x_1}^{x_2} \varphi_n(\xi)\varphi_0(\xi)d\xi &amp; = &amp; \sum_{n=1}^\infty \int_{x_1}^{x_2}  a_n \varphi_n^2(\xi)d\xi
 \end{eqnarray}\end{split}\]</div>
 <p>the coefficients <span class="math">\(a_n\)</span> become</p>
-<div class="math">
-\[a_n = \frac{1}{||\varphi_n||^2}\int_{x_1}^{x_2} \varphi_n(\xi)\varphi_0(\xi)d\xi\]</div>
+<div class="math" id="equation-eqan">
+<span class="eqno">(18)<a class="headerlink" href="#equation-eqan" title="Permalink to this equation">¶</a></span>\[a_n = \frac{1}{||\varphi_n||^2}\int_{x_1}^{x_2} \varphi_n(\xi)\varphi_0(\xi)d\xi\]</div>
 <p>where</p>
 <div class="math">
 \[||\varphi_n||^2 = \int_{x_1}^{x_2} \varphi_n^2(\xi)d\xi\]</div>
 <p>where <span class="math">\(\xi\)</span> is a free parameter (integration variable).</p>
 <div class="section" id="eigenvalues-and-eigenfunctions">
 <h3>Eigenvalues and Eigenfunctions<a class="headerlink" href="#eigenvalues-and-eigenfunctions" title="Permalink to this headline">¶</a></h3>
-<p>The eigenvalues <span class="math">\(\lambda_n\)</span> and their associated eigenfunctions <span class="math">\(\varphi_n(x)\)</span> are obtained from the boundary conditions. <a class="reference internal" href="#table-eigen"><span class="std std-ref">Table 1</span></a> summarizes the eigenvalues and eigenfunctions for the different boundary conditions of the regular Sturm-Liouville boundary problems. The Section on <a class="reference internal" href="bcs.html#boundary-conditions"><span class="std std-ref">Boundary Conditions</span></a> shows how these expressions are obtained.</p>
+<p>The eigenvalues <span class="math">\(\lambda_n\)</span> and their associated eigenfunctions <span class="math">\(\varphi_n(x)\)</span> are obtained from the boundary conditions. <a class="reference internal" href="#table-eigen"><span class="std std-ref">Table 1</span></a> summarizes the eigenvalues and eigenfunctions for the different boundary conditions of the regular Sturm-Liouville boundary problems. The <a class="reference internal" href="bcs.html#boundary-conditions"><span class="std std-ref">Boundary Conditions</span></a> section shows how these expressions are obtained.</p>
 <table border="1" class="colwidths-given docutils" id="id1">
 <span id="table-eigen"></span><caption><span class="caption-text">Table 1: Eigenvalues and Eigenfunctions for Different Homogeneous Boundary Type.</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
 <colgroup>
-<col width="40%" />
-<col width="4%" />
-<col width="4%" />
-<col width="4%" />
-<col width="4%" />
-<col width="13%" />
-<col width="31%" />
+<col width="34%" />
+<col width="5%" />
+<col width="5%" />
+<col width="5%" />
+<col width="5%" />
+<col width="14%" />
+<col width="34%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Boundary Type</th>
@@ -193,7 +189,7 @@ boundary of the domain, <span class="math">\(k_i=0\)</span>.</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>Fisrt, Dirichlet</td>
+<tr class="row-even"><td>Temperature, Dirichlet</td>
 <td>1</td>
 <td>1</td>
 <td>0</td>
@@ -201,7 +197,7 @@ boundary of the domain, <span class="math">\(k_i=0\)</span>.</p>
 <td><span class="math">\(\frac{n\pi}{L}\)</span></td>
 <td><span class="math">\(\sin(\sqrt{\lambda_n}x)\)</span></td>
 </tr>
-<tr class="row-odd"><td>Second, Neumann</td>
+<tr class="row-odd"><td>Heat Flux, Neumann</td>
 <td>0</td>
 <td>0</td>
 <td>1</td>
@@ -209,7 +205,7 @@ boundary of the domain, <span class="math">\(k_i=0\)</span>.</p>
 <td><span class="math">\(\frac{n\pi}{L}\)</span></td>
 <td><span class="math">\(\cos(\sqrt{\lambda_n}x)\)</span></td>
 </tr>
-<tr class="row-even"><td>Third, Robin</td>
+<tr class="row-even"><td>Convection, Robin</td>
 <td>&lt;0</td>
 <td>&gt;0</td>
 <td>1</td>
@@ -239,34 +235,198 @@ boundary of the domain, <span class="math">\(k_i=0\)</span>.</p>
 </div>
 <div class="section" id="green-s-functions">
 <span id="greensfcts"></span><h2>Green&#8217;s Functions<a class="headerlink" href="#green-s-functions" title="Permalink to this headline">¶</a></h2>
+<p>From separation of variable, the homogeneous solution is:</p>
+<div class="math" id="equation-fullsol">
+<span class="eqno">(19)<a class="headerlink" href="#equation-fullsol" title="Permalink to this equation">¶</a></span>\[T(x,t) = \sum_{n=1}^\infty a_n\varphi_n(x)\psi_n(t)\]</div>
+<p>where the coefficients <span class="math">\(C_n\)</span> are set to unity such that <span class="math">\(\psi_n(0)=1\)</span> and the coefficients <span class="math">\(a_n\)</span> are given by <a class="reference internal" href="#equation-eqan">(18)</a>.</p>
 <p>The Green&#8217;s function <span class="math">\(G(x,\mathbf{\xi},t)\)</span> satisfy the homogeneous equation</p>
-<div class="math">
-\[\frac{\partial}{\partial t}G - \mathcal{L}_{x}[G] = 0\]</div>
-<p>with the inhomogeneous initial condition</p>
-<div class="math">
-\[G = \delta(x,\xi), \qquad \textrm{at }t=\tau\]</div>
+<div class="math" id="equation-eqG1">
+<span class="eqno">(20)<a class="headerlink" href="#equation-eqG1" title="Permalink to this equation">¶</a></span>\[\frac{\partial}{\partial t}G - \mathcal{L}_{x}[G] = 0\]</div>
+<p>with the nonhomogeneous initial condition (Dirac distribution)</p>
+<div class="math" id="equation-eqG2">
+<span class="eqno">(21)<a class="headerlink" href="#equation-eqG2" title="Permalink to this equation">¶</a></span>\[G = \delta(x,\xi), \qquad \textrm{at }t=\tau\]</div>
 <p>and homogeneous boundary conditions</p>
+<div class="math" id="equation-eqG3">
+<span class="eqno">(22)<a class="headerlink" href="#equation-eqG3" title="Permalink to this equation">¶</a></span>\[s_1\frac{\partial }{\partial x}G + k_1 G = 0, \qquad \textrm{at }x=x_1\]</div>
+<div class="math" id="equation-eqG4">
+<span class="eqno">(23)<a class="headerlink" href="#equation-eqG4" title="Permalink to this equation">¶</a></span>\[s_2\frac{\partial }{\partial x}G + k_2 G = 0, \qquad \textrm{at }x=x_2\]</div>
+<p>At <span class="math">\(t=0\)</span>, <span class="math">\(\psi_n=1\)</span>, and <span class="math">\(G=\delta(x,\xi)\)</span>, which means that:</p>
+<div class="math" id="equation-initsol">
+<span class="eqno">(24)<a class="headerlink" href="#equation-initsol" title="Permalink to this equation">¶</a></span>\[T(x,0) = \int_{x_1}^{x_2}G\varphi_0(\xi)d\xi = \varphi_0(x)\]</div>
+<p>using <a class="reference internal" href="#equation-fullsol">(19)</a> we have</p>
+<div class="math" id="equation-fullsol1">
+<span class="eqno">(25)<a class="headerlink" href="#equation-fullsol1" title="Permalink to this equation">¶</a></span>\[T(x,0) =  \sum_{n=1}^\infty a_n\varphi_n(x) = \sum_{n=1}^\infty \frac{\varphi_n(x)}{||\varphi_n||^2}\int_{x_1}^{x_2} \varphi_n(\xi)\varphi_0(\xi)d\xi\]</div>
+<p>Comparing <a class="reference internal" href="#equation-initsol">(24)</a> and  <a class="reference internal" href="#equation-fullsol1">(25)</a> we can see that</p>
 <div class="math">
-\[s_1\frac{\partial }{\partial x}G + k_1 G = 0, \qquad \textrm{at }x=x_1\]</div>
-<div class="math">
-\[s_2\frac{\partial }{\partial x}G + k_2 G = 0, \qquad \textrm{at }x=x_2\]</div>
-<p>From the <a class="reference external" href="https://en.wikipedia.org/wiki/Green's_identities">Green&#8217;s second identity</a> we have</p>
-<blockquote>
-<div><div class="math" id="equation-2identity">
-<span class="eqno">(17)<a class="headerlink" href="#equation-2identity" title="Permalink to this equation">¶</a></span>\[\int_\Omega \left(G(x, \xi)\nabla^2\varphi-\varphi(\xi)\nabla^2G\right)d\xi - \int_\Gamma \left(G(x,\xi)\frac{\partial}{\partial \mathbf{\hat{n}}}\varphi-\varphi(\xi)\frac{\partial}{\partial \mathbf{\hat{n}}}G\right)dx = 0\]</div>
-</div></blockquote>
-<p>with</p>
+\[G(x,\xi,0) = \sum_{n=1}^\infty \frac{\varphi_n(\xi)\varphi_n(x)}{||\varphi_n||^2}\]</div>
+<p>Using <a class="reference internal" href="#equation-eqG1">(20)</a> we can see that more generally</p>
 <div class="math">
 \[G(x,\xi,t) = \sum_{n=1}^\infty \frac{\varphi_n(\xi)\varphi_n(x)}{||\varphi_n||^2}\psi_n(t)\]</div>
-<p>and</p>
+</div>
+<div class="section" id="superposition">
+<h2>Superposition<a class="headerlink" href="#superposition" title="Permalink to this headline">¶</a></h2>
+<p>The final solution is obtained by splitting the problem in three, i.e.</p>
+<div class="math">
+\[T(x,t) = T_i(x, t)+T_s(x, t)+T_b(x, t)\]</div>
+<p><strong>Initial Contribution</strong></p>
+<p>The initial part <span class="math">\(T_i(x,t)\)</span> is defined by</p>
+<div class="math" id="equation-ti1">
+<span class="eqno">(26)<a class="headerlink" href="#equation-ti1" title="Permalink to this equation">¶</a></span>\[\frac{\partial}{\partial t}T_i(x,t)-\mathcal{L}_{x}[T_i(x,t)] = 0,\qquad \textrm{for }x\in \Omega\]</div>
+<p>with boundary conditions</p>
+<div class="math" id="equation-ti2">
+<span class="eqno">(27)<a class="headerlink" href="#equation-ti2" title="Permalink to this equation">¶</a></span>\[\mathcal{G}_{x}[T_i(x,t)] = 0,\qquad \textrm{for }x\in \Gamma\]</div>
+<p>and <em>nonhomogeneous</em> initial temperature distribution</p>
+<div class="math" id="equation-ti3">
+<span class="eqno">(28)<a class="headerlink" href="#equation-ti3" title="Permalink to this equation">¶</a></span>\[T_i(x,0)=T_0(x),\qquad \textrm{at }t=0.\]</div>
+<p>With</p>
 <div class="math">
 \[T_0(x) = \lim_{t\rightarrow \tau}\int_{x_1}^{x_2}T_0(\xi)G(x,\xi,t-\tau)d\xi\]</div>
 <p>we get</p>
+<div class="math">
+\[T_i(x,t) = \int_{x_1}^{x_2}G(x,\xi,t)T_0(\xi)d\xi\]</div>
+<p><strong>Source Contribution</strong></p>
+<p>The source part <span class="math">\(T_s(x,t)\)</span> is defined by</p>
+<div class="math" id="equation-ts1">
+<span class="eqno">(29)<a class="headerlink" href="#equation-ts1" title="Permalink to this equation">¶</a></span>\[\frac{\partial}{\partial t}T_s(x,t)-\mathcal{L}_{x}[T_s(x,t)] = \Phi(x,t),\qquad \textrm{for }x\in \Omega\]</div>
+<p>with boundary conditions</p>
+<div class="math" id="equation-ts2">
+<span class="eqno">(30)<a class="headerlink" href="#equation-ts2" title="Permalink to this equation">¶</a></span>\[\mathcal{G}_{x}[T_s(x,t)] = 0,\qquad \textrm{for }x\in \Gamma\]</div>
+<p>and initial temperature distribution</p>
+<div class="math" id="equation-ts3">
+<span class="eqno">(31)<a class="headerlink" href="#equation-ts3" title="Permalink to this equation">¶</a></span>\[T_s(x,0)=0,\qquad \textrm{at }t=0.\]</div>
+<p>With <a class="reference internal" href="#equation-eigen1">(8)</a> and <span class="math">\(T_{s,n}(x,t)=\varphi_n(x)\psi_n(t)\)</span> we have</p>
+<div class="math" id="equation-ts4">
+<span class="eqno">(32)<a class="headerlink" href="#equation-ts4" title="Permalink to this equation">¶</a></span>\[\sum_{n=1}^\infty\frac{\partial }{\partial t}T_{s,n}(x,t) +\alpha\lambda_n T_{s,n}(x,t) = \Phi(x,t)\]</div>
+<p>Multiplying both side of <a class="reference internal" href="#equation-ts4">(32)</a> by <span class="math">\(\exp(\alpha\lambda_n t)\)</span> we get</p>
+<div class="math" id="equation-ts5">
+<span class="eqno">(33)<a class="headerlink" href="#equation-ts5" title="Permalink to this equation">¶</a></span>\[\sum_{n=1}^\infty\frac{\partial }{\partial t}T_{s,n}(x,t)\exp(\alpha\lambda_n t) +\alpha\lambda_n T_{s,n}(x,t)\exp(\alpha\lambda_n t) = \Phi(x,t)\sum_{n=1}^\infty\exp(\alpha\lambda_n t)\]</div>
+<p>which is equivalent to:</p>
+<div class="math" id="equation-ts6">
+<span class="eqno">(34)<a class="headerlink" href="#equation-ts6" title="Permalink to this equation">¶</a></span>\[\sum_{n=1}^\infty\frac{\partial }{\partial t}\left(T_{s,n}(x,t)\exp(\alpha\lambda_n t)\right) = \Phi(x,t)\sum_{n=1}^\infty\exp(\alpha\lambda_n t)\]</div>
+<p>Integrating on both side of <a class="reference internal" href="#equation-ts6">(34)</a> gives</p>
+<div class="math" id="equation-ts7">
+<span class="eqno">(35)<a class="headerlink" href="#equation-ts7" title="Permalink to this equation">¶</a></span>\[\sum_{n=1}^\infty T_{s,n}(x,t)\exp(\alpha\lambda_n t) = \int_0^t\Phi(x,\tau)\sum_{n=1}^\infty\exp(\alpha\lambda_n \tau)d\tau\]</div>
+<p>or</p>
+<div class="math" id="equation-ts8">
+<span class="eqno">(36)<a class="headerlink" href="#equation-ts8" title="Permalink to this equation">¶</a></span>\[T_{s}(x,t) = \int_0^t\Phi(x,\tau)\sum_{n=1}^\infty\exp(-\alpha\lambda_n (t-\tau))d\tau\]</div>
+<p>At <span class="math">\(t=\tau\)</span> <span class="math">\(G=\delta(x,\xi)\)</span> and</p>
+<div class="math">
+\[\Phi(x,\tau)=\int_{x_1}^{x_2} G(x,\xi,0)\Phi(x,\tau)d\xi\]</div>
+<p>which gives</p>
+<div class="math">
+\[T_s(x,t) = \int_0^t G(x,\xi,0)\Phi(x,\tau)\sum_{n=1}^\infty\exp(-\alpha\lambda_n (t-\tau))d\xi d\tau\]</div>
+<p>or</p>
+<div class="math">
+\[T_s(x,t) = \int_0^t G(x,\xi,t-\tau)\Phi(x,\tau)d\xi d\tau\]</div>
+<p><strong>Boundary Contribution</strong></p>
+<p>The boundary part <span class="math">\(T_b(x,t)\)</span> is defined by</p>
+<div class="math" id="equation-tb1">
+<span class="eqno">(37)<a class="headerlink" href="#equation-tb1" title="Permalink to this equation">¶</a></span>\[\frac{\partial}{\partial t}T_b(x,t)-\mathcal{L}_{x}[T_b(x,t)] = 0,\qquad \textrm{for }x\in \Omega\]</div>
+<p>with boundary conditions</p>
+<div class="math" id="equation-tb2a">
+<span class="eqno">(38)<a class="headerlink" href="#equation-tb2a" title="Permalink to this equation">¶</a></span>\[s_1\frac{\partial }{\partial x}T_b(x,t) + k_1 T_b(x,t) = g_1, \qquad \textrm{at }x=x_1\]</div>
+<div class="math" id="equation-tb2b">
+<span class="eqno">(39)<a class="headerlink" href="#equation-tb2b" title="Permalink to this equation">¶</a></span>\[s_2\frac{\partial }{\partial x}T_b(x,t) + k_2 T_b(x,t) = g_2, \qquad \textrm{at }x=x_2\]</div>
+<p>and initial temperature distribution</p>
+<div class="math" id="equation-tb3">
+<span class="eqno">(40)<a class="headerlink" href="#equation-tb3" title="Permalink to this equation">¶</a></span>\[T_b(x,0)=0,\qquad \textrm{at }t=0.\]</div>
+<p>From <a class="reference internal" href="#equation-eqG1">(20)</a> we have</p>
+<div class="math" id="equation-tb4">
+<span class="eqno">(41)<a class="headerlink" href="#equation-tb4" title="Permalink to this equation">¶</a></span>\[\int_{x_1}^{x_2}T_b\left(\frac{\partial}{\partial \tau}G-\alpha\frac{\partial^2}{\partial \xi^2}G\right)d\xi = 0\]</div>
+<p>From the <a class="reference external" href="https://en.wikipedia.org/wiki/Green's_identities">Green&#8217;s second identity</a> we can see that</p>
+<blockquote>
+<div><div class="math" id="equation-2identity">
+<span class="eqno">(42)<a class="headerlink" href="#equation-2identity" title="Permalink to this equation">¶</a></span>\[\int_{x_1}^{x_2}\left(T_b\frac{\partial^2}{\partial \xi^2}G - G\frac{\partial^2}{\partial \xi^2}T_b\right)d\xi =\left[T_b\frac{\partial}{\partial \xi}G - G\frac{\partial}{\partial \xi}T_b\right]_{\xi=x_1}^{\xi=x_2}\]</div>
+</div></blockquote>
+<p>using <a class="reference internal" href="#equation-eqG1">(20)</a> we have</p>
+<div class="math" id="equation-tb5">
+<span class="eqno">(43)<a class="headerlink" href="#equation-tb5" title="Permalink to this equation">¶</a></span>\[\frac{\partial^2}{\partial \xi^2}G = \frac{1}{\alpha}\frac{\partial}{\partial t}G\]</div>
+<p>Substituting <a class="reference internal" href="#equation-tb5">(43)</a> in <a class="reference internal" href="#equation-2identity">(42)</a> we get</p>
+<blockquote>
+<div><div class="math" id="equation-tb6">
+<span class="eqno">(44)<a class="headerlink" href="#equation-tb6" title="Permalink to this equation">¶</a></span>\[\int_{x_1}^{x_2}\left(T_b\frac{1}{\alpha}\frac{\partial}{\partial t}G - G\frac{\partial^2}{\partial \xi^2}T_b\right)d\xi =\left[T_b\frac{\partial}{\partial \xi}G - G\frac{\partial}{\partial \xi}T_b\right]_{\xi=x_1}^{\xi=x_2}\]</div>
+</div></blockquote>
+<p>or multiplying by <span class="math">\(\alpha\)</span> on both side of <a class="reference internal" href="#equation-tb6">(44)</a></p>
+<blockquote>
+<div><div class="math" id="equation-tb7">
+<span class="eqno">(45)<a class="headerlink" href="#equation-tb7" title="Permalink to this equation">¶</a></span>\[\int_{x_1}^{x_2}\left(T_b\frac{\partial}{\partial t}G - \alpha G\frac{\partial^2}{\partial \xi^2}T_b\right)d\xi =\alpha\left[T_b\frac{\partial}{\partial \xi}G - G\frac{\partial}{\partial \xi}T_b\right]_{\xi=x_1}^{\xi=x_2}\]</div>
+</div></blockquote>
+<p>Using <a class="reference internal" href="#equation-tb1">(37)</a>, and integrating both side of <a class="reference internal" href="#equation-tb7">(45)</a> over <span class="math">\(\tau\)</span> gives</p>
+<blockquote>
+<div><div class="math" id="equation-tb8">
+<span class="eqno">(46)<a class="headerlink" href="#equation-tb8" title="Permalink to this equation">¶</a></span>\[\int_0^t\int_{x_1}^{x_2}\left(T_b\frac{\partial}{\partial \tau}G + G\frac{\partial}{\partial \tau}T_b\right)d\xi d\tau=\alpha\int_0^t\left[T_b\frac{\partial}{\partial \xi}G - G\frac{\partial}{\partial \xi}T_b\right]_{\xi=x_1}^{\xi=x_2}d\tau\]</div>
+</div></blockquote>
+<p><strong>Solution</strong></p>
+<p>Combining all these terms gives:</p>
 <blockquote>
 <div><div class="math" id="equation-final">
-<span class="eqno">(18)<a class="headerlink" href="#equation-final" title="Permalink to this equation">¶</a></span>\[\begin{split}T(x,t) = \int_{x_1}^{x_2} T_0(\xi)G(x,\xi,t)d\xi +\\ \int_0^t \int_{x_1}^{x_2} \Phi(\xi,t-\tau)G(x,\xi,t-\tau) d\xi d\tau +\\ \alpha\int_0^t \int_{x_1}^{x_2} g_1(\xi,t-\tau)\Lambda_1(x,\xi,t,\tau)d\xi d\tau +\\ \alpha\int_0^t \int_{x_1}^{x_2} g_2(\xi,t-\tau)\Lambda_2(x,\xi,t,\tau)d\xi d\tau\end{split}\]</div>
+<span class="eqno">(47)<a class="headerlink" href="#equation-final" title="Permalink to this equation">¶</a></span>\[\begin{split}T(x,t) = \int_{x_1}^{x_2} T_0(\xi)G(x,\xi,t)d\xi +\\ \int_0^t \int_{x_1}^{x_2} \Phi(\xi,t-\tau)G(x,\xi,t-\tau) d\xi d\tau +\\ \alpha\int_0^t  g_1(\xi,t-\tau)\Lambda_1(x,\xi,t,\tau) d\tau +\\ \alpha\int_0^t  g_2(\xi,t-\tau)\Lambda_2(x,\xi,t,\tau) d\tau\end{split}\]</div>
 </div></blockquote>
-<p>Where <span class="math">\(\Lambda_i\)</span> is a function defined by the boundary conditions. &#8211; See [Polyanin2001].</p>
+<p>Where <span class="math">\(\Lambda_i\)</span> is a function defined by the boundary conditions.</p>
+<table border="1" class="colwidths-given docutils" id="id2">
+<span id="table-lambda"></span><caption><span class="caption-text">Table 2: <span class="math">\(\Lambda_i\)</span> for Different Homogeneous Boundary Type.</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col width="37%" />
+<col width="5%" />
+<col width="5%" />
+<col width="5%" />
+<col width="5%" />
+<col width="22%" />
+<col width="22%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Boundary Type</th>
+<th class="head"><span class="math">\(k_1\)</span></th>
+<th class="head"><span class="math">\(k_2\)</span></th>
+<th class="head"><span class="math">\(s_1\)</span></th>
+<th class="head"><span class="math">\(s_2\)</span></th>
+<th class="head"><span class="math">\(\Lambda_1,~x=x_1\)</span></th>
+<th class="head"><span class="math">\(\Lambda_2,~x=x_2\)</span></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Temperature, Dirichlet</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td><span class="math">\(\frac{\partial}{\partial \xi}G(x,\xi,t-\tau)\)</span></td>
+<td><span class="math">\(-\frac{\partial}{\partial \xi}G(x,\xi,t-\tau)\)</span></td>
+</tr>
+<tr class="row-odd"><td>Heat Flux, Neumann</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td><span class="math">\(-G(x,\xi,t-\tau)\)</span></td>
+<td><span class="math">\(G(x,\xi,t-\tau)\)</span></td>
+</tr>
+<tr class="row-even"><td>Convection, Robin</td>
+<td>&lt;0</td>
+<td>&gt;0</td>
+<td>1</td>
+<td>1</td>
+<td><span class="math">\(-G(x,\xi,t-\tau)\)</span></td>
+<td><span class="math">\(G(x,\xi,t-\tau)\)</span></td>
+</tr>
+<tr class="row-odd"><td>Mixed I</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td><span class="math">\(\frac{\partial}{\partial \xi}G(x,\xi,t-\tau)\)</span></td>
+<td><span class="math">\(G(x,\xi,t-\tau)\)</span></td>
+</tr>
+<tr class="row-even"><td>Mixed II</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td><span class="math">\(-G(x,\xi,t-\tau)\)</span></td>
+<td><span class="math">\(-\frac{\partial}{\partial \xi}G(x,\xi,t-\tau)\)</span></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
@@ -304,6 +464,7 @@ boundary of the domain, <span class="math">\(k_i=0\)</span>.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#green-s-functions">Green&#8217;s Functions</a></li>
+<li><a class="reference internal" href="#superposition">Superposition</a></li>
 <li><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>

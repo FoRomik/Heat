@@ -55,16 +55,16 @@
 <div class="section" id="convection-robin">
 <h2>Convection (Robin)<a class="headerlink" href="#convection-robin" title="Permalink to this headline">¶</a></h2>
 <p>The Robin problem has a more complicated solution than the other boundary value problems since the eigenvalues can&#8217;t be expressed in a closed-form.</p>
-<p>From equation <a class="reference internal" href="theory.html#equation-sl1">(10)</a>, we get</p>
+<p>From equation <a class="reference internal" href="theory.html#equation-sl1">(11)</a>, we get</p>
 <div class="math">
 \[\frac{\partial^2 \varphi(x)}{\partial x^2} + \lambda \varphi(x)  =  0\]</div>
-<p>The Robin conditions are generally expressed substituing <span class="math">\(s_1=s_2=1\)</span>, <span class="math">\(k_1&lt;0\)</span>, and <span class="math">\(k_2&gt;0\)</span> in equations <a class="reference internal" href="theory.html#equation-slbc1">(11)</a> and <a class="reference internal" href="theory.html#equation-slbc2">(12)</a>. If, for simplicity, we choose <span class="math">\(x_1=0\)</span> and <span class="math">\(x_2=L\)</span> we get:</p>
+<p>The Robin conditions are generally expressed substituing <span class="math">\(s_1=s_2=1\)</span>, <span class="math">\(k_1&lt;0\)</span>, and <span class="math">\(k_2&gt;0\)</span> in equations <a class="reference internal" href="theory.html#equation-slbc1">(12)</a> and <a class="reference internal" href="theory.html#equation-slbc2">(13)</a>. If, for simplicity, we choose <span class="math">\(x_1=0\)</span> and <span class="math">\(x_2=L\)</span> we get:</p>
 <div class="math">
 \[\begin{split}\begin{eqnarray}
 \frac{d \varphi(x)}{dx} - k_1'\varphi(x) &amp; = &amp; 0,\qquad \textrm{at }x=0\\
 \frac{d \varphi(x)}{dx} + k_2\varphi(x) &amp; = &amp; 0,\qquad \textrm{at }x=L
 \end{eqnarray}\end{split}\]</div>
-<p>Where <span class="math">\(k_1'=|k_1|\)</span>. From <a class="reference internal" href="theory.html#equation-general">(14)</a> and the boundary conditions we get</p>
+<p>Where <span class="math">\(k_1'=|k_1|\)</span>. From <a class="reference internal" href="theory.html#equation-general">(15)</a> and the boundary conditions we get</p>
 <div class="math">
 \[\frac{\partial \varphi_n(x)}{\partial x} = \sqrt{\lambda_n}\Big(B_n\cos(\sqrt{\lambda_n}x) - A_n\sin(\sqrt{\lambda_n}x)\Big)\]</div>
 <p>At <span class="math">\(x=0\)</span> we have</p>
@@ -73,7 +73,7 @@
 k_1'\varphi_n(0) &amp; = &amp; \frac{\partial \varphi_n(x)}{\partial x}\Big|_{x=0}\\
 k_1'A_n &amp; = &amp; \sqrt{\lambda_n}B_n
 \end{eqnarray}\end{split}\]</div>
-<p>and equation <a class="reference internal" href="theory.html#equation-general">(14)</a> becomes:</p>
+<p>and equation <a class="reference internal" href="theory.html#equation-general">(15)</a> becomes:</p>
 <div class="math">
 \[\varphi_n(x) = \Big(\frac{k_1'}{\sqrt{\lambda_n}}\cos(\sqrt{\lambda_n}x) + \sin(\sqrt{\lambda_n}x)\Big)B_n\]</div>
 <p>Similarly, using the boundary conditions at <span class="math">\(x=L\)</span> we get</p>
